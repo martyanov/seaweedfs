@@ -191,6 +191,3 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
-
-// replace github.com/seaweedfs/fuse => /Users/chrislu/go/src/github.com/seaweedfs/fuse
-// replace github.com/chrislusf/raft => /Users/chrislu/go/src/github.com/chrislusf/raft
