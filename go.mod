@@ -72,7 +72,6 @@ require (
 	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
 	github.com/kurin/blazer v0.5.3
 	github.com/lib/pq v1.10.0
-	github.com/linxGnu/grocksdb v1.6.38
 	github.com/magiconair/properties v1.8.1 // indirect
 	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/mattn/go-ieproxy v0.0.1 // indirect

@@ -29,12 +29,6 @@ dir = "./filerldb2"                    # directory to store level db files
 enabled = false
 dir = "./filerldb3"                    # directory to store level db files
 
-[rocksdb]
-# local on disk, similar to leveldb
-# since it is using a C wrapper, you need to install rocksdb and build it by yourself
-enabled = false
-dir = "./filerrdb"                    # directory to store rocksdb files
-
 [sqlite]
 # local on disk, similar to leveldb
 enabled = false
