@@ -1,15 +1,9 @@
 package util
 
-import (
-	"fmt"
-)
-
 var (
-	VERSION_NUMBER = fmt.Sprintf("%.02f", 3.19)
-	VERSION        = sizeLimit + " " + VERSION_NUMBER
-	COMMIT         = ""
+	VERSION = "dev"
 )
 
 func Version() string {
-	return VERSION + " " + COMMIT
+	return VERSION
 }

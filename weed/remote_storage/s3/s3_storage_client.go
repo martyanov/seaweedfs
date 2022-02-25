@@ -2,6 +2,9 @@ package s3
 
 import (
 	"fmt"
+	"io"
+	"reflect"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/request"
@@ -15,8 +18,6 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/pb/remote_pb"
 	"github.com/seaweedfs/seaweedfs/weed/remote_storage"
 	"github.com/seaweedfs/seaweedfs/weed/util"
-	"io"
-	"reflect"
 )
 
 func init() {
@@ -52,7 +53,7 @@ func (s s3RemoteStorageMaker) Make(conf *remote_pb.RemoteConf) (remote_storage.R
 		sess.Handlers.Sign.PushBackNamed(v4.SignRequestHandler)
 	}
 	sess.Handlers.Build.PushBack(func(r *request.Request) {
-		r.HTTPRequest.Header.Set("User-Agent", "SeaweedFS/"+util.VERSION_NUMBER)
+		r.HTTPRequest.Header.Set("User-Agent", "SeaweedFS/"+util.Version())
 	})
 	sess.Handlers.Build.PushFront(skipSha256PayloadSigning)
 	client.conn = s3.New(sess)

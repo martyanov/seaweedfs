@@ -19,6 +19,6 @@ func runVersion(cmd *Command, args []string) bool {
 		cmd.Usage()
 	}
 
-	fmt.Printf("version %s %s %s\n", util.Version(), runtime.GOOS, runtime.GOARCH)
+	fmt.Printf("SeaweedFS version %s %s/%s\n", util.Version(), runtime.GOOS, runtime.GOARCH)
 	return true
 }
