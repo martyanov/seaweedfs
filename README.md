@@ -6,14 +6,6 @@
 
 NOTE: This is a fork of SeaweedFS with very opiniated defaults and limited set of features, probably you are looking for the vanilla [SeaweedFS](https://github.com/chrislusf/seaweedfs).
 
----
-
-- [Download Binaries for different platforms](https://github.com/chrislusf/seaweedfs/releases/latest)
-- [Wiki Documentation](https://github.com/chrislusf/martyanov/wiki)
-- [SeaweedFS White Paper](https://github.com/chrislusf/seaweedfs/wiki/SeaweedFS_Architecture.pdf)
-- [SeaweedFS Introduction Slides 2021.5](https://docs.google.com/presentation/d/1DcxKWlINc-HNCjhYeERkpGXXm6nTCES8mi2W5G0Z4Ts/edit?usp=sharing)
-- [SeaweedFS Introduction Slides 2019.3](https://www.slideshare.net/chrislusf/seaweedfs-introduction)
-
 Table of Contents
 =================
 
@@ -24,6 +16,7 @@ Table of Contents
 * [Features](#features)
     * [Additional Features](#additional-features)
     * [Filer Features](#filer-features)
+* [Resources](#resources)
 * [Example: Using Seaweed Object Store](#example-Using-Seaweed-Object-Store)
 * [Architecture](#architecture)
 * [Compared to Other File Systems](#compared-to-other-file-systems)
@@ -142,6 +135,14 @@ Faster and Cheaper than direct cloud storage!
 [CloudDrive]: https://github.com/chrislusf/seaweedfs/wiki/Cloud-Drive-Architecture
 [GatewayToRemoteObjectStore]: https://github.com/chrislusf/seaweedfs/wiki/Gateway-to-Remote-Object-Storage
 
+[Back to TOC](#table-of-contents)
+
+## Resources  ##
+
+* [Documentation](https://github.com/martyanov/seaweedfs/wiki)
+* [SeaweedFS White Paper](https://github.com/chrislusf/seaweedfs/wiki/SeaweedFS_Architecture.pdf)
+* [SeaweedFS Introduction Slides 2021.5](https://docs.google.com/presentation/d/1DcxKWlINc-HNCjhYeERkpGXXm6nTCES8mi2W5G0Z4Ts/edit?usp=sharing)
+* [SeaweedFS Introduction Slides 2019.3](https://www.slideshare.net/chrislusf/seaweedfs-introduction)
 
 [Back to TOC](#table-of-contents)
 
