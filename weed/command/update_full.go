@@ -1,5 +1,5 @@
-//go:build elastic && gocdk
-// +build elastic,gocdk
+//go:build gocdk
+// +build gocdk
 
 package command
 

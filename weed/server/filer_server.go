@@ -13,7 +13,6 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/filer"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/arangodb"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/cassandra"
-	_ "github.com/seaweedfs/seaweedfs/weed/filer/elastic/v7"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/etcd"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/hbase"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/leveldb"

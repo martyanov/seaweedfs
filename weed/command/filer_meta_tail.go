@@ -2,13 +2,13 @@ package command
 
 import (
 	"fmt"
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/security"
 	"github.com/seaweedfs/seaweedfs/weed/util"
@@ -28,8 +28,6 @@ var cmdFilerMetaTail = &Command{
 	weed filer.meta.tail -timeAgo=30h -untilTimeAgo=20h | jq .
 	weed filer.meta.tail -timeAgo=30h | jq .eventNotification.newEntry.name
 
-	weed filer.meta.tail -timeAgo=30h -es=http://<elasticSearchServerHost>:<port> -es.index=seaweedfs
-
   `,
 }
 
@@ -39,8 +37,6 @@ var (
 	tailStart   = cmdFilerMetaTail.Flag.Duration("timeAgo", 0, "start time before now. \"300ms\", \"1.5h\" or \"2h45m\". Valid time units are \"ns\", \"us\" (or \"µs\"), \"ms\", \"s\", \"m\", \"h\"")
 	tailStop    = cmdFilerMetaTail.Flag.Duration("untilTimeAgo", 0, "read until this time ago. \"300ms\", \"1.5h\" or \"2h45m\". Valid time units are \"ns\", \"us\" (or \"µs\"), \"ms\", \"s\", \"m\", \"h\"")
 	tailPattern = cmdFilerMetaTail.Flag.String("pattern", "", "full path or just filename pattern, ex: \"/home/?opher\", \"*.pdf\", see https://golang.org/pkg/path/filepath/#Match ")
-	esServers   = cmdFilerMetaTail.Flag.String("es", "", "comma-separated elastic servers http://<host:port>")
-	esIndex     = cmdFilerMetaTail.Flag.String("es.index", "seaweedfs", "ES index name")
 )
 
 func runFilerMetaTail(cmd *Command, args []string) bool {
@@ -95,14 +91,6 @@ func runFilerMetaTail(cmd *Command, args []string) bool {
 		jsonpbMarshaler.Marshal(os.Stdout, resp)
 		fmt.Fprintln(os.Stdout)
 		return nil
-	}
-	if *esServers != "" {
-		var err error
-		eachEntryFunc, err = sendToElasticSearchFunc(*esServers, *esIndex)
-		if err != nil {
-			fmt.Printf("create elastic search client to %s: %+v\n", *esServers, err)
-			return false
-		}
 	}
 
 	var untilTsNs int64

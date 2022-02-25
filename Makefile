@@ -8,7 +8,7 @@ install:
 	cd weed; go install
 
 full_install:
-	cd weed; go install -tags "elastic gocdk"
+	cd weed; go install -tags "gocdk"
 
 tests:
-	cd weed; go test -tags "elastic gocdk" -v ./...
+	cd weed; go test -tags "gocdk" -v ./...
