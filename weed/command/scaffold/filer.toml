@@ -148,11 +148,6 @@ readOnly = false
 # automatically use the closest Redis server for reads
 routeByLatency = false
 
-[etcd]
-enabled = false
-servers = "localhost:2379"
-timeout = "3s"
-
 ##########################
 ##########################
 # To add path-specific filer store:
