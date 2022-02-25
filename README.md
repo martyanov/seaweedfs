@@ -62,7 +62,7 @@ Also, SeaweedFS implements erasure coding with ideas from
 
 On top of the object store, optional [Filer] can support directories and POSIX attributes.
 Filer is a separate linearly-scalable stateless server with customizable metadata stores,
-e.g. Redis, Cassandra, HBase, LevelDB, MemSql, Etcd, CockroachDB, etc.
+e.g. Redis, Cassandra, LevelDB, MemSql, Etcd, CockroachDB, etc.
 
 For any distributed key value stores, the large values can be offloaded to SeaweedFS.
 With the fast access speed and linearly scalable capacity,
@@ -95,13 +95,13 @@ Faster and Cheaper than direct cloud storage!
 [Back to TOC](#table-of-contents)
 
 ## Filer Features ##
+
 * [Filer server][Filer] provides "normal" directories and files via http.
 * [File TTL][FilerTTL] automatically expires file metadata and actual file data.
 * [Mount filer][Mount] reads and writes files directly as a local directory via FUSE.
 * [Filer Store Replication][FilerStoreReplication] enables HA for filer meta data stores.
 * [Active-Active Replication][ActiveActiveAsyncReplication] enables asynchronous one-way or two-way cross cluster continuous replication.
 * [Amazon S3 compatible API][AmazonS3API] accesses files with S3 tooling.
-* [Hadoop Compatible File System][Hadoop] accesses files from Hadoop/Spark/Flink/etc or even runs HBase.
 * [Async Replication To Cloud][BackupToCloud] has extremely fast local access and backups to Amazon S3, Google Cloud Storage, Azure, BackBlaze.
 * [WebDAV] accesses as a mapped drive on Mac and Windows, or from mobile devices.
 * [AES256-GCM Encrypted Storage][FilerDataEncryption] safely stores the encrypted data.
@@ -114,7 +114,6 @@ Faster and Cheaper than direct cloud storage!
 [Mount]: https://github.com/martyanov/seaweedfs/wiki/FUSE-Mount
 [AmazonS3API]: https://github.com/martyanov/seaweedfs/wiki/Amazon-S3-API
 [BackupToCloud]: https://github.com/martyanov/seaweedfs/wiki/Async-Replication-to-Cloud
-[Hadoop]: https://github.com/martyanov/seaweedfs/wiki/Hadoop-Compatible-File-System
 [WebDAV]: https://github.com/martyanov/seaweedfs/wiki/WebDAV
 [ErasureCoding]: https://github.com/martyanov/seaweedfs/wiki/Erasure-coding-for-warm-storage
 [TieredStorage]: https://github.com/martyanov/seaweedfs/wiki/Tiered-Storage
