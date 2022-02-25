@@ -21,7 +21,6 @@ import (
 	_ "github.com/chrislusf/seaweedfs/weed/filer/leveldb"
 	_ "github.com/chrislusf/seaweedfs/weed/filer/leveldb2"
 	_ "github.com/chrislusf/seaweedfs/weed/filer/leveldb3"
-	_ "github.com/chrislusf/seaweedfs/weed/filer/mongodb"
 	_ "github.com/chrislusf/seaweedfs/weed/filer/redis"
 	_ "github.com/chrislusf/seaweedfs/weed/filer/redis2"
 	_ "github.com/chrislusf/seaweedfs/weed/filer/redis3"

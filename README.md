@@ -52,7 +52,7 @@ Also, SeaweedFS implements erasure coding with ideas from
 
 On top of the object store, optional [Filer] can support directories and POSIX attributes.
 Filer is a separate linearly-scalable stateless server with customizable metadata stores,
-e.g. Redis, Cassandra, HBase, Mongodb, Elastic Search, LevelDB, MemSql, TiDB, Etcd, CockroachDB, etc.
+e.g. Redis, Cassandra, HBase, LevelDB, MemSql, TiDB, Etcd, etc.
 
 For any distributed key value stores, the large values can be offloaded to SeaweedFS.
 With the fast access speed and linearly scalable capacity,

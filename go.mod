@@ -37,7 +37,6 @@ require (
 	github.com/go-errors/errors v1.1.1 // indirect
 	github.com/go-redis/redis/v8 v8.4.4
 	github.com/go-redsync/redsync/v4 v4.4.1
-	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/go-zookeeper/zk v1.0.2 // indirect
 	github.com/gocql/gocql v0.0.0-20210707082121-9a3953d1826d
 	github.com/golang-jwt/jwt v3.2.1+incompatible
@@ -62,7 +61,6 @@ require (
 	github.com/jinzhu/copier v0.2.8
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/karlseguin/ccache/v2 v2.0.7
-	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/klauspost/cpuid v1.2.1 // indirect
 	github.com/klauspost/reedsolomon v1.9.2
 	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
@@ -108,12 +106,7 @@ require (
 	github.com/viant/assertly v0.5.4 // indirect
 	github.com/viant/ptrie v0.3.0
 	github.com/viant/toolbox v0.33.2 // indirect
-	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
-	github.com/xdg-go/scram v1.0.2 // indirect
-	github.com/xdg-go/stringprep v1.0.2 // indirect
-	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
 	go.etcd.io/etcd/client/v3 v3.5.0
-	go.mongodb.org/mongo-driver v1.8.0
 	go.opencensus.io v0.23.0 // indirect
 	go.opentelemetry.io/otel v0.15.0 // indirect
 	gocloud.dev v0.20.0
