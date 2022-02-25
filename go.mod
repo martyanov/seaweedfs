@@ -62,7 +62,6 @@ require (
 	github.com/jcmturner/gokrb5/v8 v8.4.1
 	github.com/jinzhu/copier v0.2.8
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	github.com/json-iterator/go v1.1.11
 	github.com/karlseguin/ccache/v2 v2.0.7
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/klauspost/cpuid v1.2.1 // indirect
@@ -70,17 +69,13 @@ require (
 	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
 	github.com/kurin/blazer v0.5.3
 	github.com/magiconair/properties v1.8.1 // indirect
-	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/mattn/go-ieproxy v0.0.1 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
-	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
-	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/nats-io/jwt v1.0.1 // indirect
 	github.com/nats-io/nats.go v1.10.0 // indirect
 	github.com/nats-io/nkeys v0.2.0 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
-	github.com/olivere/elastic/v7 v7.0.19
 	github.com/pelletier/go-toml v1.7.0 // indirect
 	github.com/peterh/liner v1.1.0
 	github.com/pierrec/lz4 v2.2.7+incompatible // indirect
