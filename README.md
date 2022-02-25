@@ -1,6 +1,6 @@
 # SeaweedFS
 
-[![Build Status](https://img.shields.io/github/workflow/status/martyanov/seaweedfs/Go)](https://github.com/martyanov/seaweedfs/actions/workflows/go.yml)
+![Build Status](https://img.shields.io/github/workflow/status/martyanov/seaweedfs/Go)](https://github.com/martyanov/seaweedfs/actions/workflows/go.yml)
 [![GoDoc](https://godoc.org/github.com/chrislusf/seaweedfs/weed?status.svg)](https://godoc.org/github.com/chrislusf/seaweedfs/weed)
 [![Wiki](https://img.shields.io/badge/docs-wiki-blue.svg)](https://github.com/martyanov/seaweedfs/wiki)
 
@@ -10,9 +10,6 @@ Table of Contents
 =================
 
 * [Quick Start](#quick-start)
-    * [Quick Start for S3 API on Docker](#quick-start-for-s3-api-on-docker)
-    * [Quick Start with Single Binary](#quick-start-with-single-binary)
-    * [Quick Start SeaweedFS S3 on AWS](#quick-start-seaweedfs-s3-on-aws)
 * [Introduction](#introduction)
 * [Features](#features)
     * [Additional Features](#additional-features)
@@ -31,14 +28,10 @@ Table of Contents
 * [Benchmark](#Benchmark)
 * [License](#license)
 
+## Quick Start ##
 
-## Quick Start for S3 API on Docker ##
-
-`docker run -p 8333:8333 chrislusf/seaweedfs server -s3`
-
-## Quick Start with Single Binary ##
-* Download the latest binary from https://github.com/martyanov/seaweedfs/releases and unzip a single binary file `weed` or `weed.exe`
-* Run `weed server -dir=/some/data/dir -s3` to start one master, one volume server, one filer, and one S3 gateway.
+* Download the latest binary from https://github.com/martyanov/seaweedfs/releases and unzip a single binary file
+* Run `weed server -dir=/some/data/dir -s3` to start one master, one volume server, one filer, and one S3 gateway
 
 Also, to increase capacity, just add more volume servers by running `weed volume -dir="/some/data/dir2" -mserver="<master_host>:9333" -port=8081` locally, or on a different machine, or on thousands of machines. That is it!
 
