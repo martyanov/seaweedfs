@@ -3,11 +3,12 @@ package weed_server
 import (
 	"context"
 	"fmt"
-	"github.com/chrislusf/seaweedfs/weed/pb/filer_pb"
 	"net/http"
 	"os"
 	"sync"
 	"time"
+
+	"github.com/chrislusf/seaweedfs/weed/pb/filer_pb"
 
 	"github.com/chrislusf/seaweedfs/weed/stats"
 
@@ -29,14 +30,9 @@ import (
 	_ "github.com/chrislusf/seaweedfs/weed/filer/leveldb2"
 	_ "github.com/chrislusf/seaweedfs/weed/filer/leveldb3"
 	_ "github.com/chrislusf/seaweedfs/weed/filer/mongodb"
-	_ "github.com/chrislusf/seaweedfs/weed/filer/mysql"
-	_ "github.com/chrislusf/seaweedfs/weed/filer/mysql2"
-	_ "github.com/chrislusf/seaweedfs/weed/filer/postgres"
-	_ "github.com/chrislusf/seaweedfs/weed/filer/postgres2"
 	_ "github.com/chrislusf/seaweedfs/weed/filer/redis"
 	_ "github.com/chrislusf/seaweedfs/weed/filer/redis2"
 	_ "github.com/chrislusf/seaweedfs/weed/filer/redis3"
-	_ "github.com/chrislusf/seaweedfs/weed/filer/sqlite"
 	"github.com/chrislusf/seaweedfs/weed/glog"
 	"github.com/chrislusf/seaweedfs/weed/notification"
 	_ "github.com/chrislusf/seaweedfs/weed/notification/aws_sqs"

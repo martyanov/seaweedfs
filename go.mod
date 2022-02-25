@@ -38,7 +38,6 @@ require (
 	github.com/go-errors/errors v1.1.1 // indirect
 	github.com/go-redis/redis/v8 v8.4.4
 	github.com/go-redsync/redsync/v4 v4.4.1
-	github.com/go-sql-driver/mysql v1.5.0
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/go-zookeeper/zk v1.0.2 // indirect
 	github.com/gocql/gocql v0.0.0-20210707082121-9a3953d1826d
@@ -65,17 +64,14 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/json-iterator/go v1.1.11
 	github.com/karlseguin/ccache/v2 v2.0.7
-	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/klauspost/cpuid v1.2.1 // indirect
 	github.com/klauspost/reedsolomon v1.9.2
 	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
 	github.com/kurin/blazer v0.5.3
-	github.com/lib/pq v1.10.0
 	github.com/magiconair/properties v1.8.1 // indirect
 	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/mattn/go-ieproxy v0.0.1 // indirect
-	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
@@ -97,7 +93,6 @@ require (
 	github.com/prometheus/common v0.26.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563 // indirect
-	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/seaweedfs/fuse v1.2.2
 	github.com/seaweedfs/goexif v1.0.2
 	github.com/sirupsen/logrus v1.6.0 // indirect
@@ -150,15 +145,7 @@ require (
 	gopkg.in/jcmturner/gokrb5.v7 v7.3.0 // indirect
 	gopkg.in/jcmturner/rpc.v1 v1.1.0 // indirect
 	modernc.org/b v1.0.0 // indirect
-	modernc.org/cc/v3 v3.33.5 // indirect
-	modernc.org/ccgo/v3 v3.9.4 // indirect
-	modernc.org/libc v1.9.5 // indirect
 	modernc.org/mathutil v1.2.2 // indirect
-	modernc.org/memory v1.0.4 // indirect
-	modernc.org/opt v0.1.1 // indirect
-	modernc.org/sqlite v1.10.7
-	modernc.org/strutil v1.1.0 // indirect
-	modernc.org/token v1.0.0 // indirect
 )
 
 require (
@@ -176,7 +163,6 @@ require (
 	github.com/jcmturner/goidentity/v6 v6.0.1 // indirect
 	github.com/jcmturner/rpc/v2 v2.0.2 // indirect
 	github.com/mattn/go-runewidth v0.0.7 // indirect
-	github.com/mattn/go-sqlite3 v2.0.1+incompatible // indirect
 	github.com/philhofer/fwd v1.1.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tinylib/msgp v1.1.6 // indirect
@@ -185,7 +171,6 @@ require (
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.17.0 // indirect
-	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
