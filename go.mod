@@ -230,5 +230,3 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	lukechampine.com/uint128 v1.1.1 // indirect
 )
-
-// replace github.com/seaweedfs/raft => /Users/chrislu/go/src/github.com/seaweedfs/raft
