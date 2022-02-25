@@ -8,17 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/seaweedfs/seaweedfs/weed/stats"
-
 	"google.golang.org/grpc"
-
-	"github.com/seaweedfs/seaweedfs/weed/util/grace"
-
-	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-	"github.com/seaweedfs/seaweedfs/weed/util"
 
 	"github.com/seaweedfs/seaweedfs/weed/filer"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/arangodb"
@@ -30,15 +20,9 @@ import (
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/leveldb2"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/leveldb3"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/mongodb"
-	_ "github.com/seaweedfs/seaweedfs/weed/filer/mysql"
-	_ "github.com/seaweedfs/seaweedfs/weed/filer/mysql2"
-	_ "github.com/seaweedfs/seaweedfs/weed/filer/postgres"
-	_ "github.com/seaweedfs/seaweedfs/weed/filer/postgres2"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/redis"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/redis2"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/redis3"
-	_ "github.com/seaweedfs/seaweedfs/weed/filer/sqlite"
-	_ "github.com/seaweedfs/seaweedfs/weed/filer/ydb"
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/notification"
 	_ "github.com/seaweedfs/seaweedfs/weed/notification/aws_sqs"
@@ -46,7 +30,14 @@ import (
 	_ "github.com/seaweedfs/seaweedfs/weed/notification/google_pub_sub"
 	_ "github.com/seaweedfs/seaweedfs/weed/notification/kafka"
 	_ "github.com/seaweedfs/seaweedfs/weed/notification/log"
+	"github.com/seaweedfs/seaweedfs/weed/operation"
+	"github.com/seaweedfs/seaweedfs/weed/pb"
+	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
 	"github.com/seaweedfs/seaweedfs/weed/security"
+	"github.com/seaweedfs/seaweedfs/weed/stats"
+	"github.com/seaweedfs/seaweedfs/weed/util"
+	"github.com/seaweedfs/seaweedfs/weed/util/grace"
 )
 
 type FilerOption struct {

@@ -2,10 +2,10 @@ package command
 
 import (
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/util"
 	"path/filepath"
 
 	"github.com/seaweedfs/seaweedfs/weed/command/scaffold"
+	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
 func init() {
@@ -18,8 +18,6 @@ var cmdScaffold = &Command{
 	Long: `Generate filer.toml with all possible configurations for you to customize.
 
 	The options can also be overwritten by environment variables.
-	For example, the filer.toml mysql password can be overwritten by environment variable
-		export WEED_MYSQL_PASSWORD=some_password
 	Environment variable rules:
 		* Prefix the variable name with "WEED_"
 		* Upppercase the reset of variable name.
