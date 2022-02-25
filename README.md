@@ -10,8 +10,6 @@ Table of Contents
 =================
 
 * [Quick Start](#quick-start)
-    * [Quick Start for S3 API on Docker](#quick-start-for-s3-api-on-docker)
-    * [Quick Start with Single Binary](#quick-start-with-single-binary)
 * [Introduction](#introduction)
 * [Features](#features)
     * [Additional Features](#additional-features)
@@ -30,14 +28,10 @@ Table of Contents
 * [Benchmark](#Benchmark)
 * [License](#license)
 
+## Quick Start ##
 
-## Quick Start for S3 API on Docker ##
-
-`docker run -p 8333:8333 chrislusf/seaweedfs server -s3`
-
-## Quick Start with Single Binary ##
-* Download the latest binary from https://github.com/martyanov/seaweedfs/releases and unzip a single binary file `weed` or `weed.exe`
-* Run `weed server -dir=/some/data/dir -s3` to start one master, one volume server, one filer, and one S3 gateway.
+* Download the latest binary from https://github.com/martyanov/seaweedfs/releases and unzip a single binary file
+* Run `weed server -dir=/some/data/dir -s3` to start one master, one volume server, one filer, and one S3 gateway
 
 Also, to increase capacity, just add more volume servers by running `weed volume -dir="/some/data/dir2" -mserver="<master_host>:9333" -port=8081` locally, or on a different machine, or on thousands of machines. That is it!
 

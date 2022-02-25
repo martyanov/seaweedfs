@@ -1,3 +1,0 @@
-[rocksdb]
-enabled = true
-dir = "/data/filer_rocksdb"
