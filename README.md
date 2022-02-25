@@ -4,7 +4,7 @@
 [![GoDoc](https://godoc.org/github.com/chrislusf/seaweedfs/weed?status.svg)](https://godoc.org/github.com/chrislusf/seaweedfs/weed)
 [![Wiki](https://img.shields.io/badge/docs-wiki-blue.svg)](https://github.com/martyanov/seaweedfs/wiki)
 
-NOTE: This is a fork of SeaweedFS with very opiniated defaults and limited set of features, probably you are looking for the vanilla [SeaweedFS](https://github.com/chrislusf/seaweedfs).
+NOTE: This is a fork of SeaweedFS with very opinionated defaults and limited set of features, probably you are looking for the vanilla [SeaweedFS](https://github.com/chrislusf/seaweedfs).
 
 Table of Contents
 =================
@@ -17,12 +17,6 @@ Table of Contents
 * [Resources](#resources)
 * [Example: Using Seaweed Object Store](#example-Using-Seaweed-Object-Store)
 * [Architecture](#architecture)
-* [Compared to Other File Systems](#compared-to-other-file-systems)
-    * [Compared to HDFS](#compared-to-hdfs)
-    * [Compared to GlusterFS, Ceph](#compared-to-glusterfs-ceph)
-    * [Compared to GlusterFS](#compared-to-glusterfs)
-    * [Compared to Ceph](#compared-to-ceph)
-* [Dev Plan](#dev-plan)
 * [Installation Guide](#installation-guide)
 * [Disk Related Topics](#disk-related-topics)
 * [Benchmark](#Benchmark)
@@ -334,111 +328,6 @@ Usually hot data are fresh and warm data are old. SeaweedFS puts the newly creat
 With the O(1) access time, the network latency cost is kept at minimum.
 
 If the hot/warm data is split as 20/80, with 20 servers, you can achieve storage capacity of 100 servers. That's a cost saving of 80%! Or you can repurpose the 80 servers to store new data also, and get 5X storage throughput.
-
-[Back to TOC](#table-of-contents)
-
-## Compared to Other File Systems ##
-
-Most other distributed file systems seem more complicated than necessary.
-
-SeaweedFS is meant to be fast and simple, in both setup and operation. If you do not understand how it works when you reach here, we've failed! Please raise an issue with any questions or update this file with clarifications.
-
-SeaweedFS is constantly moving forward. Same with other systems. These comparisons can be outdated quickly. Please help to keep them updated.
-
-[Back to TOC](#table-of-contents)
-
-### Compared to HDFS ###
-
-HDFS uses the chunk approach for each file, and is ideal for storing large files.
-
-SeaweedFS is ideal for serving relatively smaller files quickly and concurrently.
-
-SeaweedFS can also store extra large files by splitting them into manageable data chunks, and store the file ids of the data chunks into a meta chunk. This is managed by "weed upload/download" tool, and the weed master or volume servers are agnostic about it.
-
-[Back to TOC](#table-of-contents)
-
-### Compared to GlusterFS, Ceph ###
-
-The architectures are mostly the same. SeaweedFS aims to store and read files fast, with a simple and flat architecture. The main differences are
-
-* SeaweedFS optimizes for small files, ensuring O(1) disk seek operation, and can also handle large files.
-* SeaweedFS statically assigns a volume id for a file. Locating file content becomes just a lookup of the volume id, which can be easily cached.
-* SeaweedFS Filer metadata store can be any well-known and proven data stores, e.g., Redis, Cassandra, HBase, Mongodb, Elastic Search, MySql, Postgres, Sqlite, MemSql, TiDB, CockroachDB, Etcd etc, and is easy to customized.
-* SeaweedFS Volume server also communicates directly with clients via HTTP, supporting range queries, direct uploads, etc.
-
-| System         | File Metadata                   | File Content Read| POSIX  | REST API | Optimized for large number of small files |
-| -------------  | ------------------------------- | ---------------- | ------ | -------- | ------------------------- |
-| SeaweedFS      | lookup volume id, cacheable     | O(1) disk seek   |        | Yes      | Yes                       |
-| SeaweedFS Filer| Linearly Scalable, Customizable | O(1) disk seek   | FUSE   | Yes      | Yes                       |
-| GlusterFS      | hashing          |                  | FUSE, NFS          |          |                           |
-| Ceph           | hashing + rules  |                  | FUSE               | Yes      |                           |
-| MooseFS        | in memory        |                  | FUSE               |       | No                          |
-| MinIO          | separate meta file for each file  |                  |         | Yes   | No                          |
-
-[Back to TOC](#table-of-contents)
-
-### Compared to GlusterFS ###
-
-GlusterFS stores files, both directories and content, in configurable volumes called "bricks".
-
-GlusterFS hashes the path and filename into ids, and assigned to virtual volumes, and then mapped to "bricks".
-
-[Back to TOC](#table-of-contents)
-
-### Compared to MooseFS ###
-
-MooseFS chooses to neglect small file issue. From moosefs 3.0 manual, "even a small file will occupy 64KiB plus additionally 4KiB of checksums and 1KiB for the header", because it "was initially designed for keeping large amounts (like several thousands) of very big files"
-
-MooseFS Master Server keeps all meta data in memory. Same issue as HDFS namenode.
-
-[Back to TOC](#table-of-contents)
-
-### Compared to Ceph ###
-
-Ceph can be setup similar to SeaweedFS as a key->blob store. It is much more complicated, with the need to support layers on top of it. [Here is a more detailed comparison](https://github.com/chrislusf/seaweedfs/issues/120)
-
-SeaweedFS has a centralized master group to look up free volumes, while Ceph uses hashing and metadata servers to locate its objects. Having a centralized master makes it easy to code and manage.
-
-Same as SeaweedFS, Ceph is also based on the object store RADOS. Ceph is rather complicated with mixed reviews.
-
-Ceph uses CRUSH hashing to automatically manage the data placement, which is efficient to locate the data. But the data has to be placed according to the CRUSH algorithm. Any wrong configuration would cause data loss. Topology changes, such as adding new servers to increase capacity, will cause data migration with high IO cost to fit the CRUSH algorithm. SeaweedFS places data by assigning them to any writable volumes. If writes to one volume failed, just pick another volume to write. Adding more volumes are also as simple as it can be.
-
-SeaweedFS is optimized for small files. Small files are stored as one continuous block of content, with at most 8 unused bytes between files. Small file access is O(1) disk read.
-
-SeaweedFS Filer uses off-the-shelf stores, such as MySql, Postgres, Sqlite, Mongodb, Redis, Elastic Search, Cassandra, HBase, MemSql, TiDB, CockroachCB, Etcd, to manage file directories. These stores are proven, scalable, and easier to manage.
-
-| SeaweedFS         | comparable to Ceph | advantage |
-| -------------  | ------------- | ---------------- |
-| Master  | MDS | simpler |
-| Volume  | OSD | optimized for small files |
-| Filer  | Ceph FS | linearly scalable, Customizable, O(1) or O(logN) |
-
-[Back to TOC](#table-of-contents)
-
-### Compared to MinIO ###
-
-MinIO follows AWS S3 closely and is ideal for testing for S3 API. It has good UI, policies, versionings, etc. SeaweedFS is trying to catch up here. It is also possible to put MinIO as a gateway in front of SeaweedFS later.
-
-MinIO metadata are in simple files. Each file write will incur extra writes to corresponding meta file.
-
-MinIO does not have optimization for lots of small files. The files are simply stored as is to local disks.
-Plus the extra meta file and shards for erasure coding, it only amplifies the LOSF problem.
-
-MinIO has multiple disk IO to read one file. SeaweedFS has O(1) disk reads, even for erasure coded files.
-
-MinIO has full-time erasure coding. SeaweedFS uses replication on hot data for faster speed and optionally applies erasure coding on warm data.
-
-MinIO does not have POSIX-like API support.
-
-MinIO has specific requirements on storage layout. It is not flexible to adjust capacity. In SeaweedFS, just start one volume server pointing to the master. That's all.
-
-## Dev Plan ##
-
-* More tools and documentation, on how to manage and scale the system.
-* Read and write stream data.
-* Support structured data.
-
-This is a super exciting project! And we need helpers and [support](https://www.patreon.com/seaweedfs)!
 
 [Back to TOC](#table-of-contents)
 
