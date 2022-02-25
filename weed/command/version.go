@@ -11,7 +11,7 @@ var cmdVersion = &Command{
 	Run:       runVersion,
 	UsageLine: "version",
 	Short:     "print SeaweedFS version",
-	Long:      `Version prints the SeaweedFS version`,
+	Long:      `print the SeaweedFS version`,
 }
 
 func runVersion(cmd *Command, args []string) bool {
@@ -19,6 +19,6 @@ func runVersion(cmd *Command, args []string) bool {
 		cmd.Usage()
 	}
 
-	fmt.Printf("SeaweedFS version %s %s/%s\n", util.Version(), runtime.GOOS, runtime.GOARCH)
+	fmt.Printf("SeaweedFS %s %s/%s\n", util.Version(), runtime.GOOS, runtime.GOARCH)
 	return true
 }
