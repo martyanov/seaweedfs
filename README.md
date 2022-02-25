@@ -1,6 +1,5 @@
 # SeaweedFS
 
-
 [![Slack](https://img.shields.io/badge/slack-purple)](https://join.slack.com/t/seaweedfs/shared_invite/enQtMzI4MTMwMjU2MzA3LTEyYzZmZWYzOGQ3MDJlZWMzYmI0OTE4OTJiZjJjODBmMzUxNmYwODg0YjY3MTNlMjBmZDQ1NzQ5NDJhZWI2ZmY)
 [![Twitter](https://img.shields.io/twitter/follow/seaweedfs.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=seaweedfs)
 [![Build Status](https://img.shields.io/github/workflow/status/chrislusf/seaweedfs/Go)](https://github.com/seaweedfs/seaweedfs/actions/workflows/go.yml)
@@ -9,38 +8,14 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/chrislusf/seaweedfs?maxAge=4800)](https://hub.docker.com/r/chrislusf/seaweedfs/)
 [![SeaweedFS on Maven Central](https://img.shields.io/maven-central/v/com.github.chrislusf/seaweedfs-client)](https://search.maven.org/search?q=g:com.github.chrislusf)
 
-
-![SeaweedFS Logo](https://raw.githubusercontent.com/seaweedfs/seaweedfs/master/note/seaweedfs.png)
-
-<h2 align="center"><a href="https://www.patreon.com/seaweedfs">Sponsor SeaweedFS via Patreon</a></h2>
-
-SeaweedFS is an independent Apache-licensed open source project with its ongoing development made
-possible entirely thanks to the support of these awesome [backers](https://github.com/seaweedfs/seaweedfs/blob/master/backers.md).
-If you'd like to grow SeaweedFS even stronger, please consider joining our
-<a href="https://www.patreon.com/seaweedfs">sponsors on Patreon</a>.
-
-Your support will be really appreciated by me and other supporters!
-
-<!--
-<h4 align="center">Platinum</h4>
-
-<p align="center">
-  <a href="" target="_blank">
-    Add your name or icon here
-  </a>
-</p>
--->
-
-### Gold Sponsors
-- [![nodion](https://www.nodion.com/img/logo.svg)](https://www.nodion.com)
+![SeaweedFS Logo](https://raw.githubusercontent.com/chrislusf/seaweedfs/master/note/seaweedfs.png)
 
 ---
 
-- [Download Binaries for different platforms](https://github.com/seaweedfs/seaweedfs/releases/latest)
+- [Download Binaries for different platforms](https://github.com/chrislusf/seaweedfs/releases/latest)
 - [SeaweedFS on Slack](https://join.slack.com/t/seaweedfs/shared_invite/enQtMzI4MTMwMjU2MzA3LTEyYzZmZWYzOGQ3MDJlZWMzYmI0OTE4OTJiZjJjODBmMzUxNmYwODg0YjY3MTNlMjBmZDQ1NzQ5NDJhZWI2ZmY)
 - [SeaweedFS on Twitter](https://twitter.com/SeaweedFS)
-- [SeaweedFS on Telegram](https://t.me/Seaweedfs) 
-- [SeaweedFS on Reddit](https://www.reddit.com/r/SeaweedFS/)
+- [SeaweedFS on Telegram](https://t.me/Seaweedfs)
 - [SeaweedFS Mailing List](https://groups.google.com/d/forum/seaweedfs)
 - [Wiki Documentation](https://github.com/seaweedfs/seaweedfs/wiki)
 - [SeaweedFS White Paper](https://github.com/seaweedfs/seaweedfs/wiki/SeaweedFS_Architecture.pdf)
