@@ -10,7 +10,6 @@ import (
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/leveldb"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/leveldb2"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/leveldb3"
-	_ "github.com/seaweedfs/seaweedfs/weed/filer/mongodb"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/redis"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/redis2"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/redis3"
