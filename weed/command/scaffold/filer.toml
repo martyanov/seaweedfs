@@ -148,11 +148,6 @@ readOnly = false
 # automatically use the closest Redis server for reads
 routeByLatency = false
 
-[etcd]
-enabled = false
-servers = "localhost:2379"
-timeout = "3s"
-
 [arangodb] # in development dont use it
 enabled = false
 db_name = "seaweedfs"
