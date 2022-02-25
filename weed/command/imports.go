@@ -17,7 +17,6 @@ import (
 
 	_ "github.com/chrislusf/seaweedfs/weed/filer/cassandra"
 	_ "github.com/chrislusf/seaweedfs/weed/filer/etcd"
-	_ "github.com/chrislusf/seaweedfs/weed/filer/hbase"
 	_ "github.com/chrislusf/seaweedfs/weed/filer/leveldb"
 	_ "github.com/chrislusf/seaweedfs/weed/filer/leveldb2"
 	_ "github.com/chrislusf/seaweedfs/weed/filer/leveldb3"

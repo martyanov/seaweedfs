@@ -37,7 +37,6 @@ require (
 	github.com/go-errors/errors v1.1.1 // indirect
 	github.com/go-redis/redis/v8 v8.4.4
 	github.com/go-redsync/redsync/v4 v4.4.1
-	github.com/go-zookeeper/zk v1.0.2 // indirect
 	github.com/gocql/gocql v0.0.0-20210707082121-9a3953d1826d
 	github.com/golang-jwt/jwt v3.2.1+incompatible
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da
@@ -63,7 +62,6 @@ require (
 	github.com/karlseguin/ccache/v2 v2.0.7
 	github.com/klauspost/cpuid v1.2.1 // indirect
 	github.com/klauspost/reedsolomon v1.9.2
-	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
 	github.com/kurin/blazer v0.5.3
 	github.com/magiconair/properties v1.8.1 // indirect
 	github.com/mattn/go-ieproxy v0.0.1 // indirect
@@ -87,7 +85,6 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563 // indirect
 	github.com/seaweedfs/fuse v1.2.2
 	github.com/seaweedfs/goexif v1.0.2
-	github.com/sirupsen/logrus v1.6.0 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/spf13/afero v1.6.0 // indirect
 	github.com/spf13/cast v1.3.0 // indirect
@@ -100,7 +97,6 @@ require (
 	github.com/tidwall/gjson v1.10.2
 	github.com/tidwall/match v1.1.1
 	github.com/tidwall/pretty v1.2.0 // indirect
-	github.com/tsuna/gohbase v0.0.0-20201125011725-348991136365
 	github.com/tylertreat/BoomFilters v0.0.0-20210315201527-1a82519a3e43
 	github.com/valyala/bytebufferpool v1.0.0
 	github.com/viant/assertly v0.5.4 // indirect
@@ -131,8 +127,6 @@ require (
 	gopkg.in/jcmturner/goidentity.v3 v3.0.0 // indirect
 	gopkg.in/jcmturner/gokrb5.v7 v7.3.0 // indirect
 	gopkg.in/jcmturner/rpc.v1 v1.1.0 // indirect
-	modernc.org/b v1.0.0 // indirect
-	modernc.org/mathutil v1.2.2 // indirect
 )
 
 require (
