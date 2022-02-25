@@ -36,7 +36,7 @@ Table of Contents
 `docker run -p 8333:8333 chrislusf/seaweedfs server -s3`
 
 ## Quick Start with Single Binary ##
-* Download the latest binary from https://github.com/chrislusf/seaweedfs/releases and unzip a single binary file `weed` or `weed.exe`
+* Download the latest binary from https://github.com/martyanov/seaweedfs/releases and unzip a single binary file `weed` or `weed.exe`
 * Run `weed server -dir=/some/data/dir -s3` to start one master, one volume server, one filer, and one S3 gateway.
 
 Also, to increase capacity, just add more volume servers by running `weed volume -dir="/some/data/dir2" -mserver="<master_host>:9333" -port=8081` locally, or on a different machine, or on thousands of machines. That is it!
@@ -48,32 +48,32 @@ SeaweedFS is a simple and highly scalable distributed file system. There are two
 1. to store billions of files!
 2. to serve the files fast!
 
-SeaweedFS started as an Object Store to handle small files efficiently. 
-Instead of managing all file metadata in a central master, 
-the central master only manages volumes on volume servers, 
-and these volume servers manage files and their metadata. 
-This relieves concurrency pressure from the central master and spreads file metadata into volume servers, 
+SeaweedFS started as an Object Store to handle small files efficiently.
+Instead of managing all file metadata in a central master,
+the central master only manages volumes on volume servers,
+and these volume servers manage files and their metadata.
+This relieves concurrency pressure from the central master and spreads file metadata into volume servers,
 allowing faster file access (O(1), usually just one disk read operation).
 
-There is only 40 bytes of disk storage overhead for each file's metadata. 
+There is only 40 bytes of disk storage overhead for each file's metadata.
 It is so simple with O(1) disk reads that you are welcome to challenge the performance with your actual use cases.
 
-SeaweedFS started by implementing [Facebook's Haystack design paper](http://www.usenix.org/event/osdi10/tech/full_papers/Beaver.pdf). 
-Also, SeaweedFS implements erasure coding with ideas from 
+SeaweedFS started by implementing [Facebook's Haystack design paper](http://www.usenix.org/event/osdi10/tech/full_papers/Beaver.pdf).
+Also, SeaweedFS implements erasure coding with ideas from
 [f4: Facebook’s Warm BLOB Storage System](https://www.usenix.org/system/files/conference/osdi14/osdi14-paper-muralidhar.pdf), and has a lot of similarities with [Facebook’s Tectonic Filesystem](https://www.usenix.org/system/files/fast21-pan.pdf)
 
-On top of the object store, optional [Filer] can support directories and POSIX attributes. 
-Filer is a separate linearly-scalable stateless server with customizable metadata stores, 
+On top of the object store, optional [Filer] can support directories and POSIX attributes.
+Filer is a separate linearly-scalable stateless server with customizable metadata stores,
 e.g., MySql, Postgres, Redis, Cassandra, HBase, Mongodb, Elastic Search, LevelDB, RocksDB, Sqlite, MemSql, TiDB, Etcd, CockroachDB, etc.
 
-For any distributed key value stores, the large values can be offloaded to SeaweedFS. 
-With the fast access speed and linearly scalable capacity, 
+For any distributed key value stores, the large values can be offloaded to SeaweedFS.
+With the fast access speed and linearly scalable capacity,
 SeaweedFS can work as a distributed [Key-Large-Value store][KeyLargeValueStore].
 
-SeaweedFS can transparently integrate with the cloud. 
-With hot data on local cluster, and warm data on the cloud with O(1) access time, 
+SeaweedFS can transparently integrate with the cloud.
+With hot data on local cluster, and warm data on the cloud with O(1) access time,
 SeaweedFS can achieve both fast local access time and elastic cloud storage capacity.
-What's more, the cloud storage access API cost is minimized. 
+What's more, the cloud storage access API cost is minimized.
 Faster and Cheaper than direct cloud storage!
 
 [Back to TOC](#table-of-contents)
@@ -115,32 +115,32 @@ Faster and Cheaper than direct cloud storage!
 * [Kubernetes CSI Driver][SeaweedFsCsiDriver] A Container Storage Interface (CSI) Driver. [![Docker Pulls](https://img.shields.io/docker/pulls/chrislusf/seaweedfs-csi-driver.svg?maxAge=4800)](https://hub.docker.com/r/chrislusf/seaweedfs-csi-driver/)
 * [SeaweedFS Operator](https://github.com/seaweedfs/seaweedfs-operator)
 
-[Filer]: https://github.com/chrislusf/seaweedfs/wiki/Directories-and-Files
-[SuperLargeFiles]: https://github.com/chrislusf/seaweedfs/wiki/Data-Structure-for-Large-Files
-[Mount]: https://github.com/chrislusf/seaweedfs/wiki/FUSE-Mount
-[AmazonS3API]: https://github.com/chrislusf/seaweedfs/wiki/Amazon-S3-API
-[BackupToCloud]: https://github.com/chrislusf/seaweedfs/wiki/Async-Replication-to-Cloud
-[Hadoop]: https://github.com/chrislusf/seaweedfs/wiki/Hadoop-Compatible-File-System
-[WebDAV]: https://github.com/chrislusf/seaweedfs/wiki/WebDAV
-[ErasureCoding]: https://github.com/chrislusf/seaweedfs/wiki/Erasure-coding-for-warm-storage
-[TieredStorage]: https://github.com/chrislusf/seaweedfs/wiki/Tiered-Storage
-[CloudTier]: https://github.com/chrislusf/seaweedfs/wiki/Cloud-Tier
-[FilerDataEncryption]: https://github.com/chrislusf/seaweedfs/wiki/Filer-Data-Encryption
-[FilerTTL]: https://github.com/chrislusf/seaweedfs/wiki/Filer-Stores
-[VolumeServerTTL]: https://github.com/chrislusf/seaweedfs/wiki/Store-file-with-a-Time-To-Live
+[Filer]: https://github.com/martyanov/seaweedfs/wiki/Directories-and-Files
+[SuperLargeFiles]: https://github.com/martyanov/seaweedfs/wiki/Data-Structure-for-Large-Files
+[Mount]: https://github.com/martyanov/seaweedfs/wiki/FUSE-Mount
+[AmazonS3API]: https://github.com/martyanov/seaweedfs/wiki/Amazon-S3-API
+[BackupToCloud]: https://github.com/martyanov/seaweedfs/wiki/Async-Replication-to-Cloud
+[Hadoop]: https://github.com/martyanov/seaweedfs/wiki/Hadoop-Compatible-File-System
+[WebDAV]: https://github.com/martyanov/seaweedfs/wiki/WebDAV
+[ErasureCoding]: https://github.com/martyanov/seaweedfs/wiki/Erasure-coding-for-warm-storage
+[TieredStorage]: https://github.com/martyanov/seaweedfs/wiki/Tiered-Storage
+[CloudTier]: https://github.com/martyanov/seaweedfs/wiki/Cloud-Tier
+[FilerDataEncryption]: https://github.com/martyanov/seaweedfs/wiki/Filer-Data-Encryption
+[FilerTTL]: https://github.com/martyanov/seaweedfs/wiki/Filer-Stores
+[VolumeServerTTL]: https://github.com/martyanov/seaweedfs/wiki/Store-file-with-a-Time-To-Live
 [SeaweedFsCsiDriver]: https://github.com/seaweedfs/seaweedfs-csi-driver
-[ActiveActiveAsyncReplication]: https://github.com/chrislusf/seaweedfs/wiki/Filer-Active-Active-cross-cluster-continuous-synchronization
-[FilerStoreReplication]: https://github.com/chrislusf/seaweedfs/wiki/Filer-Store-Replication
-[KeyLargeValueStore]: https://github.com/chrislusf/seaweedfs/wiki/Filer-as-a-Key-Large-Value-Store
-[CloudDrive]: https://github.com/chrislusf/seaweedfs/wiki/Cloud-Drive-Architecture
-[GatewayToRemoteObjectStore]: https://github.com/chrislusf/seaweedfs/wiki/Gateway-to-Remote-Object-Storage
+[ActiveActiveAsyncReplication]: https://github.com/martyanov/seaweedfs/wiki/Filer-Active-Active-cross-cluster-continuous-synchronization
+[FilerStoreReplication]: https://github.com/martyanov/seaweedfs/wiki/Filer-Store-Replication
+[KeyLargeValueStore]: https://github.com/martyanov/seaweedfs/wiki/Filer-as-a-Key-Large-Value-Store
+[CloudDrive]: https://github.com/martyanov/seaweedfs/wiki/Cloud-Drive-Architecture
+[GatewayToRemoteObjectStore]: https://github.com/martyanov/seaweedfs/wiki/Gateway-to-Remote-Object-Storage
 
 [Back to TOC](#table-of-contents)
 
 ## Resources  ##
 
 * [Documentation](https://github.com/martyanov/seaweedfs/wiki)
-* [SeaweedFS White Paper](https://github.com/chrislusf/seaweedfs/wiki/SeaweedFS_Architecture.pdf)
+* [SeaweedFS White Paper](https://github.com/martyanov/seaweedfs/wiki/SeaweedFS_Architecture.pdf)
 * [SeaweedFS Introduction Slides 2021.5](https://docs.google.com/presentation/d/1DcxKWlINc-HNCjhYeERkpGXXm6nTCES8mi2W5G0Z4Ts/edit?usp=sharing)
 * [SeaweedFS Introduction Slides 2019.3](https://www.slideshare.net/chrislusf/seaweedfs-introduction)
 
@@ -264,7 +264,7 @@ The replication parameter options are:
 
 More details about replication can be found [on the wiki][Replication].
 
-[Replication]: https://github.com/chrislusf/seaweedfs/wiki/Replication
+[Replication]: https://github.com/martyanov/seaweedfs/wiki/Replication
 
 You can also set the default replication strategy when starting the master server.
 
@@ -289,10 +289,10 @@ When requesting a file key, an optional "dataCenter" parameter can limit the ass
   * [Chunking large files][feat-3]
   * [Collection as a Simple Name Space][feat-4]
 
-[feat-1]: https://github.com/chrislusf/seaweedfs/wiki/Failover-Master-Server
-[feat-2]: https://github.com/chrislusf/seaweedfs/wiki/Optimization#insert-with-your-own-keys
-[feat-3]: https://github.com/chrislusf/seaweedfs/wiki/Optimization#upload-large-files
-[feat-4]: https://github.com/chrislusf/seaweedfs/wiki/Optimization#collection-as-a-simple-name-space
+[feat-1]: https://github.com/martyanov/seaweedfs/wiki/Failover-Master-Server
+[feat-2]: https://github.com/martyanov/seaweedfs/wiki/Optimization#insert-with-your-own-keys
+[feat-3]: https://github.com/martyanov/seaweedfs/wiki/Optimization#upload-large-files
+[feat-4]: https://github.com/martyanov/seaweedfs/wiki/Optimization#collection-as-a-simple-name-space
 
 [Back to TOC](#table-of-contents)
 
@@ -340,9 +340,9 @@ All file meta information stored on an volume server is readable from memory wit
 
 The local volume servers are much faster, while cloud storages have elastic capacity and are actually more cost-efficient if not accessed often (usually free to upload, but relatively costly to access). With the append-only structure and O(1) access time, SeaweedFS can take advantage of both local and cloud storage by offloading the warm data to the cloud.
 
-Usually hot data are fresh and warm data are old. SeaweedFS puts the newly created volumes on local servers, and optionally upload the older volumes on the cloud. If the older data are accessed less often, this literally gives you unlimited capacity with limited local servers, and still fast for new data. 
+Usually hot data are fresh and warm data are old. SeaweedFS puts the newly created volumes on local servers, and optionally upload the older volumes on the cloud. If the older data are accessed less often, this literally gives you unlimited capacity with limited local servers, and still fast for new data.
 
-With the O(1) access time, the network latency cost is kept at minimum. 
+With the O(1) access time, the network latency cost is kept at minimum.
 
 If the hot/warm data is split as 20/80, with 20 servers, you can achieve storage capacity of 100 servers. That's a cost saving of 80%! Or you can repurpose the 80 servers to store new data also, and get 5X storage throughput.
 
@@ -400,7 +400,7 @@ GlusterFS hashes the path and filename into ids, and assigned to virtual volumes
 
 MooseFS chooses to neglect small file issue. From moosefs 3.0 manual, "even a small file will occupy 64KiB plus additionally 4KiB of checksums and 1KiB for the header", because it "was initially designed for keeping large amounts (like several thousands) of very big files"
 
-MooseFS Master Server keeps all meta data in memory. Same issue as HDFS namenode. 
+MooseFS Master Server keeps all meta data in memory. Same issue as HDFS namenode.
 
 [Back to TOC](#table-of-contents)
 
