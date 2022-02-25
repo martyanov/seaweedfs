@@ -1,24 +1,15 @@
 # SeaweedFS
 
-[![Slack](https://img.shields.io/badge/slack-purple)](https://join.slack.com/t/seaweedfs/shared_invite/enQtMzI4MTMwMjU2MzA3LTEyYzZmZWYzOGQ3MDJlZWMzYmI0OTE4OTJiZjJjODBmMzUxNmYwODg0YjY3MTNlMjBmZDQ1NzQ5NDJhZWI2ZmY)
-[![Twitter](https://img.shields.io/twitter/follow/seaweedfs.svg?style=social&label=Follow)](https://twitter.com/intent/follow?screen_name=seaweedfs)
-[![Build Status](https://img.shields.io/github/workflow/status/chrislusf/seaweedfs/Go)](https://github.com/seaweedfs/seaweedfs/actions/workflows/go.yml)
-[![GoDoc](https://godoc.org/github.com/seaweedfs/seaweedfs/weed?status.svg)](https://godoc.org/github.com/seaweedfs/seaweedfs/weed)
-[![Wiki](https://img.shields.io/badge/docs-wiki-blue.svg)](https://github.com/seaweedfs/seaweedfs/wiki)
-[![Docker Pulls](https://img.shields.io/docker/pulls/chrislusf/seaweedfs?maxAge=4800)](https://hub.docker.com/r/chrislusf/seaweedfs/)
-[![SeaweedFS on Maven Central](https://img.shields.io/maven-central/v/com.github.chrislusf/seaweedfs-client)](https://search.maven.org/search?q=g:com.github.chrislusf)
+[![Build Status](https://img.shields.io/github/workflow/status/martyanov/seaweedfs/Go)](https://github.com/martyanov/seaweedfs/actions/workflows/go.yml)
+[![GoDoc](https://godoc.org/github.com/chrislusf/seaweedfs/weed?status.svg)](https://godoc.org/github.com/chrislusf/seaweedfs/weed)
+[![Wiki](https://img.shields.io/badge/docs-wiki-blue.svg)](https://github.com/martyanov/seaweedfs/wiki)
 
-![SeaweedFS Logo](https://raw.githubusercontent.com/chrislusf/seaweedfs/master/note/seaweedfs.png)
+NOTE: This is a fork of SeaweedFS with very opiniated defaults and limited set of features, probably you are looking for the vanilla [SeaweedFS](https://github.com/seaweedfs/seaweedfs).
 
 ---
 
-- [Download Binaries for different platforms](https://github.com/chrislusf/seaweedfs/releases/latest)
-- [SeaweedFS on Slack](https://join.slack.com/t/seaweedfs/shared_invite/enQtMzI4MTMwMjU2MzA3LTEyYzZmZWYzOGQ3MDJlZWMzYmI0OTE4OTJiZjJjODBmMzUxNmYwODg0YjY3MTNlMjBmZDQ1NzQ5NDJhZWI2ZmY)
-- [SeaweedFS on Twitter](https://twitter.com/SeaweedFS)
-- [SeaweedFS on Telegram](https://t.me/Seaweedfs)
-- [SeaweedFS Mailing List](https://groups.google.com/d/forum/seaweedfs)
-- [Wiki Documentation](https://github.com/seaweedfs/seaweedfs/wiki)
-- [SeaweedFS White Paper](https://github.com/seaweedfs/seaweedfs/wiki/SeaweedFS_Architecture.pdf)
+- [Wiki Documentation](https://github.com/chrislusf/martyanov/wiki)
+- [SeaweedFS White Paper](https://github.com/chrislusf/seaweedfs/wiki/SeaweedFS_Architecture.pdf)
 - [SeaweedFS Introduction Slides 2021.5](https://docs.google.com/presentation/d/1DcxKWlINc-HNCjhYeERkpGXXm6nTCES8mi2W5G0Z4Ts/edit?usp=sharing)
 - [SeaweedFS Introduction Slides 2019.3](https://www.slideshare.net/chrislusf/seaweedfs-introduction)
 
@@ -570,9 +561,3 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 The text of this page is available for modification and reuse under the terms of the Creative Commons Attribution-Sharealike 3.0 Unported License and the GNU Free Documentation License (unversioned, with no invariant sections, front-cover texts, or back-cover texts).
-
-[Back to TOC](#table-of-contents)
-
-## Stargazers over time
-
-[![Stargazers over time](https://starchart.cc/chrislusf/seaweedfs.svg)](https://starchart.cc/chrislusf/seaweedfs)
