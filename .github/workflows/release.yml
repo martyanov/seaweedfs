@@ -23,5 +23,7 @@ jobs:
           project_path: weed
           binary_name: weed
           pre_command: export CGO_ENABLED=0 && export GODEBUG=http2client=0
-          ldflags: -extldflags -static -X github.com/chrislusf/seaweedfs/weed/util.VERSION=${{github.ref_name}}
+          build_flags: -trimpath
+          ldflags: -s -w -X github.com/chrislusf/seaweedfs/weed/util.VERSION=${{github.ref_name}}
           sha256sum: true
+          md5sum: false
