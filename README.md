@@ -1,6 +1,6 @@
 # SeaweedFS
 
-[![Build Status](https://img.shields.io/github/workflow/status/martyanov/seaweedfs/Build)](https://github.com/martyanov/seaweedfs/actions/workflows/go.yml)
+[![Build Status](https://img.shields.io/github/workflow/status/martyanov/seaweedfs/Build)](https://github.com/martyanov/seaweedfs/actions/workflows/build.yml)
 [![GoDoc](https://godoc.org/github.com/chrislusf/seaweedfs/weed?status.svg)](https://godoc.org/github.com/chrislusf/seaweedfs/weed)
 [![Wiki](https://img.shields.io/badge/docs-wiki-blue.svg)](https://github.com/martyanov/seaweedfs/wiki)
 
