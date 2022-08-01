@@ -226,14 +226,6 @@ If you want a nicer URL, you can use one of these alternative URL formats:
  http://localhost:8080/3,01637037d6
 ```
 
-If you want to get a scaled version of an image, you can add some params:
-
-```
-http://localhost:8080/3/01637037d6.jpg?height=200&width=200
-http://localhost:8080/3/01637037d6.jpg?height=200&width=200&mode=fit
-http://localhost:8080/3/01637037d6.jpg?height=200&width=200&mode=fill
-```
-
 ### Rack-Aware and Data Center-Aware Replication ###
 
 SeaweedFS applies the replication strategy at a volume level. So, when you are getting a file id, you can specify the replication strategy. For example:

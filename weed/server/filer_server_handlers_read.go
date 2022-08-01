@@ -1,11 +1,8 @@
 package weed_server
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
-	"github.com/seaweedfs/seaweedfs/weed/util/mem"
 	"io"
 	"math"
 	"mime"
@@ -15,9 +12,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
+
 	"github.com/seaweedfs/seaweedfs/weed/filer"
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/images"
 	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/stats"
 	"github.com/seaweedfs/seaweedfs/weed/util"
@@ -191,27 +189,6 @@ func (fs *FilerServer) GetOrHeadHandler(w http.ResponseWriter, r *http.Request) 
 	if r.Method == "HEAD" {
 		w.Header().Set("Content-Length", strconv.FormatInt(totalSize, 10))
 		return
-	}
-
-	if rangeReq := r.Header.Get("Range"); rangeReq == "" {
-		ext := filepath.Ext(filename)
-		if len(ext) > 0 {
-			ext = strings.ToLower(ext)
-		}
-		width, height, mode, shouldResize := shouldResizeImages(ext, r)
-		if shouldResize {
-			data := mem.Allocate(int(totalSize))
-			defer mem.Free(data)
-			err := filer.ReadAll(data, fs.filer.MasterClient, entry.Chunks)
-			if err != nil {
-				glog.Errorf("failed to read %s: %v", path, err)
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			rs, _, _ := images.Resized(ext, bytes.NewReader(data), width, height, mode)
-			io.Copy(w, rs)
-			return
-		}
 	}
 
 	processRangeRequest(r, w, totalSize, mimeType, func(writer io.Writer, offset int64, size int64) error {

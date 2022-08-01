@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/storage/types"
-	"github.com/seaweedfs/seaweedfs/weed/util/mem"
 	"io"
 	"mime"
 	"net/http"
@@ -17,8 +15,10 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/seaweedfs/seaweedfs/weed/storage/types"
+	"github.com/seaweedfs/seaweedfs/weed/util/mem"
+
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/images"
 	"github.com/seaweedfs/seaweedfs/weed/operation"
 	"github.com/seaweedfs/seaweedfs/weed/stats"
 	"github.com/seaweedfs/seaweedfs/weed/storage"
@@ -204,13 +204,7 @@ func (vs *VolumeServer) GetOrHeadHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	if n.IsCompressed() {
-		if _, _, _, shouldResize := shouldResizeImages(ext, r); shouldResize {
-			if n.Data, err = util.DecompressData(n.Data); err != nil {
-				glog.V(0).Infoln("ungzip error:", err, r.URL.Path)
-			}
-			// } else if strings.Contains(r.Header.Get("Accept-Encoding"), "zstd") && util.IsZstdContent(n.Data) {
-			//	w.Header().Set("Content-Encoding", "zstd")
-		} else if strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") && util.IsGzippedContent(n.Data) {
+		if strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") && util.IsGzippedContent(n.Data) {
 			w.Header().Set("Content-Encoding", "gzip")
 		} else {
 			if n.Data, err = util.DecompressData(n.Data); err != nil {
@@ -220,8 +214,7 @@ func (vs *VolumeServer) GetOrHeadHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	if !readOption.IsMetaOnly {
-		rs := conditionallyResizeImages(bytes.NewReader(n.Data), ext, r)
-		if e := writeResponseContent(filename, mtype, rs, w, r); e != nil {
+		if e := writeResponseContent(filename, mtype, bytes.NewReader(n.Data), w, r); e != nil {
 			glog.V(2).Infoln("response write error:", e)
 		}
 	} else {
@@ -238,10 +231,6 @@ func shouldAttemptStreamWrite(hasLocalVolume bool, ext string, r *http.Request) 
 	}
 	if r.Method == "HEAD" {
 		return true, true
-	}
-	_, _, _, shouldResize := shouldResizeImages(ext, r)
-	if shouldResize {
-		return false, false
 	}
 	return true, false
 }
@@ -277,38 +266,10 @@ func (vs *VolumeServer) tryHandleChunkedFile(n *needle.Needle, fileName string, 
 	chunkedFileReader := operation.NewChunkedFileReader(chunkManifest.Chunks, vs.GetMaster(), vs.grpcDialOption)
 	defer chunkedFileReader.Close()
 
-	rs := conditionallyResizeImages(chunkedFileReader, ext, r)
-
-	if e := writeResponseContent(fileName, mType, rs, w, r); e != nil {
+	if e := writeResponseContent(fileName, mType, chunkedFileReader, w, r); e != nil {
 		glog.V(2).Infoln("response write error:", e)
 	}
 	return true
-}
-
-func conditionallyResizeImages(originalDataReaderSeeker io.ReadSeeker, ext string, r *http.Request) io.ReadSeeker {
-	rs := originalDataReaderSeeker
-	if len(ext) > 0 {
-		ext = strings.ToLower(ext)
-	}
-	width, height, mode, shouldResize := shouldResizeImages(ext, r)
-	if shouldResize {
-		rs, _, _ = images.Resized(ext, originalDataReaderSeeker, width, height, mode)
-	}
-	return rs
-}
-
-func shouldResizeImages(ext string, r *http.Request) (width, height int, mode string, shouldResize bool) {
-	if ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".gif" || ext == ".webp" {
-		if r.FormValue("width") != "" {
-			width, _ = strconv.Atoi(r.FormValue("width"))
-		}
-		if r.FormValue("height") != "" {
-			height, _ = strconv.Atoi(r.FormValue("height"))
-		}
-	}
-	mode = r.FormValue("mode")
-	shouldResize = width > 0 || height > 0
-	return
 }
 
 func writeResponseContent(filename, mimeType string, rs io.ReadSeeker, w http.ResponseWriter, r *http.Request) error {
