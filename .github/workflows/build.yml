@@ -17,7 +17,7 @@ jobs:
         go-version: '1.17'
 
     - name: Checkout project source code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Build
       run: cd weed; go build -v .
