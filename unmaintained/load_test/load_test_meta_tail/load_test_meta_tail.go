@@ -3,12 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
 	"google.golang.org/grpc"
-	"strconv"
-	"time"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
