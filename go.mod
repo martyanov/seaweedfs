@@ -108,7 +108,6 @@ require (
 
 require (
 	github.com/Jille/raft-grpc-transport v1.2.0
-	github.com/arangodb/go-driver v1.3.3
 	github.com/fluent/fluent-logger-golang v1.9.0
 	github.com/google/flatbuffers v2.0.6+incompatible
 	github.com/hanwen/go-fuse/v2 v2.1.1-0.20220627082937-d01fda7edf17
@@ -120,7 +119,6 @@ require (
 require (
 	cloud.google.com/go/compute v1.7.0 // indirect
 	cloud.google.com/go/iam v0.3.0 // indirect
-	github.com/arangodb/go-velocypack v0.0.0-20200318135517-5af53c29c67e // indirect
 	github.com/armon/go-metrics v0.3.10 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.16.2 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.15.3 // indirect

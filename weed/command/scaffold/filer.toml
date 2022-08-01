@@ -148,16 +148,6 @@ readOnly = false
 # automatically use the closest Redis server for reads
 routeByLatency = false
 
-[arangodb] # in development dont use it
-enabled = false
-db_name = "seaweedfs"
-servers=["http://localhost:8529"] # list of servers to connect to
-# only basic auth supported for now
-username=""
-password=""
-# skip tls cert validation
-insecure_skip_verify = true
-
 ##########################
 ##########################
 # To add path-specific filer store:

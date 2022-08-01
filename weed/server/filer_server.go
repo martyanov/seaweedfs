@@ -11,7 +11,6 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/seaweedfs/seaweedfs/weed/filer"
-	_ "github.com/seaweedfs/seaweedfs/weed/filer/arangodb"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/cassandra"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/leveldb"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/leveldb2"
