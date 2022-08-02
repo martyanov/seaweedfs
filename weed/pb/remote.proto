@@ -20,10 +20,6 @@ message RemoteConf {
   bool s3_force_path_style = 9;
   bool s3_v4_signature = 11;
 
-  string backblaze_key_id = 20;
-  string backblaze_application_key = 21;
-  string backblaze_endpoint = 22;
-
   string aliyun_access_key = 25;
   string aliyun_secret_key = 26;
   string aliyun_endpoint = 27;

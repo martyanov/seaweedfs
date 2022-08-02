@@ -11,7 +11,6 @@ import (
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/redis2"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/redis3"
 	_ "github.com/seaweedfs/seaweedfs/weed/remote_storage/s3"
-	_ "github.com/seaweedfs/seaweedfs/weed/replication/sink/b2sink"
 	_ "github.com/seaweedfs/seaweedfs/weed/replication/sink/filersink"
 	_ "github.com/seaweedfs/seaweedfs/weed/replication/sink/localsink"
 	_ "github.com/seaweedfs/seaweedfs/weed/replication/sink/s3sink"

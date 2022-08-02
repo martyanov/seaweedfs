@@ -101,7 +101,7 @@ Faster and Cheaper than direct cloud storage!
 * [Filer Store Replication][FilerStoreReplication] enables HA for filer meta data stores.
 * [Active-Active Replication][ActiveActiveAsyncReplication] enables asynchronous one-way or two-way cross cluster continuous replication.
 * [Amazon S3 compatible API][AmazonS3API] accesses files with S3 tooling.
-* [Async Replication To Cloud][BackupToCloud] has extremely fast local access and backups to Amazon S3, Google Cloud Storage, BackBlaze.
+* [Async Replication To Cloud][BackupToCloud] has extremely fast local access and backups to Amazon S3.
 * [WebDAV] accesses as a mapped drive on Mac and Windows, or from mobile devices.
 * [AES256-GCM Encrypted Storage][FilerDataEncryption] safely stores the encrypted data.
 * [Super Large Files][SuperLargeFiles] stores large or super large files in tens of TB.

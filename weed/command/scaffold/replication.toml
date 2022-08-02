@@ -46,19 +46,3 @@ bucket = "your_bucket_name"    # an existing bucket
 directory = "/"                # destination directory
 endpoint = ""
 is_incremental = false
-
-[sink.google_cloud_storage]
-# read credentials doc at https://cloud.google.com/docs/authentication/getting-started
-enabled = false
-google_application_credentials = "/path/to/x.json" # path to json credential file
-bucket = "your_bucket_seaweedfs"    # an existing bucket
-directory = "/"                     # destination directory
-is_incremental = false
-
-[sink.backblaze]
-enabled = false
-b2_account_id = ""
-b2_master_application_key = ""
-bucket = "mybucket"            # an existing bucket
-directory = "/"                # destination directory
-is_incremental = false

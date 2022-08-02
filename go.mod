@@ -42,7 +42,6 @@ require (
 	github.com/karlseguin/ccache/v2 v2.0.8
 	github.com/klauspost/compress v1.15.8 // indirect
 	github.com/klauspost/reedsolomon v1.10.0
-	github.com/kurin/blazer v0.5.3
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect

@@ -70,10 +70,6 @@ func (c *commandRemoteConfigure) Do(args []string, commandEnv *CommandEnv, write
 	remoteConfigureCommand.BoolVar(&conf.S3ForcePathStyle, "s3.force_path_style", true, "s3 force path style")
 	remoteConfigureCommand.BoolVar(&conf.S3V4Signature, "s3.v4_signature", false, "s3 V4 signature")
 
-	remoteConfigureCommand.StringVar(&conf.BackblazeKeyId, "b2.key_id", "", "backblaze keyID")
-	remoteConfigureCommand.StringVar(&conf.BackblazeApplicationKey, "b2.application_key", "", "backblaze applicationKey. Note that your Master Application Key will not work with the S3 Compatible API. You must create a new key that is eligible for use. For more information: https://help.backblaze.com/hc/en-us/articles/360047425453")
-	remoteConfigureCommand.StringVar(&conf.BackblazeEndpoint, "b2.endpoint", "", "backblaze endpoint")
-
 	remoteConfigureCommand.StringVar(&conf.AliyunAccessKey, "aliyun.access_key", "", "Aliyun access key, default to use env ALICLOUD_ACCESS_KEY_ID")
 	remoteConfigureCommand.StringVar(&conf.AliyunSecretKey, "aliyun.secret_key", "", "Aliyun secret key, default to use env ALICLOUD_ACCESS_KEY_SECRET")
 	remoteConfigureCommand.StringVar(&conf.AliyunEndpoint, "aliyun.endpoint", "", "Aliyun endpoint")
