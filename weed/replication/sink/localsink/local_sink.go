@@ -1,17 +1,17 @@
 package localsink
 
 import (
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/seaweedfs/seaweedfs/weed/filer"
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/replication/repl_util"
 	"github.com/seaweedfs/seaweedfs/weed/replication/sink"
 	"github.com/seaweedfs/seaweedfs/weed/replication/source"
 	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 	"github.com/seaweedfs/seaweedfs/weed/util"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 type LocalSink struct {
@@ -22,6 +22,40 @@ type LocalSink struct {
 
 func init() {
 	sink.Sinks = append(sink.Sinks, &LocalSink{})
+}
+
+func copyFromChunkViews(chunkViews []*filer.ChunkView, filerSource *source.FilerSource, writeFunc func(data []byte) error) error {
+
+	for _, chunk := range chunkViews {
+
+		fileUrls, err := filerSource.LookupFileId(chunk.FileId)
+		if err != nil {
+			return err
+		}
+
+		var writeErr error
+		var shouldRetry bool
+
+		for _, fileUrl := range fileUrls {
+			shouldRetry, err = util.ReadUrlAsStream(fileUrl, chunk.CipherKey, chunk.IsGzipped, chunk.IsFullChunk(), chunk.Offset, int(chunk.Size), func(data []byte) {
+				writeErr = writeFunc(data)
+			})
+			if err != nil {
+				glog.V(1).Infof("read from %s: %v", fileUrl, err)
+			} else if writeErr != nil {
+				glog.V(1).Infof("copy from %s: %v", fileUrl, writeErr)
+			} else {
+				break
+			}
+		}
+		if shouldRetry && err != nil {
+			return err
+		}
+		if writeErr != nil {
+			return writeErr
+		}
+	}
+	return nil
 }
 
 func (localsink *LocalSink) SetSourceFiler(s *source.FilerSource) {
@@ -101,7 +135,7 @@ func (localsink *LocalSink) CreateEntry(key string, entry *filer_pb.Entry, signa
 		return writeErr
 	}
 
-	if err := repl_util.CopyFromChunkViews(chunkViews, localsink.filerSource, writeFunc); err != nil {
+	if err := copyFromChunkViews(chunkViews, localsink.filerSource, writeFunc); err != nil {
 		return err
 	}
 
