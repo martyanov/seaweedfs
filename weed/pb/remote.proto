@@ -20,9 +20,6 @@ message RemoteConf {
   bool s3_force_path_style = 9;
   bool s3_v4_signature = 11;
 
-  string gcs_google_application_credentials = 10;
-  string gcs_project_id = 12;
-
   string backblaze_key_id = 20;
   string backblaze_application_key = 21;
   string backblaze_endpoint = 22;
