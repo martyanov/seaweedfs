@@ -20,7 +20,6 @@ import (
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/redis3"
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/notification"
-	_ "github.com/seaweedfs/seaweedfs/weed/notification/aws_sqs"
 	_ "github.com/seaweedfs/seaweedfs/weed/notification/kafka"
 	_ "github.com/seaweedfs/seaweedfs/weed/notification/log"
 	"github.com/seaweedfs/seaweedfs/weed/operation"
