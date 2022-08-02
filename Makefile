@@ -7,8 +7,5 @@ all: install
 install:
 	cd weed; go install
 
-full_install:
-	cd weed; go install -tags "gocdk"
-
 tests:
-	cd weed; go test -tags "gocdk" -v ./...
+	cd weed; go test -v ./...

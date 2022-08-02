@@ -52,9 +52,6 @@ type githubError struct {
 	Message string
 }
 
-//default version is not full version
-var isFullVersion = false
-
 var (
 	updateOpt UpdateOptions
 )
@@ -139,17 +136,12 @@ func downloadRelease(ctx context.Context, target string, ver string) (version st
 		largeDiskSuffix = "_large_disk"
 	}
 
-	fullSuffix := ""
-	if isFullVersion {
-		fullSuffix = "_full"
-	}
-
 	ext := "tar.gz"
 	if runtime.GOOS == "windows" {
 		ext = "zip"
 	}
 
-	suffix := fmt.Sprintf("%s_%s%s%s.%s", runtime.GOOS, runtime.GOARCH, fullSuffix, largeDiskSuffix, ext)
+	suffix := fmt.Sprintf("%s_%s%s.%s", runtime.GOOS, runtime.GOARCH, largeDiskSuffix, ext)
 	md5Filename := fmt.Sprintf("%s.md5", suffix)
 	_, md5Val, err := getGithubDataFile(ctx, rel.Assets, md5Filename)
 	if err != nil {

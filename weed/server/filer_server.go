@@ -21,7 +21,6 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/notification"
 	_ "github.com/seaweedfs/seaweedfs/weed/notification/aws_sqs"
-	_ "github.com/seaweedfs/seaweedfs/weed/notification/gocdk_pub_sub"
 	_ "github.com/seaweedfs/seaweedfs/weed/notification/google_pub_sub"
 	_ "github.com/seaweedfs/seaweedfs/weed/notification/kafka"
 	_ "github.com/seaweedfs/seaweedfs/weed/notification/log"
