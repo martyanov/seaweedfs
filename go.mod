@@ -4,7 +4,6 @@ go 1.18
 
 require (
 	cloud.google.com/go v0.102.1 // indirect
-	cloud.google.com/go/pubsub v1.24.0
 	cloud.google.com/go/storage v1.24.0
 	github.com/Azure/azure-pipeline-go v0.2.3
 	github.com/Azure/azure-storage-blob-go v0.15.0
@@ -138,7 +137,6 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.3.0 // indirect
 	github.com/tinylib/msgp v1.1.6 // indirect
-	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

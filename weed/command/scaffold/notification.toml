@@ -31,11 +31,3 @@ aws_access_key_id = ""        # if empty, loads from the shared credentials file
 aws_secret_access_key = ""        # if empty, loads from the shared credentials file (~/.aws/credentials).
 region = "us-east-2"
 sqs_queue_name = "my_filer_queue" # an existing queue name
-
-
-[notification.google_pub_sub]
-# read credentials doc at https://cloud.google.com/docs/authentication/getting-started
-enabled = false
-google_application_credentials = "/path/to/x.json" # path to json credential file
-project_id = ""                       # an existing project id
-topic = "seaweedfs_filer_topic"       # a topic, auto created if does not exists
