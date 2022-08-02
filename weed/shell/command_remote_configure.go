@@ -36,11 +36,6 @@ func (c *commandRemoteConfigure) Help() string {
 
 	# set or update a configuration
 	remote.configure -name=cloud1 -type=s3 -s3.access_key=xxx -s3.secret_key=yyy -s3.region=us-east-2
-	remote.configure -name=cloud4 -type=aliyun -aliyun.access_key=xxx -aliyun.secret_key=yyy -aliyun.endpoint=oss-cn-shenzhen.aliyuncs.com -aliyun.region=cn-sehnzhen
-	remote.configure -name=cloud5 -type=tencent -tencent.secret_id=xxx -tencent.secret_key=yyy -tencent.endpoint=cos.ap-guangzhou.myqcloud.com
-	remote.configure -name=cloud6 -type=wasabi -wasabi.access_key=xxx -wasabi.secret_key=yyy -wasabi.endpoint=s3.us-west-1.wasabisys.com -wasabi.region=us-west-1
-	remote.configure -name=cloud7 -type=storj -storj.access_key=xxx -storj.secret_key=yyy -storj.endpoint=https://gateway.us1.storjshare.io
-	remote.configure -name=cloud8 -type=filebase -filebase.access_key=xxx -filebase.secret_key=yyy -filebase.endpoint=https://s3.filebase.com
 
 	# delete one configuration
 	remote.configure -delete -name=cloud1
@@ -69,33 +64,6 @@ func (c *commandRemoteConfigure) Do(args []string, commandEnv *CommandEnv, write
 	remoteConfigureCommand.StringVar(&conf.S3StorageClass, "s3.storage_class", "", "s3 storage class")
 	remoteConfigureCommand.BoolVar(&conf.S3ForcePathStyle, "s3.force_path_style", true, "s3 force path style")
 	remoteConfigureCommand.BoolVar(&conf.S3V4Signature, "s3.v4_signature", false, "s3 V4 signature")
-
-	remoteConfigureCommand.StringVar(&conf.AliyunAccessKey, "aliyun.access_key", "", "Aliyun access key, default to use env ALICLOUD_ACCESS_KEY_ID")
-	remoteConfigureCommand.StringVar(&conf.AliyunSecretKey, "aliyun.secret_key", "", "Aliyun secret key, default to use env ALICLOUD_ACCESS_KEY_SECRET")
-	remoteConfigureCommand.StringVar(&conf.AliyunEndpoint, "aliyun.endpoint", "", "Aliyun endpoint")
-	remoteConfigureCommand.StringVar(&conf.AliyunRegion, "aliyun.region", "", "Aliyun region")
-
-	remoteConfigureCommand.StringVar(&conf.TencentSecretId, "tencent.secret_id", "", "Tencent Secret Id, default to use env COS_SECRETID")
-	remoteConfigureCommand.StringVar(&conf.TencentSecretKey, "tencent.secret_key", "", "Tencent secret key, default to use env COS_SECRETKEY")
-	remoteConfigureCommand.StringVar(&conf.TencentEndpoint, "tencent.endpoint", "", "Tencent endpoint")
-
-	remoteConfigureCommand.StringVar(&conf.BaiduAccessKey, "baidu.access_key", "", "Baidu access key, default to use env BDCLOUD_ACCESS_KEY")
-	remoteConfigureCommand.StringVar(&conf.BaiduSecretKey, "baidu.secret_key", "", "Baidu secret key, default to use env BDCLOUD_SECRET_KEY")
-	remoteConfigureCommand.StringVar(&conf.BaiduEndpoint, "baidu.endpoint", "", "Baidu endpoint")
-	remoteConfigureCommand.StringVar(&conf.BaiduRegion, "baidu.region", "", "Baidu region")
-
-	remoteConfigureCommand.StringVar(&conf.WasabiAccessKey, "wasabi.access_key", "", "Wasabi access key")
-	remoteConfigureCommand.StringVar(&conf.WasabiSecretKey, "wasabi.secret_key", "", "Wasabi secret key")
-	remoteConfigureCommand.StringVar(&conf.WasabiEndpoint, "wasabi.endpoint", "", "Wasabi endpoint, see https://wasabi.com/wp-content/themes/wasabi/docs/API_Guide/index.html#t=topics%2Fapidiff-intro.htm")
-	remoteConfigureCommand.StringVar(&conf.WasabiRegion, "wasabi.region", "", "Wasabi region")
-
-	remoteConfigureCommand.StringVar(&conf.FilebaseAccessKey, "filebase.access_key", "", "Filebase access key")
-	remoteConfigureCommand.StringVar(&conf.FilebaseSecretKey, "filebase.secret_key", "", "Filebase secret key")
-	remoteConfigureCommand.StringVar(&conf.FilebaseEndpoint, "filebase.endpoint", "", "Filebase endpoint, https://s3.filebase.com")
-
-	remoteConfigureCommand.StringVar(&conf.StorjAccessKey, "storj.access_key", "", "Storj access key")
-	remoteConfigureCommand.StringVar(&conf.StorjSecretKey, "storj.secret_key", "", "Storj secret key")
-	remoteConfigureCommand.StringVar(&conf.StorjEndpoint, "storj.endpoint", "", "Storj endpoint")
 
 	if err = remoteConfigureCommand.Parse(args); err != nil {
 		return nil
@@ -141,12 +109,6 @@ func (c *commandRemoteConfigure) listExistingRemoteStorages(commandEnv *CommandE
 
 		// change secret key to stars
 		conf.S3SecretKey = strings.Repeat("*", len(conf.S3SecretKey))
-		conf.AliyunSecretKey = strings.Repeat("*", len(conf.AliyunSecretKey))
-		conf.BaiduAccessKey = strings.Repeat("*", len(conf.BaiduAccessKey))
-		conf.FilebaseSecretKey = strings.Repeat("*", len(conf.FilebaseSecretKey))
-		conf.StorjSecretKey = strings.Repeat("*", len(conf.StorjSecretKey))
-		conf.TencentSecretKey = strings.Repeat("*", len(conf.TencentSecretKey))
-		conf.WasabiSecretKey = strings.Repeat("*", len(conf.WasabiSecretKey))
 
 		m := jsonpb.Marshaler{
 			EmitDefaults: false,

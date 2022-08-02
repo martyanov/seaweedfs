@@ -286,3 +286,15 @@ func (s *s3RemoteStorageClient) DeleteBucket(name string) (err error) {
 	}
 	return
 }
+
+var skipSha256PayloadSigning = func(r *request.Request) {
+	// see https://github.com/ceph/ceph/pull/15965/files
+	if r.ClientInfo.ServiceID != "S3" {
+		return
+	}
+	if r.Operation.Name == "PutObject" || r.Operation.Name == "UploadPart" {
+		if len(r.HTTPRequest.Header.Get("X-Amz-Content-Sha256")) == 0 {
+			r.HTTPRequest.Header.Set("X-Amz-Content-Sha256", "UNSIGNED-PAYLOAD")
+		}
+	}
+}
