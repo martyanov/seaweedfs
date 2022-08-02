@@ -5,8 +5,6 @@ go 1.18
 require (
 	cloud.google.com/go v0.102.1 // indirect
 	cloud.google.com/go/storage v1.24.0
-	github.com/Azure/azure-pipeline-go v0.2.3
-	github.com/Azure/azure-storage-blob-go v0.15.0
 	github.com/Shopify/sarama v1.35.0
 	github.com/aws/aws-sdk-go v1.44.66
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -51,7 +49,6 @@ require (
 	github.com/klauspost/reedsolomon v1.10.0
 	github.com/kurin/blazer v0.5.3
 	github.com/magiconair/properties v1.8.6 // indirect
-	github.com/mattn/go-ieproxy v0.0.3 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
@@ -113,12 +110,10 @@ require (
 require (
 	cloud.google.com/go/compute v1.7.0 // indirect
 	cloud.google.com/go/iam v0.3.0 // indirect
-	github.com/Azure/go-autorest/autorest/adal v0.9.17 // indirect
 	github.com/armon/go-metrics v0.3.10 // indirect
 	github.com/boltdb/bolt v1.3.1 // indirect
 	github.com/d4l3k/messagediff v1.2.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
-	github.com/golang-jwt/jwt/v4 v4.4.1 // indirect
 	github.com/google/martian/v3 v3.3.2 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.1.0 // indirect
 	github.com/hashicorp/go-hclog v1.2.0 // indirect

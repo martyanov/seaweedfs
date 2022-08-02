@@ -55,15 +55,6 @@ bucket = "your_bucket_seaweedfs"    # an existing bucket
 directory = "/"                     # destination directory
 is_incremental = false
 
-[sink.azure]
-# experimental, let me know if it works
-enabled = false
-account_name = ""
-account_key = ""
-container = "mycontainer"      # an existing container
-directory = "/"                # destination directory
-is_incremental = false
-
 [sink.backblaze]
 enabled = false
 b2_account_id = ""
