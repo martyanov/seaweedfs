@@ -362,21 +362,6 @@ message KeepConnectedRequest {
 message KeepConnectedResponse {
 }
 
-message LocateBrokerRequest {
-    string resource = 1;
-}
-
-message LocateBrokerResponse {
-    bool found = 1;
-    // if found, send the exact address
-    // if not found, send the full list of existing brokers
-    message Resource {
-        string grpc_addresses = 1;
-        int32 resource_count = 2;
-    }
-    repeated Resource resources = 2;
-}
-
 /////////////////////////
 // Key-Value operations
 /////////////////////////

@@ -1,18 +1,18 @@
 package cluster
 
 import (
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
 	"math"
 	"sync"
 	"time"
+
+	"github.com/seaweedfs/seaweedfs/weed/pb"
+	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
 )
 
 const (
 	MasterType       = "master"
 	VolumeServerType = "volumeServer"
 	FilerType        = "filer"
-	BrokerType       = "broker"
 )
 
 type FilerGroupName string
@@ -39,8 +39,7 @@ type ClusterNodeGroups struct {
 	sync.RWMutex
 }
 type Cluster struct {
-	filerGroups  *ClusterNodeGroups
-	brokerGroups *ClusterNodeGroups
+	filerGroups *ClusterNodeGroups
 }
 
 func newClusterNodeGroups() *ClusterNodeGroups {
@@ -143,8 +142,7 @@ func (g *ClusterNodeGroups) ListClusterNodeLeaders(filerGroup FilerGroupName) (n
 
 func NewCluster() *Cluster {
 	return &Cluster{
-		filerGroups:  newClusterNodeGroups(),
-		brokerGroups: newClusterNodeGroups(),
+		filerGroups: newClusterNodeGroups(),
 	}
 }
 
@@ -152,8 +150,6 @@ func (cluster *Cluster) getGroupMembers(filerGroup FilerGroupName, nodeType stri
 	switch nodeType {
 	case FilerType:
 		return cluster.filerGroups.getGroupMembers(filerGroup, createIfNotFound)
-	case BrokerType:
-		return cluster.brokerGroups.getGroupMembers(filerGroup, createIfNotFound)
 	}
 	return nil
 }
@@ -163,8 +159,6 @@ func (cluster *Cluster) AddClusterNode(ns, nodeType string, dataCenter DataCente
 	switch nodeType {
 	case FilerType:
 		return cluster.filerGroups.AddClusterNode(filerGroup, nodeType, dataCenter, rack, address, version)
-	case BrokerType:
-		return cluster.brokerGroups.AddClusterNode(filerGroup, nodeType, dataCenter, rack, address, version)
 	case MasterType:
 		return []*master_pb.KeepConnectedResponse{
 			{
@@ -184,8 +178,6 @@ func (cluster *Cluster) RemoveClusterNode(ns string, nodeType string, address pb
 	switch nodeType {
 	case FilerType:
 		return cluster.filerGroups.RemoveClusterNode(filerGroup, nodeType, address)
-	case BrokerType:
-		return cluster.brokerGroups.RemoveClusterNode(filerGroup, nodeType, address)
 	case MasterType:
 		return []*master_pb.KeepConnectedResponse{
 			{
@@ -204,8 +196,6 @@ func (cluster *Cluster) ListClusterNode(filerGroup FilerGroupName, nodeType stri
 	switch nodeType {
 	case FilerType:
 		return cluster.filerGroups.ListClusterNode(filerGroup)
-	case BrokerType:
-		return cluster.brokerGroups.ListClusterNode(filerGroup)
 	case MasterType:
 	}
 	return
@@ -215,8 +205,6 @@ func (cluster *Cluster) ListClusterNodeLeaders(filerGroup FilerGroupName, nodeTy
 	switch nodeType {
 	case FilerType:
 		return cluster.filerGroups.ListClusterNodeLeaders(filerGroup)
-	case BrokerType:
-		return cluster.brokerGroups.ListClusterNodeLeaders(filerGroup)
 	case MasterType:
 	}
 	return
@@ -226,8 +214,6 @@ func (cluster *Cluster) IsOneLeader(filerGroup FilerGroupName, nodeType string, 
 	switch nodeType {
 	case FilerType:
 		return cluster.filerGroups.IsOneLeader(filerGroup, address)
-	case BrokerType:
-		return cluster.brokerGroups.IsOneLeader(filerGroup, address)
 	case MasterType:
 	}
 	return false

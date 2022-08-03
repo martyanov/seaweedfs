@@ -24,13 +24,12 @@ type ServerOptions struct {
 }
 
 var (
-	serverOptions   ServerOptions
-	masterOptions   MasterOptions
-	filerOptions    FilerOptions
-	s3Options       S3Options
-	iamOptions      IamOptions
-	webdavOptions   WebDavOption
-	mqBrokerOptions MessageQueueBrokerOptions
+	serverOptions ServerOptions
+	masterOptions MasterOptions
+	filerOptions  FilerOptions
+	s3Options     S3Options
+	iamOptions    IamOptions
+	webdavOptions WebDavOption
 )
 
 func init() {
@@ -74,7 +73,6 @@ var (
 	isStartingS3           = cmdServer.Flag.Bool("s3", false, "whether to start S3 gateway")
 	isStartingIam          = cmdServer.Flag.Bool("iam", false, "whether to start IAM service")
 	isStartingWebDav       = cmdServer.Flag.Bool("webdav", false, "whether to start WebDAV gateway")
-	isStartingMqBroker     = cmdServer.Flag.Bool("mq.broker", false, "whether to start message queue broker")
 
 	serverWhiteList []string
 
@@ -153,9 +151,6 @@ func init() {
 	webdavOptions.tlsCertificate = cmdServer.Flag.String("webdav.cert.file", "", "path to the TLS certificate file")
 	webdavOptions.cacheDir = cmdServer.Flag.String("webdav.cacheDir", os.TempDir(), "local cache directory for file chunks")
 	webdavOptions.cacheSizeMB = cmdServer.Flag.Int64("webdav.cacheCapacityMB", 0, "local cache capacity in MB")
-
-	mqBrokerOptions.port = cmdServer.Flag.Int("mq.broker.port", 17777, "message queue broker gRPC listen port")
-
 }
 
 func runServer(cmd *Command, args []string) bool {
@@ -176,9 +171,6 @@ func runServer(cmd *Command, args []string) bool {
 		*isStartingFiler = true
 	}
 	if *isStartingWebDav {
-		*isStartingFiler = true
-	}
-	if *isStartingMqBroker {
 		*isStartingFiler = true
 	}
 
@@ -207,9 +199,6 @@ func runServer(cmd *Command, args []string) bool {
 	serverOptions.v.idleConnectionTimeout = serverTimeout
 	serverOptions.v.dataCenter = serverDataCenter
 	serverOptions.v.rack = serverRack
-	mqBrokerOptions.ip = serverIp
-	mqBrokerOptions.masters = filerOptions.masters
-	mqBrokerOptions.filerGroup = filerOptions.filerGroup
 
 	// serverOptions.v.pulseSeconds = pulseSeconds
 	// masterOptions.pulseSeconds = pulseSeconds
@@ -218,8 +207,6 @@ func runServer(cmd *Command, args []string) bool {
 
 	filerOptions.dataCenter = serverDataCenter
 	filerOptions.rack = serverRack
-	mqBrokerOptions.dataCenter = serverDataCenter
-	mqBrokerOptions.rack = serverRack
 	filerOptions.disableHttp = serverDisableHttp
 	masterOptions.disableHttp = serverDisableHttp
 
@@ -227,7 +214,6 @@ func runServer(cmd *Command, args []string) bool {
 	s3Options.filer = &filerAddress
 	iamOptions.filer = &filerAddress
 	webdavOptions.filer = &filerAddress
-	mqBrokerOptions.filerGroup = filerOptions.filerGroup
 
 	go stats_collect.StartMetricsServer(*serverMetricsHttpPort)
 
@@ -276,13 +262,6 @@ func runServer(cmd *Command, args []string) bool {
 			time.Sleep(2 * time.Second)
 			webdavOptions.startWebDav()
 
-		}()
-	}
-
-	if *isStartingMqBroker {
-		go func() {
-			time.Sleep(2 * time.Second)
-			mqBrokerOptions.startQueueServer()
 		}()
 	}
 

@@ -3,9 +3,6 @@ package pb
 import (
 	"context"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
-	"github.com/seaweedfs/seaweedfs/weed/util"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -13,12 +10,15 @@ import (
 	"sync"
 	"time"
 
+	"github.com/seaweedfs/seaweedfs/weed/glog"
+	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/util"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 
 	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/mq_pb"
 )
 
 const (
@@ -216,14 +216,6 @@ func WithVolumeServerClient(streamingMode bool, volumeServer ServerAddress, grpc
 
 }
 
-func WithBrokerClient(streamingMode bool, broker ServerAddress, grpcDialOption grpc.DialOption, fn func(client mq_pb.SeaweedMessagingClient) error) error {
-	return WithGrpcClient(streamingMode, func(grpcConnection *grpc.ClientConn) error {
-		client := mq_pb.NewSeaweedMessagingClient(grpcConnection)
-		return fn(client)
-	}, broker.ToGrpcAddress(), grpcDialOption)
-
-}
-
 func WithOneOfGrpcMasterClients(streamingMode bool, masterGrpcAddresses map[string]ServerAddress, grpcDialOption grpc.DialOption, fn func(client master_pb.SeaweedClient) error) (err error) {
 
 	for _, masterGrpcAddress := range masterGrpcAddresses {
@@ -237,15 +229,6 @@ func WithOneOfGrpcMasterClients(streamingMode bool, masterGrpcAddresses map[stri
 	}
 
 	return err
-}
-
-func WithBrokerGrpcClient(streamingMode bool, brokerGrpcAddress string, grpcDialOption grpc.DialOption, fn func(client mq_pb.SeaweedMessagingClient) error) error {
-
-	return WithGrpcClient(streamingMode, func(grpcConnection *grpc.ClientConn) error {
-		client := mq_pb.NewSeaweedMessagingClient(grpcConnection)
-		return fn(client)
-	}, brokerGrpcAddress, grpcDialOption)
-
 }
 
 func WithFilerClient(streamingMode bool, filer ServerAddress, grpcDialOption grpc.DialOption, fn func(client filer_pb.SeaweedFilerClient) error) error {
