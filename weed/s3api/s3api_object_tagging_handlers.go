@@ -3,9 +3,10 @@ package s3api
 import (
 	"encoding/xml"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 	"io"
 	"net/http"
+
+	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
@@ -81,7 +82,6 @@ func (s3a *S3ApiServer) PutObjectTaggingHandler(w http.ResponseWriter, r *http.R
 	}
 
 	w.WriteHeader(http.StatusOK)
-	s3err.PostLog(r, http.StatusOK, s3err.ErrNone)
 }
 
 // DeleteObjectTaggingHandler Delete object tagging
@@ -107,5 +107,4 @@ func (s3a *S3ApiServer) DeleteObjectTaggingHandler(w http.ResponseWriter, r *htt
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-	s3err.PostLog(r, http.StatusNoContent, s3err.ErrNone)
 }

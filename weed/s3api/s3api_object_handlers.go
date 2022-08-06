@@ -6,15 +6,16 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
-	"github.com/seaweedfs/seaweedfs/weed/security"
-	"github.com/seaweedfs/seaweedfs/weed/util/mem"
-	"golang.org/x/exp/slices"
 	"io"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
+	"github.com/seaweedfs/seaweedfs/weed/security"
+	"github.com/seaweedfs/seaweedfs/weed/util/mem"
+	"golang.org/x/exp/slices"
 
 	"github.com/pquerna/cachecontrol/cacheobject"
 	"github.com/seaweedfs/seaweedfs/weed/filer"
@@ -234,13 +235,9 @@ func (s3a *S3ApiServer) DeleteMultipleObjectsHandler(w http.ResponseWriter, r *h
 
 	var deletedObjects []ObjectIdentifier
 	var deleteErrors []DeleteError
-	var auditLog *s3err.AccessLog
 
 	directoriesWithDeletion := make(map[string]int)
 
-	if s3err.Logger != nil {
-		auditLog = s3err.GetAccessLog(r, http.StatusNoContent, s3err.ErrNone)
-	}
 	s3a.WithFilerClient(false, func(client filer_pb.SeaweedFilerClient) error {
 
 		// delete file entries
@@ -266,10 +263,6 @@ func (s3a *S3ApiServer) DeleteMultipleObjectsHandler(w http.ResponseWriter, r *h
 					Message: err.Error(),
 					Key:     object.ObjectName,
 				})
-			}
-			if auditLog != nil {
-				auditLog.Key = entryName
-				s3err.PostAccessLog(*auditLog)
 			}
 		}
 
@@ -364,9 +357,6 @@ func (s3a *S3ApiServer) proxyToFiler(w http.ResponseWriter, r *http.Request, des
 			return
 		}
 	}
-
-	responseStatusCode := responseFn(resp, w)
-	s3err.PostLog(r, responseStatusCode, s3err.ErrNone)
 }
 
 func passThroughResponse(proxyResponse *http.Response, w http.ResponseWriter) (statusCode int) {

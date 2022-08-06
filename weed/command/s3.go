@@ -3,10 +3,10 @@ package command
 import (
 	"context"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/s3api/s3err"
-	"google.golang.org/grpc/reflection"
 	"net/http"
 	"time"
+
+	"google.golang.org/grpc/reflection"
 
 	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
@@ -37,7 +37,6 @@ type S3Options struct {
 	metricsHttpPort           *int
 	allowEmptyFolder          *bool
 	allowDeleteBucketNotEmpty *bool
-	auditLogConfig            *string
 	localFilerSocket          *string
 	dataCenter                *string
 }
@@ -51,7 +50,6 @@ func init() {
 	s3StandaloneOptions.domainName = cmdS3.Flag.String("domainName", "", "suffix of the host name in comma separated list, {bucket}.{domainName}")
 	s3StandaloneOptions.dataCenter = cmdS3.Flag.String("dataCenter", "", "prefer to read and write to volumes in this data center")
 	s3StandaloneOptions.config = cmdS3.Flag.String("config", "", "path to the config file")
-	s3StandaloneOptions.auditLogConfig = cmdS3.Flag.String("auditLogConfig", "", "path to the audit log config file")
 	s3StandaloneOptions.tlsPrivateKey = cmdS3.Flag.String("key.file", "", "path to the TLS private key file")
 	s3StandaloneOptions.tlsCertificate = cmdS3.Flag.String("cert.file", "", "path to the TLS certificate file")
 	s3StandaloneOptions.metricsHttpPort = cmdS3.Flag.Int("metricsPort", 0, "Prometheus metrics listen port")
@@ -214,13 +212,6 @@ func (s3opt *S3Options) startS3Server() bool {
 	s3ApiListener, s3ApiLocalListner, err := util.NewIpAndLocalListeners(*s3opt.bindIp, *s3opt.port, time.Duration(10)*time.Second)
 	if err != nil {
 		glog.Fatalf("S3 API Server listener on %s error: %v", listenAddress, err)
-	}
-
-	if len(*s3opt.auditLogConfig) > 0 {
-		s3err.InitAuditLog(*s3opt.auditLogConfig)
-		if s3err.Logger != nil {
-			defer s3err.Logger.Close()
-		}
 	}
 
 	// starting grpc server

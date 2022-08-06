@@ -3,9 +3,10 @@ package s3api
 import (
 	"encoding/base64"
 	"fmt"
+	"net/http"
+
 	"github.com/seaweedfs/seaweedfs/weed/s3api/s3err"
 	"google.golang.org/grpc"
-	"net/http"
 
 	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
@@ -32,7 +33,6 @@ func (s3a *S3ApiServer) GetDataCenter() string {
 
 func writeSuccessResponseXML(w http.ResponseWriter, r *http.Request, response interface{}) {
 	s3err.WriteXMLResponse(w, r, http.StatusOK, response)
-	s3err.PostLog(r, http.StatusOK, s3err.ErrNone)
 }
 
 func writeSuccessResponseEmpty(w http.ResponseWriter, r *http.Request) {

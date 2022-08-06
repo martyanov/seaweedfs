@@ -122,8 +122,6 @@ func (s3a *S3ApiServer) AbortMultipartUploadHandler(w http.ResponseWriter, r *ht
 
 	//https://docs.aws.amazon.com/AmazonS3/latest/API/API_AbortMultipartUpload.html
 	s3err.WriteXMLResponse(w, r, http.StatusNoContent, response)
-	s3err.PostLog(r, http.StatusNoContent, s3err.ErrNone)
-
 }
 
 // ListMultipartUploadsHandler - Lists multipart uploads.
