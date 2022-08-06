@@ -1,10 +1,8 @@
-//go:build !linux
-// +build !linux
-
 package backend
 
 import (
 	"os"
+	"syscall"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 )
@@ -14,8 +12,9 @@ func CreateVolumeFile(fileName string, preallocate int64, memoryMapSizeMB uint32
 	if e != nil {
 		return nil, e
 	}
-	if preallocate > 0 {
-		glog.V(2).Infof("Preallocated disk space for %s is not supported", fileName)
+	if preallocate != 0 {
+		syscall.Fallocate(int(file.Fd()), 1, 0, preallocate)
+		glog.V(1).Infof("Preallocated %d bytes disk space for %s", preallocate, fileName)
 	}
 	return NewDiskFile(file), nil
 }

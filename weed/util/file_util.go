@@ -6,6 +6,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
@@ -111,4 +112,8 @@ func WriteFile(name string, data []byte, perm os.FileMode) error {
 		err = err1
 	}
 	return err
+}
+
+func GetFileUidGid(fi os.FileInfo) (uid, gid uint32) {
+	return fi.Sys().(*syscall.Stat_t).Uid, fi.Sys().(*syscall.Stat_t).Gid
 }

@@ -1,11 +1,17 @@
-//go:build linux || darwin
-// +build linux darwin
-
 package command
 
 import (
 	"context"
 	"fmt"
+	"net"
+	"net/http"
+	"os"
+	"os/user"
+	"runtime"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/hanwen/go-fuse/v2/fuse"
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/mount"
@@ -17,14 +23,6 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/security"
 	"github.com/seaweedfs/seaweedfs/weed/storage/types"
 	"google.golang.org/grpc/reflection"
-	"net"
-	"net/http"
-	"os"
-	"os/user"
-	"runtime"
-	"strconv"
-	"strings"
-	"time"
 
 	"github.com/seaweedfs/seaweedfs/weed/util"
 	"github.com/seaweedfs/seaweedfs/weed/util/grace"

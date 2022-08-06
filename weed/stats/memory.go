@@ -2,6 +2,7 @@ package stats
 
 import (
 	"runtime"
+	"syscall"
 
 	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
 )
@@ -17,4 +18,15 @@ func MemStat() *volume_server_pb.MemStatus {
 
 	fillInMemStatus(mem)
 	return mem
+}
+
+func fillInMemStatus(mem *volume_server_pb.MemStatus) {
+	//system memory usage
+	sysInfo := new(syscall.Sysinfo_t)
+	err := syscall.Sysinfo(sysInfo)
+	if err == nil {
+		mem.All = uint64(sysInfo.Totalram) //* uint64(syscall.Getpagesize())
+		mem.Free = uint64(sysInfo.Freeram) //* uint64(syscall.Getpagesize())
+		mem.Used = mem.All - mem.Free
+	}
 }
