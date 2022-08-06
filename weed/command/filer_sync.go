@@ -4,6 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"strings"
+	"time"
+
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
@@ -16,9 +20,6 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/util"
 	"github.com/seaweedfs/seaweedfs/weed/util/grace"
 	"google.golang.org/grpc"
-	"os"
-	"strings"
-	"time"
 )
 
 type SyncOptions struct {
@@ -447,5 +448,5 @@ func buildKey(dataSink sink.ReplicationSink, message *filer_pb.EventNotification
 		key = util.Join(targetPath, dateKey, string(sourceKey)[len(sourcePath):])
 	}
 
-	return escapeKey(key)
+	return key
 }

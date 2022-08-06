@@ -3,7 +3,6 @@ package storage
 import (
 	"fmt"
 	"os"
-	"runtime"
 	"time"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
@@ -135,16 +134,6 @@ func (v *Volume) CommitCompact() error {
 			return e
 		}
 	} else {
-		if runtime.GOOS == "windows" {
-			e = os.RemoveAll(v.FileName(".dat"))
-			if e != nil {
-				return e
-			}
-			e = os.RemoveAll(v.FileName(".idx"))
-			if e != nil {
-				return e
-			}
-		}
 		var e error
 		if e = os.Rename(v.FileName(".cpd"), v.FileName(".dat")); e != nil {
 			return fmt.Errorf("rename %s: %v", v.FileName(".cpd"), e)

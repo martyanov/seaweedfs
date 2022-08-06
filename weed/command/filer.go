@@ -5,7 +5,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"runtime"
 	"sort"
 	"strings"
 	"time"
@@ -291,22 +290,24 @@ func (fo *FilerOptions) startFiler() {
 	go grpcS.Serve(grpcL)
 
 	httpS := &http.Server{Handler: defaultMux}
-	if runtime.GOOS != "windows" {
-		if *fo.localSocket == "" {
-			*fo.localSocket = fmt.Sprintf("/tmp/seaweefs-filer-%d.sock", *fo.port)
-		}
-		if err := os.Remove(*fo.localSocket); err != nil && !os.IsNotExist(err) {
-			glog.Fatalf("Failed to remove %s, error: %s", *fo.localSocket, err.Error())
-		}
-		go func() {
-			// start on local unix socket
-			filerSocketListener, err := net.Listen("unix", *fo.localSocket)
-			if err != nil {
-				glog.Fatalf("Failed to listen on %s: %v", *fo.localSocket, err)
-			}
-			httpS.Serve(filerSocketListener)
-		}()
+
+	if *fo.localSocket == "" {
+		*fo.localSocket = fmt.Sprintf("/tmp/seaweefs-filer-%d.sock", *fo.port)
 	}
+
+	if err := os.Remove(*fo.localSocket); err != nil && !os.IsNotExist(err) {
+		glog.Fatalf("Failed to remove %s, error: %s", *fo.localSocket, err.Error())
+	}
+
+	go func() {
+		// start on local unix socket
+		filerSocketListener, err := net.Listen("unix", *fo.localSocket)
+		if err != nil {
+			glog.Fatalf("Failed to listen on %s: %v", *fo.localSocket, err)
+		}
+		httpS.Serve(filerSocketListener)
+	}()
+
 	if filerLocalListener != nil {
 		go func() {
 			if err := httpS.Serve(filerLocalListener); err != nil {

@@ -2,10 +2,10 @@ package command
 
 import (
 	"fmt"
+
 	"github.com/posener/complete"
 	completeinstall "github.com/posener/complete/cmd/install"
 	flag "github.com/seaweedfs/seaweedfs/weed/util/fla9"
-	"runtime"
 )
 
 func AutocompleteMain(commands []*Command) bool {
@@ -40,11 +40,6 @@ func AutocompleteMain(commands []*Command) bool {
 }
 
 func installAutoCompletion() bool {
-	if runtime.GOOS == "windows" {
-		fmt.Println("Windows is not supported")
-		return false
-	}
-
 	err := completeinstall.Install("weed")
 	if err != nil {
 		fmt.Printf("install failed! %s\n", err)
@@ -55,11 +50,6 @@ func installAutoCompletion() bool {
 }
 
 func uninstallAutoCompletion() bool {
-	if runtime.GOOS == "windows" {
-		fmt.Println("Windows is not supported")
-		return false
-	}
-
 	err := completeinstall.Uninstall("weed")
 	if err != nil {
 		fmt.Printf("uninstall failed! %s\n", err)
@@ -76,7 +66,6 @@ var cmdAutocomplete = &Command{
 	Long: `weed autocomplete is installed in the shell.
 
     Supported shells are bash, zsh, and fish.
-    Windows is not supported.
 
 `,
 }
@@ -94,8 +83,6 @@ var cmdUnautocomplete = &Command{
 	UsageLine: "autocomplete.uninstall",
 	Short:     "uninstall autocomplete",
 	Long: `weed autocomplete is uninstalled in the shell.
-
-    Windows is not supported.
 
 `,
 }

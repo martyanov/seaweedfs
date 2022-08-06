@@ -21,13 +21,14 @@ package glog
 import (
 	"errors"
 	"fmt"
-	flag "github.com/seaweedfs/seaweedfs/weed/util/fla9"
 	"os"
 	"os/user"
 	"path/filepath"
 	"strings"
 	"sync"
 	"time"
+
+	flag "github.com/seaweedfs/seaweedfs/weed/util/fla9"
 )
 
 // MaxSize is the maximum size of a log file in bytes.
@@ -64,9 +65,6 @@ func init() {
 	if err == nil {
 		userName = current.Username
 	}
-
-	// Sanitize userName since it may contain filepath separators on Windows.
-	userName = strings.Replace(userName, `\`, "_", -1)
 }
 
 // shortHostname returns its argument, truncating at the first period.

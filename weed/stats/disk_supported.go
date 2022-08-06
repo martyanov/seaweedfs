@@ -1,5 +1,5 @@
-//go:build !windows && !openbsd && !netbsd && !plan9 && !solaris
-// +build !windows,!openbsd,!netbsd,!plan9,!solaris
+//go:build !openbsd && !netbsd && !plan9 && !solaris
+// +build !openbsd,!netbsd,!plan9,!solaris
 
 package stats
 
