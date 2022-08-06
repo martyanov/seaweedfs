@@ -7,11 +7,6 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
-type Offset struct {
-	OffsetHigher
-	OffsetLower
-}
-
 type Size int32
 
 func (s Size) IsDeleted() bool {
@@ -19,13 +14,6 @@ func (s Size) IsDeleted() bool {
 }
 func (s Size) IsValid() bool {
 	return s > 0 && s != TombstoneFileSize
-}
-
-type OffsetLower struct {
-	b3 byte
-	b2 byte
-	b1 byte
-	b0 byte // the smaller byte
 }
 
 type Cookie uint32

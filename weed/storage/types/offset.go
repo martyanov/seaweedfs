@@ -1,14 +1,22 @@
-//go:build !5BytesOffset
-// +build !5BytesOffset
-
 package types
 
 import (
 	"fmt"
 )
 
+type OffsetLower struct {
+	b3 byte
+	b2 byte
+	b1 byte
+	b0 byte // the smaller byte
+}
+
 type OffsetHigher struct {
-	// b4 byte
+}
+
+type Offset struct {
+	OffsetLower
+	OffsetHigher
 }
 
 const (
