@@ -4,11 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 	"time"
+
+	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/operation"
@@ -105,6 +107,18 @@ func (fs *FilerServer) PostHandler(w http.ResponseWriter, r *http.Request, conte
 
 	util.CloseRequest(r)
 
+}
+
+func clearName(name string) (string, error) {
+	slashed := strings.HasSuffix(name, "/")
+	name = path.Clean(name)
+	if !strings.HasSuffix(name, "/") && slashed {
+		name += "/"
+	}
+	if !strings.HasPrefix(name, "/") {
+		return "", os.ErrInvalid
+	}
+	return name, nil
 }
 
 func (fs *FilerServer) move(ctx context.Context, w http.ResponseWriter, r *http.Request, so *operation.StorageOption) {

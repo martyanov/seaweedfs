@@ -22,13 +22,11 @@ import (
 )
 
 var (
-	f                  FilerOptions
-	filerStartS3       *bool
-	filerS3Options     S3Options
-	filerStartWebDav   *bool
-	filerWebDavOptions WebDavOption
-	filerStartIam      *bool
-	filerIamOptions    IamOptions
+	f               FilerOptions
+	filerStartS3    *bool
+	filerS3Options  S3Options
+	filerStartIam   *bool
+	filerIamOptions IamOptions
 )
 
 type FilerOptions struct {
@@ -101,17 +99,6 @@ func init() {
 	filerS3Options.allowEmptyFolder = cmdFiler.Flag.Bool("s3.allowEmptyFolder", true, "allow empty folders")
 	filerS3Options.allowDeleteBucketNotEmpty = cmdFiler.Flag.Bool("s3.allowDeleteBucketNotEmpty", true, "allow recursive deleting all entries along with bucket")
 
-	// start webdav on filer
-	filerStartWebDav = cmdFiler.Flag.Bool("webdav", false, "whether to start webdav gateway")
-	filerWebDavOptions.port = cmdFiler.Flag.Int("webdav.port", 7333, "webdav server http listen port")
-	filerWebDavOptions.collection = cmdFiler.Flag.String("webdav.collection", "", "collection to create the files")
-	filerWebDavOptions.replication = cmdFiler.Flag.String("webdav.replication", "", "replication to create the files")
-	filerWebDavOptions.disk = cmdFiler.Flag.String("webdav.disk", "", "[hdd|ssd|<tag>] hard drive or solid state drive or any tag")
-	filerWebDavOptions.tlsPrivateKey = cmdFiler.Flag.String("webdav.key.file", "", "path to the TLS private key file")
-	filerWebDavOptions.tlsCertificate = cmdFiler.Flag.String("webdav.cert.file", "", "path to the TLS certificate file")
-	filerWebDavOptions.cacheDir = cmdFiler.Flag.String("webdav.cacheDir", os.TempDir(), "local cache directory for file chunks")
-	filerWebDavOptions.cacheSizeMB = cmdFiler.Flag.Int64("webdav.cacheCapacityMB", 0, "local cache capacity in MB")
-
 	// start iam on filer
 	filerStartIam = cmdFiler.Flag.Bool("iam", false, "whether to start IAM service")
 	filerIamOptions.ip = cmdFiler.Flag.String("iam.ip", *f.ip, "iam server http listen ip address")
@@ -174,15 +161,6 @@ func runFiler(cmd *Command, args []string) bool {
 		go func() {
 			time.Sleep(startDelay * time.Second)
 			filerS3Options.startS3Server()
-		}()
-		startDelay++
-	}
-
-	if *filerStartWebDav {
-		filerWebDavOptions.filer = &filerAddress
-		go func() {
-			time.Sleep(startDelay * time.Second)
-			filerWebDavOptions.startWebDav()
 		}()
 		startDelay++
 	}

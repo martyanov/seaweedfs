@@ -29,7 +29,6 @@ var (
 	filerOptions  FilerOptions
 	s3Options     S3Options
 	iamOptions    IamOptions
-	webdavOptions WebDavOption
 )
 
 func init() {
@@ -72,7 +71,6 @@ var (
 	isStartingFiler        = cmdServer.Flag.Bool("filer", false, "whether to start filer")
 	isStartingS3           = cmdServer.Flag.Bool("s3", false, "whether to start S3 gateway")
 	isStartingIam          = cmdServer.Flag.Bool("iam", false, "whether to start IAM service")
-	isStartingWebDav       = cmdServer.Flag.Bool("webdav", false, "whether to start WebDAV gateway")
 
 	serverWhiteList []string
 
@@ -142,15 +140,6 @@ func init() {
 	s3Options.allowDeleteBucketNotEmpty = cmdServer.Flag.Bool("s3.allowDeleteBucketNotEmpty", true, "allow recursive deleting all entries along with bucket")
 
 	iamOptions.port = cmdServer.Flag.Int("iam.port", 8111, "iam server http listen port")
-
-	webdavOptions.port = cmdServer.Flag.Int("webdav.port", 7333, "webdav server http listen port")
-	webdavOptions.collection = cmdServer.Flag.String("webdav.collection", "", "collection to create the files")
-	webdavOptions.replication = cmdServer.Flag.String("webdav.replication", "", "replication to create the files")
-	webdavOptions.disk = cmdServer.Flag.String("webdav.disk", "", "[hdd|ssd|<tag>] hard drive or solid state drive or any tag")
-	webdavOptions.tlsPrivateKey = cmdServer.Flag.String("webdav.key.file", "", "path to the TLS private key file")
-	webdavOptions.tlsCertificate = cmdServer.Flag.String("webdav.cert.file", "", "path to the TLS certificate file")
-	webdavOptions.cacheDir = cmdServer.Flag.String("webdav.cacheDir", os.TempDir(), "local cache directory for file chunks")
-	webdavOptions.cacheSizeMB = cmdServer.Flag.Int64("webdav.cacheCapacityMB", 0, "local cache capacity in MB")
 }
 
 func runServer(cmd *Command, args []string) bool {
@@ -168,9 +157,6 @@ func runServer(cmd *Command, args []string) bool {
 		*isStartingFiler = true
 	}
 	if *isStartingIam {
-		*isStartingFiler = true
-	}
-	if *isStartingWebDav {
 		*isStartingFiler = true
 	}
 
@@ -214,7 +200,6 @@ func runServer(cmd *Command, args []string) bool {
 	filerAddress := string(pb.NewServerAddress(*serverIp, *filerOptions.port, *filerOptions.portGrpc))
 	s3Options.filer = &filerAddress
 	iamOptions.filer = &filerAddress
-	webdavOptions.filer = &filerAddress
 
 	go stats_collect.StartMetricsServer(*serverMetricsHttpPort)
 
@@ -255,14 +240,6 @@ func runServer(cmd *Command, args []string) bool {
 		go func() {
 			time.Sleep(2 * time.Second)
 			iamOptions.startIamServer()
-		}()
-	}
-
-	if *isStartingWebDav {
-		go func() {
-			time.Sleep(2 * time.Second)
-			webdavOptions.startWebDav()
-
 		}()
 	}
 

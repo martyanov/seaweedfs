@@ -101,7 +101,6 @@ Faster and Cheaper than direct cloud storage!
 * [Active-Active Replication][ActiveActiveAsyncReplication] enables asynchronous one-way or two-way cross cluster continuous replication.
 * [Amazon S3 compatible API][AmazonS3API] accesses files with S3 tooling.
 * [Async Replication To Cloud][BackupToCloud] has extremely fast local access and backups to Amazon S3.
-* [WebDAV] accesses as a mapped drive on Mac and Windows, or from mobile devices.
 * [AES256-GCM Encrypted Storage][FilerDataEncryption] safely stores the encrypted data.
 * [Super Large Files][SuperLargeFiles] stores large or super large files in tens of TB.
 * [Cloud Drive][CloudDrive] mounts cloud storage to local cluster, cached for fast read and write with asynchronous write back.
@@ -111,7 +110,6 @@ Faster and Cheaper than direct cloud storage!
 [SuperLargeFiles]: https://github.com/martyanov/seaweedfs/wiki/Data-Structure-for-Large-Files
 [AmazonS3API]: https://github.com/martyanov/seaweedfs/wiki/Amazon-S3-API
 [BackupToCloud]: https://github.com/martyanov/seaweedfs/wiki/Async-Replication-to-Cloud
-[WebDAV]: https://github.com/martyanov/seaweedfs/wiki/WebDAV
 [ErasureCoding]: https://github.com/martyanov/seaweedfs/wiki/Erasure-coding-for-warm-storage
 [TieredStorage]: https://github.com/martyanov/seaweedfs/wiki/Tiered-Storage
 [CloudTier]: https://github.com/martyanov/seaweedfs/wiki/Cloud-Tier
