@@ -97,7 +97,6 @@ Faster and Cheaper than direct cloud storage!
 
 * [Filer server][Filer] provides "normal" directories and files via http.
 * [File TTL][FilerTTL] automatically expires file metadata and actual file data.
-* [Mount filer][Mount] reads and writes files directly as a local directory via FUSE.
 * [Filer Store Replication][FilerStoreReplication] enables HA for filer meta data stores.
 * [Active-Active Replication][ActiveActiveAsyncReplication] enables asynchronous one-way or two-way cross cluster continuous replication.
 * [Amazon S3 compatible API][AmazonS3API] accesses files with S3 tooling.
@@ -110,7 +109,6 @@ Faster and Cheaper than direct cloud storage!
 
 [Filer]: https://github.com/martyanov/seaweedfs/wiki/Directories-and-Files
 [SuperLargeFiles]: https://github.com/martyanov/seaweedfs/wiki/Data-Structure-for-Large-Files
-[Mount]: https://github.com/martyanov/seaweedfs/wiki/FUSE-Mount
 [AmazonS3API]: https://github.com/martyanov/seaweedfs/wiki/Amazon-S3-API
 [BackupToCloud]: https://github.com/martyanov/seaweedfs/wiki/Async-Replication-to-Cloud
 [WebDAV]: https://github.com/martyanov/seaweedfs/wiki/WebDAV
