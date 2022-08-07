@@ -11,7 +11,6 @@ import (
 	"golang.org/x/exp/slices"
 
 	"github.com/gorilla/mux"
-	"github.com/seaweedfs/raft/protobuf"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
@@ -52,7 +51,6 @@ type MasterOptions struct {
 	metricsHttpPort    *int
 	heartbeatInterval  *time.Duration
 	electionTimeout    *time.Duration
-	raftHashicorp      *bool
 	raftBootstrap      *bool
 }
 
@@ -77,7 +75,6 @@ func init() {
 	m.raftResumeState = cmdMaster.Flag.Bool("resumeState", false, "resume previous state on start master server")
 	m.heartbeatInterval = cmdMaster.Flag.Duration("heartbeatInterval", 300*time.Millisecond, "heartbeat interval of master servers, and will be randomly multiplied by [1, 1.25)")
 	m.electionTimeout = cmdMaster.Flag.Duration("electionTimeout", 10*time.Second, "election timeout of master servers")
-	m.raftHashicorp = cmdMaster.Flag.Bool("raftHashicorp", false, "use hashicorp raft")
 	m.raftBootstrap = cmdMaster.Flag.Bool("raftBootstrap", false, "Whether to bootstrap the Raft cluster")
 }
 
@@ -159,22 +156,14 @@ func startMaster(masterOption MasterOptions, masterWhiteList []string) {
 	}
 	var raftServer *weed_server.RaftServer
 	var err error
-	if *m.raftHashicorp {
-		if raftServer, err = weed_server.NewHashicorpRaftServer(raftServerOption); err != nil {
-			glog.Fatalf("NewHashicorpRaftServer: %s", err)
-		}
-	} else {
-		raftServer, err = weed_server.NewRaftServer(raftServerOption)
-		if raftServer == nil {
-			glog.Fatalf("please verify %s is writable, see https://github.com/seaweedfs/seaweedfs/issues/717: %s", *masterOption.metaFolder, err)
-		}
+	if raftServer, err = weed_server.NewRaftServer(raftServerOption); err != nil {
+		glog.Fatalf("NewRaftServer: %s", err)
 	}
 	ms.SetRaftServer(raftServer)
 	r.HandleFunc("/cluster/status", raftServer.StatusHandler).Methods("GET")
 	r.HandleFunc("/cluster/healthz", raftServer.HealthzHandler).Methods("GET", "HEAD")
-	if *m.raftHashicorp {
-		r.HandleFunc("/raft/stats", raftServer.StatsRaftHandler).Methods("GET")
-	}
+	r.HandleFunc("/raft/stats", raftServer.StatsRaftHandler).Methods("GET")
+
 	// starting grpc server
 	grpcPort := *masterOption.portGrpc
 	grpcL, grpcLocalL, err := util.NewIpAndLocalListeners(*masterOption.ipBind, grpcPort, 0)
@@ -183,29 +172,15 @@ func startMaster(masterOption MasterOptions, masterWhiteList []string) {
 	}
 	grpcS := pb.NewGrpcServer()
 	master_pb.RegisterSeaweedServer(grpcS, ms)
-	if *m.raftHashicorp {
-		raftServer.TransportManager.Register(grpcS)
-	} else {
-		protobuf.RegisterRaftServer(grpcS, raftServer)
-	}
+
+	raftServer.TransportManager.Register(grpcS)
+
 	reflection.Register(grpcS)
 	glog.V(0).Infof("Start Seaweed Master %s grpc server at %s:%d", util.Version(), *masterOption.ipBind, grpcPort)
 	if grpcLocalL != nil {
 		go grpcS.Serve(grpcLocalL)
 	}
 	go grpcS.Serve(grpcL)
-
-	timeSleep := 1500 * time.Millisecond
-	if !*m.raftHashicorp {
-		go func() {
-			time.Sleep(timeSleep)
-			if ms.Topo.RaftServer.Leader() == "" && ms.Topo.RaftServer.IsLogEmpty() && isTheFirstOne(myMasterAddress, peers) {
-				if ms.MasterClient.FindLeaderFromOtherPeers(myMasterAddress) == "" {
-					raftServer.DoJoinCommand()
-				}
-			}
-		}()
-	}
 
 	go ms.MasterClient.KeepConnectedToMaster()
 

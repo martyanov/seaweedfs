@@ -3,7 +3,7 @@ package weed_server
 import (
 	"context"
 
-	"github.com/seaweedfs/raft"
+	"github.com/hashicorp/raft"
 
 	"github.com/seaweedfs/seaweedfs/weed/operation"
 	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
@@ -13,7 +13,7 @@ import (
 func (ms *MasterServer) CollectionList(ctx context.Context, req *master_pb.CollectionListRequest) (*master_pb.CollectionListResponse, error) {
 
 	if !ms.Topo.IsLeader() {
-		return nil, raft.NotLeaderError
+		return nil, raft.ErrNotLeader
 	}
 
 	resp := &master_pb.CollectionListResponse{}
@@ -30,7 +30,7 @@ func (ms *MasterServer) CollectionList(ctx context.Context, req *master_pb.Colle
 func (ms *MasterServer) CollectionDelete(ctx context.Context, req *master_pb.CollectionDeleteRequest) (*master_pb.CollectionDeleteResponse, error) {
 
 	if !ms.Topo.IsLeader() {
-		return nil, raft.NotLeaderError
+		return nil, raft.ErrNotLeader
 	}
 
 	resp := &master_pb.CollectionDeleteResponse{}

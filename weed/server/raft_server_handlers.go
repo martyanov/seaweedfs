@@ -1,9 +1,10 @@
 package weed_server
 
 import (
+	"net/http"
+
 	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
-	"net/http"
 )
 
 type ClusterStatusResult struct {
@@ -36,9 +37,9 @@ func (s *RaftServer) HealthzHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *RaftServer) StatsRaftHandler(w http.ResponseWriter, r *http.Request) {
-	if s.RaftHashicorp == nil {
+	if s.Raft == nil {
 		writeJsonQuiet(w, r, http.StatusNotFound, nil)
 		return
 	}
-	writeJsonQuiet(w, r, http.StatusOK, s.RaftHashicorp.Stats())
+	writeJsonQuiet(w, r, http.StatusOK, s.Raft.Stats())
 }
