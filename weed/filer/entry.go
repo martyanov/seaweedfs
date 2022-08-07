@@ -9,18 +9,17 @@ import (
 )
 
 type Attr struct {
-	Mtime         time.Time   // time of last modification
-	Crtime        time.Time   // time of creation (OS X only)
-	Mode          os.FileMode // file mode
-	Uid           uint32      // owner uid
-	Gid           uint32      // group gid
-	Mime          string      // mime type
-	TtlSec        int32       // ttl in seconds
-	UserName      string
-	GroupNames    []string
-	SymlinkTarget string
-	Md5           []byte
-	FileSize      uint64
+	Mtime      time.Time   // time of last modification
+	Crtime     time.Time   // time of creation (OS X only)
+	Mode       os.FileMode // file mode
+	Uid        uint32      // owner uid
+	Gid        uint32      // group gid
+	Mime       string      // mime type
+	TtlSec     int32       // ttl in seconds
+	UserName   string
+	GroupNames []string
+	Md5        []byte
+	FileSize   uint64
 }
 
 func (attr Attr) IsDirectory() bool {
