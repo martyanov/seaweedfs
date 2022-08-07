@@ -3,7 +3,6 @@ package command
 import (
 	_ "net/http/pprof"
 
-	_ "github.com/seaweedfs/seaweedfs/weed/filer/cassandra"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/leveldb"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/leveldb2"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/leveldb3"

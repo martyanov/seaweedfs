@@ -61,7 +61,7 @@ Also, SeaweedFS implements erasure coding with ideas from
 [f4: Facebook’s Warm BLOB Storage System](https://www.usenix.org/system/files/conference/osdi14/osdi14-paper-muralidhar.pdf), and has a lot of similarities with [Facebook’s Tectonic Filesystem](https://www.usenix.org/system/files/fast21-pan.pdf)
 
 On top of the object store, optional [Filer] can support directories and POSIX attributes.
-Filer is a separate linearly-scalable stateless server with customizable metadata stores: LevelDB, Redis and Cassandra.
+Filer is a separate linearly-scalable stateless server with customizable metadata stores: LevelDB and Redis.
 
 For any distributed key value stores, the large values can be offloaded to SeaweedFS.
 With the fast access speed and linearly scalable capacity,

@@ -29,27 +29,6 @@ dir = "./filerldb2"                    # directory to store level db files
 enabled = false
 dir = "./filerldb3"                    # directory to store level db files
 
-[cassandra]
-# CREATE TABLE filemeta (
-#    directory varchar,
-#    name varchar,
-#    meta blob,
-#    PRIMARY KEY (directory, name)
-# ) WITH CLUSTERING ORDER BY (name ASC);
-enabled = false
-keyspace = "seaweedfs"
-hosts = [
-    "localhost:9042",
-]
-username = ""
-password = ""
-# This changes the data layout. Only add new directories. Removing/Updating will cause data loss.
-superLargeDirectories = []
-# Name of the datacenter local to this filer, used as host selection fallback.
-localDC = ""
-# Gocql connection timeout, default: 600ms
-connection_timeout_millisecond = 600
-
 [redis2]
 enabled = false
 address = "localhost:6379"
