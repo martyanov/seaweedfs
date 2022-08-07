@@ -2,15 +2,17 @@ package main
 
 import (
 	"flag"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"log"
 	"time"
 
+	"golang.org/x/tools/godoc/util"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/security"
+	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	util2 "github.com/seaweedfs/seaweedfs/weed/util"
-	"golang.org/x/tools/godoc/util"
 )
 
 var (
@@ -24,8 +26,7 @@ var (
 func main() {
 	flag.Parse()
 
-	util2.LoadConfiguration("security", false)
-	grpcDialOption := security.LoadClientTLS(util2.GetViper(), "grpc.client")
+	grpcDialOption := grpc.WithTransportCredentials(insecure.NewCredentials())
 
 	vid := needle.VolumeId(*volumeId)
 

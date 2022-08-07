@@ -2,14 +2,16 @@ package command
 
 import (
 	"fmt"
+	"time"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/replication/source"
-	"github.com/seaweedfs/seaweedfs/weed/security"
 	"github.com/seaweedfs/seaweedfs/weed/util"
-	"google.golang.org/grpc"
-	"time"
 )
 
 type RemoteSyncOptions struct {
@@ -55,7 +57,7 @@ var cmdFilerRemoteSynchronize = &Command{
 	Short:     "resumable continuously write back updates to remote storage",
 	Long: `resumable continuously write back updates to remote storage
 
-	filer.remote.sync listens on filer update events. 
+	filer.remote.sync listens on filer update events.
 	If any mounted remote file is updated, it will fetch the updated content,
 	and write to the remote storage.
 
@@ -70,10 +72,7 @@ var cmdFilerRemoteSynchronize = &Command{
 }
 
 func runFilerRemoteSynchronize(cmd *Command, args []string) bool {
-
-	util.LoadConfiguration("security", false)
-	grpcDialOption := security.LoadClientTLS(util.GetViper(), "grpc.client")
-	remoteSyncOptions.grpcDialOption = grpcDialOption
+	remoteSyncOptions.grpcDialOption = grpc.WithTransportCredentials(insecure.NewCredentials())
 
 	dir := *remoteSyncOptions.dir
 	filerAddress := pb.ServerAddress(*remoteSyncOptions.filerAddress)

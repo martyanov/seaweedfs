@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-	"google.golang.org/grpc"
 	"os"
 	"path/filepath"
 
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/security"
+	"github.com/seaweedfs/seaweedfs/weed/pb"
+	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
@@ -67,9 +68,7 @@ var cmdUpload = &Command{
 }
 
 func runUpload(cmd *Command, args []string) bool {
-
-	util.LoadConfiguration("security", false)
-	grpcDialOption := security.LoadClientTLS(util.GetViper(), "grpc.client")
+	grpcDialOption := grpc.WithTransportCredentials(insecure.NewCredentials())
 
 	defaultReplication, err := readMasterConfiguration(grpcDialOption, pb.ServerAddress(*upload.master))
 	if err != nil {

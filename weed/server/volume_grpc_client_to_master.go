@@ -5,20 +5,16 @@ import (
 	"os"
 	"time"
 
-	"github.com/seaweedfs/seaweedfs/weed/operation"
-
-	"google.golang.org/grpc"
-
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/security"
-	"github.com/seaweedfs/seaweedfs/weed/storage/backend"
-	"github.com/seaweedfs/seaweedfs/weed/storage/erasure_coding"
-
 	"golang.org/x/net/context"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
+	"github.com/seaweedfs/seaweedfs/weed/operation"
+	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-	"github.com/seaweedfs/seaweedfs/weed/util"
+	"github.com/seaweedfs/seaweedfs/weed/storage/backend"
+	"github.com/seaweedfs/seaweedfs/weed/storage/erasure_coding"
 )
 
 func (vs *VolumeServer) GetMaster() pb.ServerAddress {
@@ -48,12 +44,11 @@ func (vs *VolumeServer) checkWithMaster() (err error) {
 }
 
 func (vs *VolumeServer) heartbeat() {
-
 	glog.V(0).Infof("Volume server start with seed master nodes: %v", vs.SeedMasterNodes)
 	vs.store.SetDataCenter(vs.dataCenter)
 	vs.store.SetRack(vs.rack)
 
-	grpcDialOption := security.LoadClientTLS(util.GetViper(), "grpc.volume")
+	grpcDialOption := grpc.WithTransportCredentials(insecure.NewCredentials())
 
 	var err error
 	var newLeader pb.ServerAddress

@@ -8,6 +8,9 @@ import (
 	"strings"
 	"time"
 
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
@@ -15,11 +18,9 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/replication/sink"
 	"github.com/seaweedfs/seaweedfs/weed/replication/sink/filersink"
 	"github.com/seaweedfs/seaweedfs/weed/replication/source"
-	"github.com/seaweedfs/seaweedfs/weed/security"
 	statsCollect "github.com/seaweedfs/seaweedfs/weed/stats"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 	"github.com/seaweedfs/seaweedfs/weed/util/grace"
-	"google.golang.org/grpc"
 )
 
 type SyncOptions struct {
@@ -95,7 +96,7 @@ var cmdFilerSynchronize = &Command{
 	* filer.sync only works between two filers.
 	* filer.sync does not need any special message queue setup.
 	* filer.sync supports both active-active and active-passive modes.
-	
+
 	If restarted, the synchronization will resume from the previous checkpoints, persisted every minute.
 	A fresh sync will start from the earliest metadata logs.
 
@@ -103,9 +104,7 @@ var cmdFilerSynchronize = &Command{
 }
 
 func runFilerSynchronize(cmd *Command, args []string) bool {
-
-	util.LoadConfiguration("security", false)
-	grpcDialOption := security.LoadClientTLS(util.GetViper(), "grpc.client")
+	grpcDialOption := grpc.WithTransportCredentials(insecure.NewCredentials())
 
 	grace.SetupProfiling(*syncCpuProfile, *syncMemProfile)
 

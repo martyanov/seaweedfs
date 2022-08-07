@@ -2,13 +2,15 @@ package command
 
 import (
 	"fmt"
+	"time"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/replication/source"
-	"github.com/seaweedfs/seaweedfs/weed/security"
 	"github.com/seaweedfs/seaweedfs/weed/util"
-	"google.golang.org/grpc"
-	"time"
 )
 
 type FilerBackupOptions struct {
@@ -50,11 +52,9 @@ var cmdFilerBackup = &Command{
 }
 
 func runFilerBackup(cmd *Command, args []string) bool {
-
-	util.LoadConfiguration("security", false)
 	util.LoadConfiguration("replication", true)
 
-	grpcDialOption := security.LoadClientTLS(util.GetViper(), "grpc.client")
+	grpcDialOption := grpc.WithTransportCredentials(insecure.NewCredentials())
 
 	clientId := util.RandomInt32()
 	var clientEpoch int32

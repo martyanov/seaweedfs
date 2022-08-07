@@ -2,7 +2,6 @@ package weed_server
 
 import (
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/stats"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -12,19 +11,20 @@ import (
 	"sync"
 	"time"
 
-	"github.com/seaweedfs/seaweedfs/weed/cluster"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-
 	"github.com/gorilla/mux"
 	hashicorpRaft "github.com/hashicorp/raft"
 	"github.com/seaweedfs/raft"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
+	"github.com/seaweedfs/seaweedfs/weed/cluster"
 	"github.com/seaweedfs/seaweedfs/weed/glog"
+	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
 	"github.com/seaweedfs/seaweedfs/weed/security"
 	"github.com/seaweedfs/seaweedfs/weed/sequence"
 	"github.com/seaweedfs/seaweedfs/weed/shell"
+	"github.com/seaweedfs/seaweedfs/weed/stats"
 	"github.com/seaweedfs/seaweedfs/weed/topology"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 	"github.com/seaweedfs/seaweedfs/weed/wdclient"
@@ -77,7 +77,6 @@ type MasterServer struct {
 }
 
 func NewMasterServer(r *mux.Router, option *MasterOption, peers map[string]pb.ServerAddress) *MasterServer {
-
 	v := util.GetViper()
 	signingKey := v.GetString("jwt.signing.key")
 	v.SetDefault("jwt.signing.expires_after_seconds", 10)
@@ -101,7 +100,7 @@ func NewMasterServer(r *mux.Router, option *MasterOption, peers map[string]pb.Se
 		preallocateSize = int64(option.VolumeSizeLimitMB) * (1 << 20)
 	}
 
-	grpcDialOption := security.LoadClientTLS(v, "grpc.master")
+	grpcDialOption := grpc.WithTransportCredentials(insecure.NewCredentials())
 	ms := &MasterServer{
 		option:          option,
 		preallocateSize: preallocateSize,
@@ -262,7 +261,7 @@ func (ms *MasterServer) startAdminScripts() {
 	masterAddress := string(ms.option.Master)
 
 	var shellOptions shell.ShellOptions
-	shellOptions.GrpcDialOption = security.LoadClientTLS(v, "grpc.master")
+	shellOptions.GrpcDialOption = grpc.WithTransportCredentials(insecure.NewCredentials())
 	shellOptions.Masters = &masterAddress
 
 	shellOptions.Directory = "/"

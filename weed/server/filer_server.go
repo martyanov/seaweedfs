@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/seaweedfs/seaweedfs/weed/filer"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/cassandra"
@@ -91,7 +92,7 @@ func NewFilerServer(defaultMux, readonlyMux *http.ServeMux, option *FilerOption)
 
 	fs = &FilerServer{
 		option:                option,
-		grpcDialOption:        security.LoadClientTLS(util.GetViper(), "grpc.filer"),
+		grpcDialOption:        grpc.WithTransportCredentials(insecure.NewCredentials()),
 		knownListeners:        make(map[int32]int32),
 		inFlightDataLimitCond: sync.NewCond(new(sync.Mutex)),
 	}

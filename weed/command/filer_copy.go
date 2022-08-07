@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/seaweedfs/seaweedfs/weed/filer"
 	"github.com/seaweedfs/seaweedfs/weed/operation"
@@ -80,9 +81,6 @@ var cmdFilerCopy = &Command{
 }
 
 func runCopy(cmd *Command, args []string) bool {
-
-	util.LoadConfiguration("security", false)
-
 	if len(args) <= 1 {
 		return false
 	}
@@ -99,7 +97,7 @@ func runCopy(cmd *Command, args []string) bool {
 		return false
 	}
 
-	copy.grpcDialOption = security.LoadClientTLS(util.GetViper(), "grpc.client")
+	copy.grpcDialOption = grpc.WithTransportCredentials(insecure.NewCredentials())
 
 	masters, collection, replication, dirBuckets, maxMB, cipher, err := readFilerConfiguration(copy.grpcDialOption, filerAddress)
 	if err != nil {

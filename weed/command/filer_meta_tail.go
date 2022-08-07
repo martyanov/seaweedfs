@@ -8,9 +8,11 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/jsonpb"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
 	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/security"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
@@ -40,9 +42,7 @@ var (
 )
 
 func runFilerMetaTail(cmd *Command, args []string) bool {
-
-	util.LoadConfiguration("security", false)
-	grpcDialOption := security.LoadClientTLS(util.GetViper(), "grpc.client")
+	grpcDialOption := grpc.WithTransportCredentials(insecure.NewCredentials())
 	clientId := util.RandomInt32()
 
 	var filterFunc func(dir, fname string) bool

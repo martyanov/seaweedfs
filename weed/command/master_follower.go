@@ -8,13 +8,15 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/gorilla/mux"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/reflection"
+
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-	"github.com/seaweedfs/seaweedfs/weed/security"
 	weed_server "github.com/seaweedfs/seaweedfs/weed/server"
 	"github.com/seaweedfs/seaweedfs/weed/util"
-	"google.golang.org/grpc/reflection"
 )
 
 var (
@@ -67,8 +69,6 @@ var cmdMasterFollower = &Command{
 }
 
 func runMasterFollower(cmd *Command, args []string) bool {
-
-	util.LoadConfiguration("security", false)
 	util.LoadConfiguration("master", false)
 
 	if *mf.portGrpc == 0 {
@@ -81,12 +81,11 @@ func runMasterFollower(cmd *Command, args []string) bool {
 }
 
 func startMasterFollower(masterOptions MasterOptions) {
-
 	// collect settings from main masters
 	masters := pb.ServerAddresses(*mf.peers).ToAddressMap()
 
 	var err error
-	grpcDialOption := security.LoadClientTLS(util.GetViper(), "grpc.master")
+	grpcDialOption := grpc.WithTransportCredentials(insecure.NewCredentials())
 	for i := 0; i < 10; i++ {
 		err = pb.WithOneOfGrpcMasterClients(false, masters, grpcDialOption, func(client master_pb.SeaweedClient) error {
 			resp, err := client.GetMasterConfiguration(context.Background(), &master_pb.GetMasterConfigurationRequest{})
@@ -131,7 +130,7 @@ func startMasterFollower(masterOptions MasterOptions) {
 	if err != nil {
 		glog.Fatalf("master failed to listen on grpc port %d: %v", grpcPort, err)
 	}
-	grpcS := pb.NewGrpcServer(security.LoadServerTLS(util.GetViper(), "grpc.master"))
+	grpcS := pb.NewGrpcServer()
 	master_pb.RegisterSeaweedServer(grpcS, ms)
 	reflection.Register(grpcS)
 	glog.V(0).Infof("Start Seaweed Master %s grpc server at %s:%d", util.Version(), *masterOptions.ip, grpcPort)

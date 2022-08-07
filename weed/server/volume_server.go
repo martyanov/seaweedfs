@@ -5,18 +5,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
-	"github.com/seaweedfs/seaweedfs/weed/storage/types"
-
 	"google.golang.org/grpc"
-
-	"github.com/seaweedfs/seaweedfs/weed/stats"
-	"github.com/seaweedfs/seaweedfs/weed/util"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
+	"github.com/seaweedfs/seaweedfs/weed/pb"
+	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
 	"github.com/seaweedfs/seaweedfs/weed/security"
+	"github.com/seaweedfs/seaweedfs/weed/stats"
 	"github.com/seaweedfs/seaweedfs/weed/storage"
+	"github.com/seaweedfs/seaweedfs/weed/storage/types"
+	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
 type VolumeServer struct {
@@ -80,7 +79,7 @@ func NewVolumeServer(adminMux, publicMux *http.ServeMux, ip string,
 		rack:                          rack,
 		needleMapKind:                 needleMapKind,
 		ReadMode:                      readMode,
-		grpcDialOption:                security.LoadClientTLS(util.GetViper(), "grpc.volume"),
+		grpcDialOption:                grpc.WithTransportCredentials(insecure.NewCredentials()),
 		compactionBytePerSecond:       int64(compactionMBPerSecond) * 1024 * 1024,
 		fileSizeLimitBytes:            int64(fileSizeLimitMB) * 1024 * 1024,
 		isHeartbeating:                true,

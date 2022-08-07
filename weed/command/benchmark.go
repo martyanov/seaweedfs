@@ -3,7 +3,6 @@ package command
 import (
 	"bufio"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"io"
 	"math"
 	"math/rand"
@@ -15,9 +14,11 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/operation"
+	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/security"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 	"github.com/seaweedfs/seaweedfs/weed/wdclient"
@@ -111,9 +112,7 @@ var (
 )
 
 func runBenchmark(cmd *Command, args []string) bool {
-
-	util.LoadConfiguration("security", false)
-	b.grpcDialOption = security.LoadClientTLS(util.GetViper(), "grpc.client")
+	b.grpcDialOption = grpc.WithTransportCredentials(insecure.NewCredentials())
 
 	fmt.Printf("This is SeaweedFS version %s %s %s\n", util.Version(), runtime.GOOS, runtime.GOARCH)
 	if *b.maxCpu < 1 {

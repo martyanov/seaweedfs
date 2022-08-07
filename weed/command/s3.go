@@ -6,12 +6,13 @@ import (
 	"net/http"
 	"time"
 
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 
 	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/s3_pb"
-	"github.com/seaweedfs/seaweedfs/weed/security"
 
 	"github.com/gorilla/mux"
 
@@ -32,8 +33,6 @@ type S3Options struct {
 	portGrpc                  *int
 	config                    *string
 	domainName                *string
-	tlsPrivateKey             *string
-	tlsCertificate            *string
 	metricsHttpPort           *int
 	allowEmptyFolder          *bool
 	allowDeleteBucketNotEmpty *bool
@@ -50,8 +49,6 @@ func init() {
 	s3StandaloneOptions.domainName = cmdS3.Flag.String("domainName", "", "suffix of the host name in comma separated list, {bucket}.{domainName}")
 	s3StandaloneOptions.dataCenter = cmdS3.Flag.String("dataCenter", "", "prefer to read and write to volumes in this data center")
 	s3StandaloneOptions.config = cmdS3.Flag.String("config", "", "path to the config file")
-	s3StandaloneOptions.tlsPrivateKey = cmdS3.Flag.String("key.file", "", "path to the TLS private key file")
-	s3StandaloneOptions.tlsCertificate = cmdS3.Flag.String("cert.file", "", "path to the TLS certificate file")
 	s3StandaloneOptions.metricsHttpPort = cmdS3.Flag.Int("metricsPort", 0, "Prometheus metrics listen port")
 	s3StandaloneOptions.allowEmptyFolder = cmdS3.Flag.Bool("allowEmptyFolder", true, "allow empty folders")
 	s3StandaloneOptions.allowDeleteBucketNotEmpty = cmdS3.Flag.Bool("allowDeleteBucketNotEmpty", true, "allow recursive deleting all entries along with bucket")
@@ -153,7 +150,7 @@ func (s3opt *S3Options) startS3Server() bool {
 
 	filerBucketsPath := "/buckets"
 
-	grpcDialOption := security.LoadClientTLS(util.GetViper(), "grpc.client")
+	grpcDialOption := grpc.WithTransportCredentials(insecure.NewCredentials())
 
 	// metrics read from the filer
 	var metricsAddress string
@@ -220,7 +217,7 @@ func (s3opt *S3Options) startS3Server() bool {
 	if err != nil {
 		glog.Fatalf("s3 failed to listen on grpc port %d: %v", grpcPort, err)
 	}
-	grpcS := pb.NewGrpcServer(security.LoadServerTLS(util.GetViper(), "grpc.s3"))
+	grpcS := pb.NewGrpcServer()
 	s3_pb.RegisterSeaweedS3Server(grpcS, s3ApiServer)
 	reflection.Register(grpcS)
 	if grpcLocalL != nil {
@@ -228,30 +225,16 @@ func (s3opt *S3Options) startS3Server() bool {
 	}
 	go grpcS.Serve(grpcL)
 
-	if *s3opt.tlsPrivateKey != "" {
-		glog.V(0).Infof("Start Seaweed S3 API Server %s at https port %d", util.Version(), *s3opt.port)
-		if s3ApiLocalListner != nil {
-			go func() {
-				if err = httpS.ServeTLS(s3ApiLocalListner, *s3opt.tlsCertificate, *s3opt.tlsPrivateKey); err != nil {
-					glog.Fatalf("S3 API Server Fail to serve: %v", err)
-				}
-			}()
-		}
-		if err = httpS.ServeTLS(s3ApiListener, *s3opt.tlsCertificate, *s3opt.tlsPrivateKey); err != nil {
-			glog.Fatalf("S3 API Server Fail to serve: %v", err)
-		}
-	} else {
-		glog.V(0).Infof("Start Seaweed S3 API Server %s at http port %d", util.Version(), *s3opt.port)
-		if s3ApiLocalListner != nil {
-			go func() {
-				if err = httpS.Serve(s3ApiLocalListner); err != nil {
-					glog.Fatalf("S3 API Server Fail to serve: %v", err)
-				}
-			}()
-		}
-		if err = httpS.Serve(s3ApiListener); err != nil {
-			glog.Fatalf("S3 API Server Fail to serve: %v", err)
-		}
+	glog.V(0).Infof("Start Seaweed S3 API Server %s at http port %d", util.Version(), *s3opt.port)
+	if s3ApiLocalListner != nil {
+		go func() {
+			if err = httpS.Serve(s3ApiLocalListner); err != nil {
+				glog.Fatalf("S3 API Server Fail to serve: %v", err)
+			}
+		}()
+	}
+	if err = httpS.Serve(s3ApiListener); err != nil {
+		glog.Fatalf("S3 API Server Fail to serve: %v", err)
 	}
 
 	return true

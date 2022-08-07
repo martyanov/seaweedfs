@@ -10,16 +10,16 @@ import (
 	"math"
 	"os"
 
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/operation"
 	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
-	"github.com/seaweedfs/seaweedfs/weed/security"
 	"github.com/seaweedfs/seaweedfs/weed/storage/idx"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	"github.com/seaweedfs/seaweedfs/weed/storage/types"
-	"github.com/seaweedfs/seaweedfs/weed/util"
-	"google.golang.org/grpc"
 )
 
 var (
@@ -41,8 +41,7 @@ var (
 func main() {
 	flag.Parse()
 
-	util.LoadConfiguration("security", false)
-	grpcDialOption = security.LoadClientTLS(util.GetViper(), "grpc.client")
+	grpcDialOption = grpc.WithTransportCredentials(insecure.NewCredentials())
 
 	vid := uint32(*volumeId)
 	servers := pb.ServerAddresses(*serversStr).ToAddresses()

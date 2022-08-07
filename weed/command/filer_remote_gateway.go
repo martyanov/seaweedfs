@@ -3,16 +3,18 @@ package command
 import (
 	"context"
 	"fmt"
+	"os"
+	"time"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/remote_pb"
 	"github.com/seaweedfs/seaweedfs/weed/replication/source"
-	"github.com/seaweedfs/seaweedfs/weed/security"
 	"github.com/seaweedfs/seaweedfs/weed/util"
-	"google.golang.org/grpc"
-	"os"
-	"time"
 )
 
 type RemoteGatewayOptions struct {
@@ -77,9 +79,7 @@ var cmdFilerRemoteGateway = &Command{
 }
 
 func runFilerRemoteGateway(cmd *Command, args []string) bool {
-
-	util.LoadConfiguration("security", false)
-	grpcDialOption := security.LoadClientTLS(util.GetViper(), "grpc.client")
+	grpcDialOption := grpc.WithTransportCredentials(insecure.NewCredentials())
 	remoteGatewayOptions.grpcDialOption = grpcDialOption
 
 	filerAddress := pb.ServerAddress(*remoteGatewayOptions.filerAddress)

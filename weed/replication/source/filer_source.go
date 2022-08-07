@@ -8,11 +8,10 @@ import (
 	"strings"
 
 	"google.golang.org/grpc"
-
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/security"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
+	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
@@ -47,7 +46,7 @@ func (fs *FilerSource) DoInitialize(address, grpcAddress string, dir string, rea
 	}
 	fs.grpcAddress = grpcAddress
 	fs.Dir = dir
-	fs.grpcDialOption = security.LoadClientTLS(util.GetViper(), "grpc.client")
+	fs.grpcDialOption = grpc.WithTransportCredentials(insecure.NewCredentials())
 	fs.proxyByFiler = readChunkFromFiler
 	return nil
 }

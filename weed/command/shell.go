@@ -2,9 +2,11 @@ package command
 
 import (
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
 
-	"github.com/seaweedfs/seaweedfs/weed/security"
+	"github.com/seaweedfs/seaweedfs/weed/pb"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
 	"github.com/seaweedfs/seaweedfs/weed/shell"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
@@ -34,9 +36,7 @@ var cmdShell = &Command{
 }
 
 func runShell(command *Command, args []string) bool {
-
-	util.LoadConfiguration("security", false)
-	shellOptions.GrpcDialOption = security.LoadClientTLS(util.GetViper(), "grpc.client")
+	shellOptions.GrpcDialOption = grpc.WithTransportCredentials(insecure.NewCredentials())
 
 	if *shellOptions.Masters == "" {
 		util.LoadConfiguration("shell", false)
@@ -60,5 +60,4 @@ func runShell(command *Command, args []string) bool {
 	shell.RunShell(shellOptions)
 
 	return true
-
 }

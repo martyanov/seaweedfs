@@ -12,13 +12,11 @@ import (
 
 	"github.com/seaweedfs/seaweedfs/weed/storage/types"
 
-	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 
 	"github.com/seaweedfs/seaweedfs/weed/util/grace"
 
 	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/security"
 	"github.com/seaweedfs/seaweedfs/weed/util/httpdown"
 
 	"google.golang.org/grpc/reflection"
@@ -320,7 +318,7 @@ func (v VolumeServerOptions) startGrpcService(vs volume_server_pb.VolumeServerSe
 	if err != nil {
 		glog.Fatalf("failed to listen on grpc port %d: %v", grpcPort, err)
 	}
-	grpcS := pb.NewGrpcServer(security.LoadServerTLS(util.GetViper(), "grpc.volume"))
+	grpcS := pb.NewGrpcServer()
 	volume_server_pb.RegisterVolumeServerServer(grpcS, vs)
 	reflection.Register(grpcS)
 	go func() {
@@ -351,14 +349,6 @@ func (v VolumeServerOptions) startPublicHttpService(handler http.Handler) httpdo
 }
 
 func (v VolumeServerOptions) startClusterHttpService(handler http.Handler) httpdown.Server {
-	var (
-		certFile, keyFile string
-	)
-	if viper.GetString("https.volume.key") != "" {
-		certFile = viper.GetString("https.volume.cert")
-		keyFile = viper.GetString("https.volume.key")
-	}
-
 	listeningAddress := util.JoinHostPort(*v.bindIp, *v.port)
 	glog.V(0).Infof("Start Seaweed volume server %s at %s", util.Version(), listeningAddress)
 	listener, e := util.NewListener(listeningAddress, time.Duration(*v.idleConnectionTimeout)*time.Second)
@@ -369,14 +359,8 @@ func (v VolumeServerOptions) startClusterHttpService(handler http.Handler) httpd
 	httpDown := httpdown.HTTP{
 		KillTimeout: time.Minute,
 		StopTimeout: 30 * time.Second,
-		CertFile:    certFile,
-		KeyFile:     keyFile}
-	httpS := &http.Server{Handler: handler}
-
-	if viper.GetString("https.volume.ca") != "" {
-		clientCertFile := viper.GetString("https.volume.ca")
-		httpS.TLSConfig = security.LoadClientTLSHTTP(clientCertFile)
 	}
+	httpS := &http.Server{Handler: handler}
 
 	clusterHttpServer := httpDown.Serve(httpS, listener)
 	go func() {

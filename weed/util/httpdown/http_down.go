@@ -1,7 +1,6 @@
 // Package httpdown provides http.ConnState enabled graceful termination of
 // http.Server.
-// based on github.com/facebookarchive/httpdown, who's licence is MIT-licence,
-// we add a feature of supporting for http TLS
+// Based on github.com/facebookarchive/httpdown, who's licence is MIT-licence.
 package httpdown
 
 import (
@@ -59,15 +58,6 @@ type HTTP struct {
 	// Clock allows for testing timing related functionality. Do not specify this
 	// in production code.
 	Clock clock.Clock
-
-	// when set CertFile and KeyFile, the httpDown will start a http with TLS.
-	// Files containing a certificate and matching private key for the
-	// server must be provided if neither the Server's
-	// TLSConfig.Certificates nor TLSConfig.GetCertificate are populated.
-	// If the certificate is signed by a certificate authority, the
-	// certFile should be the concatenation of the server's certificate,
-	// any intermediates, and the CA's certificate.
-	CertFile, KeyFile string
 }
 
 // Serve provides the low-level API which is useful if you're creating your own
@@ -102,8 +92,6 @@ func (h HTTP) Serve(s *http.Server, l net.Listener) Server {
 		closed:       make(chan net.Conn),
 		stop:         make(chan chan struct{}),
 		kill:         make(chan chan struct{}),
-		certFile:     h.CertFile,
-		keyFile:      h.KeyFile,
 	}
 	s.ConnState = ss.connState
 	go ss.manage()
@@ -157,8 +145,6 @@ type server struct {
 
 	stopOnce sync.Once
 	stopErr  error
-
-	certFile, keyFile string
 }
 
 func (s *server) connState(c net.Conn, cs http.ConnState) {
@@ -289,11 +275,7 @@ func (s *server) manage() {
 
 func (s *server) serve() {
 	stats.BumpSum(s.stats, "serve", 1)
-	if s.certFile == "" && s.keyFile == "" {
-		s.serveErr <- s.server.Serve(s.listener)
-	} else {
-		s.serveErr <- s.server.ServeTLS(s.listener, s.certFile, s.keyFile)
-	}
+	s.serveErr <- s.server.Serve(s.listener)
 	close(s.serveDone)
 	close(s.serveErr)
 }

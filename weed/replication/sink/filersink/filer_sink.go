@@ -3,20 +3,19 @@ package filersink
 import (
 	"context"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/wdclient"
 	"math"
 
 	"google.golang.org/grpc"
-
-	"github.com/seaweedfs/seaweedfs/weed/security"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/seaweedfs/seaweedfs/weed/filer"
 	"github.com/seaweedfs/seaweedfs/weed/glog"
+	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/replication/sink"
 	"github.com/seaweedfs/seaweedfs/weed/replication/source"
 	"github.com/seaweedfs/seaweedfs/weed/util"
+	"github.com/seaweedfs/seaweedfs/weed/wdclient"
 )
 
 type FilerSink struct {
@@ -61,7 +60,7 @@ func (fs *FilerSink) Initialize(configuration util.Configuration, prefix string)
 		configuration.GetString(prefix+"collection"),
 		configuration.GetInt(prefix+"ttlSec"),
 		configuration.GetString(prefix+"disk"),
-		security.LoadClientTLS(util.GetViper(), "grpc.client"),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		false)
 }
 

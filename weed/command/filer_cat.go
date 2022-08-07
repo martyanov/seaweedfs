@@ -3,17 +3,18 @@ package command
 import (
 	"context"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/filer"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/wdclient"
-	"google.golang.org/grpc"
 	"net/url"
 	"os"
 	"strings"
 
-	"github.com/seaweedfs/seaweedfs/weed/security"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
+	"github.com/seaweedfs/seaweedfs/weed/filer"
+	"github.com/seaweedfs/seaweedfs/weed/pb"
+	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
+	"github.com/seaweedfs/seaweedfs/weed/wdclient"
 )
 
 var (
@@ -58,9 +59,6 @@ var cmdFilerCat = &Command{
 }
 
 func runFilerCat(cmd *Command, args []string) bool {
-
-	util.LoadConfiguration("security", false)
-
 	if len(args) == 0 {
 		return false
 	}
@@ -78,7 +76,7 @@ func runFilerCat(cmd *Command, args []string) bool {
 	}
 
 	filerCat.filerAddress = pb.ServerAddress(filerUrl.Host)
-	filerCat.grpcDialOption = security.LoadClientTLS(util.GetViper(), "grpc.client")
+	filerCat.grpcDialOption = grpc.WithTransportCredentials(insecure.NewCredentials())
 
 	dir, name := util.FullPath(urlPath).DirAndName()
 
