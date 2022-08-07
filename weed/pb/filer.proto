@@ -154,16 +154,14 @@ message FileId {
 
 message FuseAttributes {
     uint64 file_size = 1;
-    int64 mtime = 2; // unix time in seconds
-    uint32 file_mode = 3;
-    uint32 uid = 4;
-    uint32 gid = 5;
-    int64 crtime = 6; // unix time in seconds
+    int64 crtime = 2; // unix time in seconds
+    int64 mtime = 3; // unix time in seconds
+    uint32 file_mode = 4;
+    uint32 uid = 5;
+    uint32 gid = 6;
     string mime = 7;
-    int32 ttl_sec = 10;
-    string user_name = 11; // for hdfs
-    repeated string group_name = 12; // for hdfs
-    bytes md5 = 14;
+    int32 ttl_sec = 8;
+    bytes md5 = 9;
 }
 
 message CreateEntryRequest {

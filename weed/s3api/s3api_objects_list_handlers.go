@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/xml"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 	"io"
 	"net/http"
 	"net/url"
@@ -13,6 +11,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/seaweedfs/seaweedfs/weed/glog"
+	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 
 	"github.com/seaweedfs/seaweedfs/weed/filer"
 	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
@@ -170,7 +171,7 @@ func (s3a *S3ApiServer) listFilerEntries(bucket string, originalPrefix string, m
 				Size:         int64(filer.FileSize(entry)),
 				Owner: CanonicalUser{
 					ID:          fmt.Sprintf("%x", entry.Attributes.Uid),
-					DisplayName: entry.Attributes.UserName,
+					DisplayName: "",
 				},
 				StorageClass: StorageClass(storageClass),
 			})
@@ -202,7 +203,7 @@ func (s3a *S3ApiServer) listFilerEntries(bucket string, originalPrefix string, m
 						Size:         int64(filer.FileSize(entry)),
 						Owner: CanonicalUser{
 							ID:          fmt.Sprintf("%x", entry.Attributes.Uid),
-							DisplayName: entry.Attributes.UserName,
+							DisplayName: "",
 						},
 						StorageClass: StorageClass(storageClass),
 					})

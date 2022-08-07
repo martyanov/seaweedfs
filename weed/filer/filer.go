@@ -3,13 +3,14 @@ package filer
 import (
 	"context"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/cluster"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
 	"os"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/seaweedfs/seaweedfs/weed/cluster"
+	"github.com/seaweedfs/seaweedfs/weed/pb"
+	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
 
 	"google.golang.org/grpc"
 
@@ -236,13 +237,11 @@ func (f *Filer) ensureParentDirecotryEntry(ctx context.Context, entry *Entry, di
 		dirEntry = &Entry{
 			FullPath: util.FullPath(dirPath),
 			Attr: Attr{
-				Mtime:      now,
-				Crtime:     now,
-				Mode:       os.ModeDir | entry.Mode | 0111,
-				Uid:        entry.Uid,
-				Gid:        entry.Gid,
-				UserName:   entry.UserName,
-				GroupNames: entry.GroupNames,
+				Mtime:  now,
+				Crtime: now,
+				Mode:   os.ModeDir | entry.Mode | 0111,
+				Uid:    entry.Uid,
+				Gid:    entry.Gid,
 			},
 		}
 

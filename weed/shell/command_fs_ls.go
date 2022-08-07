@@ -72,20 +72,13 @@ func (c *commandFsLs) Do(args []string, commandEnv *CommandEnv, writer io.Writer
 
 		if isLongFormat {
 			fileMode := os.FileMode(entry.Attributes.FileMode)
-			userName, groupNames := entry.Attributes.UserName, entry.Attributes.GroupName
-			if userName == "" {
-				if user, userErr := user.LookupId(strconv.Itoa(int(entry.Attributes.Uid))); userErr == nil {
-					userName = user.Username
-				}
+
+			var userName, groupName string
+			if user, userErr := user.LookupId(strconv.Itoa(int(entry.Attributes.Uid))); userErr == nil {
+				userName = user.Username
 			}
-			groupName := ""
-			if len(groupNames) > 0 {
-				groupName = groupNames[0]
-			}
-			if groupName == "" {
-				if group, groupErr := user.LookupGroupId(strconv.Itoa(int(entry.Attributes.Gid))); groupErr == nil {
-					groupName = group.Name
-				}
+			if group, groupErr := user.LookupGroupId(strconv.Itoa(int(entry.Attributes.Gid))); groupErr == nil {
+				groupName = group.Name
 			}
 
 			if strings.HasSuffix(dir, "/") {
