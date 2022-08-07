@@ -2,11 +2,12 @@ package shell
 
 import (
 	"context"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/util"
 	"io"
 	"os"
 	"time"
+
+	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
 func init() {
@@ -43,7 +44,7 @@ func (c *commandFsMkdir) Do(args []string, commandEnv *CommandEnv, writer io.Wri
 			Entry: &filer_pb.Entry{
 				Name:        name,
 				IsDirectory: true,
-				Attributes: &filer_pb.FuseAttributes{
+				Attributes: &filer_pb.Attributes{
 					Mtime:    time.Now().Unix(),
 					Crtime:   time.Now().Unix(),
 					FileMode: uint32(0777 | os.ModeDir),

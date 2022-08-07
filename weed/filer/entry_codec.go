@@ -30,9 +30,9 @@ func (entry *Entry) DecodeAttributesAndChunks(blob []byte) error {
 	return nil
 }
 
-func EntryAttributeToPb(entry *Entry) *filer_pb.FuseAttributes {
+func EntryAttributeToPb(entry *Entry) *filer_pb.Attributes {
 
-	return &filer_pb.FuseAttributes{
+	return &filer_pb.Attributes{
 		Crtime:   entry.Attr.Crtime.Unix(),
 		Mtime:    entry.Attr.Mtime.Unix(),
 		FileMode: uint32(entry.Attr.Mode),
@@ -45,7 +45,7 @@ func EntryAttributeToPb(entry *Entry) *filer_pb.FuseAttributes {
 	}
 }
 
-func PbToEntryAttribute(attr *filer_pb.FuseAttributes) Attr {
+func PbToEntryAttribute(attr *filer_pb.Attributes) Attr {
 
 	t := Attr{}
 

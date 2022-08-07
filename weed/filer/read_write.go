@@ -53,7 +53,7 @@ func SaveInsideFiler(client filer_pb.SeaweedFilerClient, dir, name string, conte
 			Entry: &filer_pb.Entry{
 				Name:        name,
 				IsDirectory: false,
-				Attributes: &filer_pb.FuseAttributes{
+				Attributes: &filer_pb.Attributes{
 					Mtime:    time.Now().Unix(),
 					Crtime:   time.Now().Unix(),
 					FileMode: uint32(0644),

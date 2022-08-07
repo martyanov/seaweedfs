@@ -214,7 +214,7 @@ func DoMkdir(client SeaweedFilerClient, parentDirectoryPath string, dirName stri
 	entry := &Entry{
 		Name:        dirName,
 		IsDirectory: true,
-		Attributes: &FuseAttributes{
+		Attributes: &Attributes{
 			Mtime:    time.Now().Unix(),
 			Crtime:   time.Now().Unix(),
 			FileMode: uint32(0777 | os.ModeDir),
@@ -247,7 +247,7 @@ func MkFile(filerClient FilerClient, parentDirectoryPath string, fileName string
 		entry := &Entry{
 			Name:        fileName,
 			IsDirectory: false,
-			Attributes: &FuseAttributes{
+			Attributes: &Attributes{
 				Mtime:    time.Now().Unix(),
 				Crtime:   time.Now().Unix(),
 				FileMode: uint32(0770),

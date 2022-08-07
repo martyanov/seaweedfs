@@ -55,7 +55,7 @@ func (c *commandS3BucketCreate) Do(args []string, commandEnv *CommandEnv, writer
 		entry := &filer_pb.Entry{
 			Name:        *bucketName,
 			IsDirectory: true,
-			Attributes: &filer_pb.FuseAttributes{
+			Attributes: &filer_pb.Attributes{
 				Mtime:    time.Now().Unix(),
 				Crtime:   time.Now().Unix(),
 				FileMode: uint32(0777 | os.ModeDir),

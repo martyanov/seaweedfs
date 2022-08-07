@@ -409,7 +409,7 @@ func (worker *FileCopyWorker) uploadFileAsOne(task FileCopyTask, f *os.File) err
 			Directory: task.destinationUrlPath,
 			Entry: &filer_pb.Entry{
 				Name: fileName,
-				Attributes: &filer_pb.FuseAttributes{
+				Attributes: &filer_pb.Attributes{
 					Crtime:   time.Now().Unix(),
 					Mtime:    time.Now().Unix(),
 					Gid:      task.gid,
@@ -544,7 +544,7 @@ func (worker *FileCopyWorker) uploadFileInChunks(task FileCopyTask, f *os.File, 
 			Directory: task.destinationUrlPath,
 			Entry: &filer_pb.Entry{
 				Name: fileName,
-				Attributes: &filer_pb.FuseAttributes{
+				Attributes: &filer_pb.Attributes{
 					Crtime:   time.Now().Unix(),
 					Mtime:    time.Now().Unix(),
 					Gid:      task.gid,

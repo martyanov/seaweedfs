@@ -4,6 +4,11 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io"
+	"os"
+	"strings"
+	"time"
+
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/seaweedfs/seaweedfs/weed/filer"
@@ -11,10 +16,6 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/pb/remote_pb"
 	"github.com/seaweedfs/seaweedfs/weed/remote_storage"
 	"github.com/seaweedfs/seaweedfs/weed/util"
-	"io"
-	"os"
-	"strings"
-	"time"
 )
 
 func init() {
@@ -130,7 +131,7 @@ func syncMetadata(commandEnv *CommandEnv, writer io.Writer, dir string, nonEmpty
 					Entry: &filer_pb.Entry{
 						Name:        name,
 						IsDirectory: true,
-						Attributes: &filer_pb.FuseAttributes{
+						Attributes: &filer_pb.Attributes{
 							Mtime:    time.Now().Unix(),
 							Crtime:   time.Now().Unix(),
 							FileMode: uint32(0644 | os.ModeDir),

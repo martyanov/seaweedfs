@@ -104,7 +104,7 @@ message Entry {
     string name = 1;
     bool is_directory = 2;
     repeated FileChunk chunks = 3;
-    FuseAttributes attributes = 4;
+    Attributes attributes = 4;
     map<string, bytes> extended = 5;
     bytes hard_link_id = 7;
     int32 hard_link_counter = 8; // only exists in hard link meta data
@@ -152,7 +152,7 @@ message FileId {
     fixed32 cookie = 3;
 }
 
-message FuseAttributes {
+message Attributes {
     uint64 file_size = 1;
     int64 crtime = 2; // unix time in seconds
     int64 mtime = 3; // unix time in seconds

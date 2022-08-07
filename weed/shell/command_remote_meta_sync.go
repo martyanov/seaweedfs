@@ -4,12 +4,13 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io"
+
 	"github.com/seaweedfs/seaweedfs/weed/filer"
 	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/remote_pb"
 	"github.com/seaweedfs/seaweedfs/weed/remote_storage"
 	"github.com/seaweedfs/seaweedfs/weed/util"
-	"io"
 )
 
 func init() {
@@ -142,7 +143,7 @@ func pullMetadata(commandEnv *CommandEnv, writer io.Writer, localMountedDir util
 					Entry: &filer_pb.Entry{
 						Name:        name,
 						IsDirectory: isDirectory,
-						Attributes: &filer_pb.FuseAttributes{
+						Attributes: &filer_pb.Attributes{
 							FileSize: uint64(remoteEntry.RemoteSize),
 							Mtime:    remoteEntry.RemoteMtime,
 							FileMode: uint32(0644),
