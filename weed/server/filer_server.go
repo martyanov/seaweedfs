@@ -18,7 +18,6 @@ import (
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/leveldb3"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/redis"
 	_ "github.com/seaweedfs/seaweedfs/weed/filer/redis2"
-	_ "github.com/seaweedfs/seaweedfs/weed/filer/redis3"
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/notification"
 	_ "github.com/seaweedfs/seaweedfs/weed/notification/kafka"

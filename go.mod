@@ -22,7 +22,6 @@ require (
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/go-errors/errors v1.1.1 // indirect
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/go-redsync/redsync/v4 v4.5.1
 	github.com/gocql/gocql v0.0.0-20210707082121-9a3953d1826d
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang/protobuf v1.5.2
@@ -63,7 +62,6 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.12.0
 	github.com/stretchr/testify v1.8.0
-	github.com/stvp/tempredis v0.0.0-20181119212430-b82af8480203
 	github.com/syndtr/goleveldb v1.0.1-0.20190318030020-c3a204f8e965
 	github.com/tidwall/gjson v1.14.1
 	github.com/tidwall/match v1.1.1
