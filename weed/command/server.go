@@ -72,8 +72,6 @@ var (
 	isStartingS3           = cmdServer.Flag.Bool("s3", false, "whether to start S3 gateway")
 	isStartingIam          = cmdServer.Flag.Bool("iam", false, "whether to start IAM service")
 
-	serverWhiteList []string
-
 	False = false
 )
 
@@ -217,9 +215,7 @@ func runServer(cmd *Command, args []string) bool {
 	}
 	filerOptions.defaultLevelDbDirectory = masterOptions.metaFolder
 
-	if *serverWhiteListOption != "" {
-		serverWhiteList = strings.Split(*serverWhiteListOption, ",")
-	}
+	serverWhiteList := util.StringSplit(*serverWhiteListOption, ",")
 
 	if *isStartingFiler {
 		go func() {
