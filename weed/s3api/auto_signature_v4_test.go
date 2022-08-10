@@ -219,11 +219,6 @@ func getMD5Sum(data []byte) []byte {
 	return hash.Sum(nil)
 }
 
-// getMD5Hash returns MD5 hash in hex encoding of given data.
-func getMD5Hash(data []byte) string {
-	return hex.EncodeToString(getMD5Sum(data))
-}
-
 var ignoredHeaders = map[string]bool{
 	"Authorization":  true,
 	"Content-Type":   true,

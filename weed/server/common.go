@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 	"io"
 	"io/fs"
 	"mime/multipart"
@@ -17,13 +16,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
+
 	"google.golang.org/grpc"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/operation"
 	"github.com/seaweedfs/seaweedfs/weed/stats"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
-	"github.com/seaweedfs/seaweedfs/weed/util"
 
 	"github.com/gorilla/mux"
 )
@@ -219,25 +219,6 @@ func parseURLPath(path string) (vid, fid, filename, ext string, isVolumeIdOnly b
 		}
 	}
 	return
-}
-
-func statsHealthHandler(w http.ResponseWriter, r *http.Request) {
-	m := make(map[string]interface{})
-	m["Version"] = util.Version()
-	writeJsonQuiet(w, r, http.StatusOK, m)
-}
-func statsCounterHandler(w http.ResponseWriter, r *http.Request) {
-	m := make(map[string]interface{})
-	m["Version"] = util.Version()
-	m["Counters"] = serverStats
-	writeJsonQuiet(w, r, http.StatusOK, m)
-}
-
-func statsMemoryHandler(w http.ResponseWriter, r *http.Request) {
-	m := make(map[string]interface{})
-	m["Version"] = util.Version()
-	m["Memory"] = stats.MemStat()
-	writeJsonQuiet(w, r, http.StatusOK, m)
 }
 
 var StaticFS fs.FS

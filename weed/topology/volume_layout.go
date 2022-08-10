@@ -3,10 +3,11 @@ package topology
 import (
 	"errors"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/storage/types"
 	"math/rand"
 	"sync"
 	"time"
+
+	"github.com/seaweedfs/seaweedfs/weed/storage/types"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/storage"
@@ -27,7 +28,6 @@ type volumeState string
 const (
 	readOnlyState  volumeState = "ReadOnly"
 	oversizedState             = "Oversized"
-	crowdedState               = "Crowded"
 )
 
 type stateIndicator func(copyState) bool

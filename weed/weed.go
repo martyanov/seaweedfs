@@ -3,19 +3,19 @@ package main
 import (
 	"embed"
 	"fmt"
-	weed_server "github.com/seaweedfs/seaweedfs/weed/server"
-	"github.com/seaweedfs/seaweedfs/weed/util"
-	flag "github.com/seaweedfs/seaweedfs/weed/util/fla9"
 	"io"
 	"io/fs"
 	"math/rand"
 	"os"
 	"strings"
-	"sync"
 	"text/template"
 	"time"
 	"unicode"
 	"unicode/utf8"
+
+	weed_server "github.com/seaweedfs/seaweedfs/weed/server"
+	"github.com/seaweedfs/seaweedfs/weed/util"
+	flag "github.com/seaweedfs/seaweedfs/weed/util/fla9"
 
 	"github.com/seaweedfs/seaweedfs/weed/command"
 	"github.com/seaweedfs/seaweedfs/weed/glog"
@@ -24,17 +24,6 @@ import (
 var IsDebug *bool
 
 var commands = command.Commands
-
-var exitStatus = 0
-var exitMu sync.Mutex
-
-func setExitStatus(n int) {
-	exitMu.Lock()
-	if exitStatus < n {
-		exitStatus = n
-	}
-	exitMu.Unlock()
-}
 
 //go:embed static
 var static embed.FS
@@ -47,7 +36,9 @@ func init() {
 
 func main() {
 	glog.MaxSize = 1024 * 1024 * 32
+
 	rand.Seed(time.Now().UnixNano())
+
 	flag.Usage = usage
 
 	if command.AutocompleteMain(commands) {
@@ -84,14 +75,12 @@ func main() {
 				fmt.Fprintf(os.Stderr, "Default Parameters:\n")
 				cmd.Flag.PrintDefaults()
 			}
-			exit()
-			return
+			os.Exit(2)
 		}
 	}
 
 	fmt.Fprintf(os.Stderr, "weed: unknown subcommand %q\nRun 'weed help' for usage.\n", args[0])
-	setExitStatus(2)
-	exit()
+	os.Exit(2)
 }
 
 var usageTemplate = `
@@ -167,21 +156,4 @@ func help(args []string) {
 
 	fmt.Fprintf(os.Stderr, "Unknown help topic %#q.  Run 'weed help'.\n", arg)
 	os.Exit(2) // failed at 'weed help cmd'
-}
-
-var atexitFuncs []func()
-
-func atexit(f func()) {
-	atexitFuncs = append(atexitFuncs, f)
-}
-
-func exit() {
-	for _, f := range atexitFuncs {
-		f()
-	}
-	os.Exit(exitStatus)
-}
-
-func debug(params ...interface{}) {
-	glog.V(4).Infoln(params...)
 }

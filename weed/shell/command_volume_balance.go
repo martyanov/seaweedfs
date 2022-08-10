@@ -3,13 +3,14 @@ package shell
 import (
 	"flag"
 	"fmt"
+	"io"
+	"os"
+	"time"
+
 	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/super_block"
 	"github.com/seaweedfs/seaweedfs/weed/storage/types"
 	"golang.org/x/exp/slices"
-	"io"
-	"os"
-	"time"
 
 	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
@@ -227,12 +228,6 @@ func (n *Node) selectVolumes(fn func(v *master_pb.VolumeInformationMessage) bool
 func sortWritableVolumes(volumes []*master_pb.VolumeInformationMessage) {
 	slices.SortFunc(volumes, func(a, b *master_pb.VolumeInformationMessage) bool {
 		return a.Size < b.Size
-	})
-}
-
-func sortReadOnlyVolumes(volumes []*master_pb.VolumeInformationMessage) {
-	slices.SortFunc(volumes, func(a, b *master_pb.VolumeInformationMessage) bool {
-		return a.Id < b.Id
 	})
 }
 

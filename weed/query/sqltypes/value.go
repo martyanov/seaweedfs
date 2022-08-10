@@ -11,7 +11,6 @@ var (
 	NULL = Value{}
 	// DontEscape tells you if a character should not be escaped.
 	DontEscape = byte(255)
-	nullstr    = []byte("null")
 )
 
 type Value struct {

@@ -5,10 +5,7 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"strings"
 	"time"
-
-	"golang.org/x/exp/slices"
 
 	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
@@ -214,16 +211,6 @@ func checkPeers(masterIp string, masterPort int, masterGrpcPort int, peers strin
 		glog.Fatalf("Only odd number of masters are supported: %+v", cleanedPeers)
 	}
 	return
-}
-
-func isTheFirstOne(self pb.ServerAddress, peers []pb.ServerAddress) bool {
-	slices.SortFunc(peers, func(a, b pb.ServerAddress) bool {
-		return strings.Compare(string(a), string(b)) < 0
-	})
-	if len(peers) <= 0 {
-		return true
-	}
-	return self == peers[0]
 }
 
 func (m *MasterOptions) toMasterOption(whiteList []string) *weed_server.MasterOption {
