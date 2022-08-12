@@ -1,10 +1,12 @@
 package backend
 
 import (
+	"os"
+	"syscall"
+	"time"
+
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	. "github.com/seaweedfs/seaweedfs/weed/storage/types"
-	"os"
-	"time"
 )
 
 var (
@@ -81,6 +83,6 @@ func (df *DiskFile) Name() string {
 }
 
 func (df *DiskFile) Sync() error {
-	return nil
-	// return df.File.Sync()
+	fd := df.File.Fd()
+	return syscall.Fdatasync(int(fd))
 }
