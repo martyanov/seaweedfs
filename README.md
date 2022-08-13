@@ -12,18 +12,10 @@ Table of Contents
 * [Quick Start](#quick-start)
 * [Introduction](#introduction)
 * [Features](#features)
-    * [Additional Features](#additional-features)
-    * [Filer Features](#filer-features)
+* [Filer Features](#filer-features)
 * [Resources](#resources)
 * [Example: Using Seaweed Object Store](#example-Using-Seaweed-Object-Store)
 * [Architecture](#Object-Store-Architecture)
-* [Compared to Other File Systems](#compared-to-other-file-systems)
-    * [Compared to HDFS](#compared-to-hdfs)
-    * [Compared to GlusterFS, Ceph](#compared-to-glusterfs-ceph)
-    * [Compared to GlusterFS](#compared-to-glusterfs)
-    * [Compared to Ceph](#compared-to-ceph)
-* [Dev Plan](#dev-plan)
-* [Architecture](#architecture)
 * [Installation Guide](#installation-guide)
 * [Disk Related Topics](#disk-related-topics)
 * [Benchmark](#Benchmark)
@@ -34,17 +26,14 @@ Table of Contents
 * Download the latest binary from https://github.com/martyanov/seaweedfs/releases and unzip a single binary file
 * Run `weed server -dir=/some/data/dir -s3` to start one master, one volume server, one filer, and one S3 gateway
 
-Also, to increase capacity, just add more volume servers by running `weed volume -dir="/some/data/dir2" -mserver="<master_host>:9333" -port=8081` locally, or on a different machine, or on thousands of machines. That is it!
-
-## Quick Start SeaweedFS S3 on AWS ##
-* Setup fast production-ready [SeaweedFS S3 on AWS with cloudformation](https://aws.amazon.com/marketplace/pp/prodview-nzelz5gprlrjc)
+Also, to increase capacity, just add more volume servers by running `weed volume -dir="/some/data/dir2" -mserver="<master_host>:9333" -port=8081` locally, or on a different machine. That is it!
 
 ## Introduction ##
 
 SeaweedFS is a simple and highly scalable distributed file system. There are two objectives:
 
-1. to store billions of files!
-2. to serve the files fast!
+1. To store billions of files.
+2. To serve the files fast.
 
 SeaweedFS started as an Object Store to handle small files efficiently.
 Instead of managing all file metadata in a central master,
@@ -58,24 +47,17 @@ It is so simple with O(1) disk reads that you are welcome to challenge the perfo
 
 SeaweedFS started by implementing [Facebook's Haystack design paper](http://www.usenix.org/event/osdi10/tech/full_papers/Beaver.pdf).
 Also, SeaweedFS implements erasure coding with ideas from
-[f4: Facebook’s Warm BLOB Storage System](https://www.usenix.org/system/files/conference/osdi14/osdi14-paper-muralidhar.pdf), and has a lot of similarities with [Facebook’s Tectonic Filesystem](https://www.usenix.org/system/files/fast21-pan.pdf)
+[f4: Facebook’s Warm BLOB Storage System](https://www.usenix.org/system/files/conference/osdi14/osdi14-paper-muralidhar.pdf), and has a lot of similarities with [Facebook’s Tectonic Filesystem](https://www.usenix.org/system/files/fast21-pan.pdf).
 
-On top of the object store, optional [Filer] can support directories and POSIX attributes.
 Filer is a separate linearly-scalable stateless server with customizable metadata stores: LevelDB and Redis.
 
 For any distributed key value stores, the large values can be offloaded to SeaweedFS.
 With the fast access speed and linearly scalable capacity,
 SeaweedFS can work as a distributed [Key-Large-Value store][KeyLargeValueStore].
 
-SeaweedFS can transparently integrate with the cloud.
-With hot data on local cluster, and warm data on the cloud with O(1) access time,
-SeaweedFS can achieve both fast local access time and elastic cloud storage capacity.
-What's more, the cloud storage access API cost is minimized.
-Faster and Cheaper than direct cloud storage!
-
 [Back to TOC](#table-of-contents)
 
-## Additional Features ##
+## Features ##
 * Can choose no replication or different replication levels, rack and data center aware.
 * Automatic master servers failover - no single point of failure (SPOF).
 * Automatic Gzip compression depending on file MIME type.
@@ -83,12 +65,10 @@ Faster and Cheaper than direct cloud storage!
 * [Automatic entry TTL expiration][VolumeServerTTL].
 * Any server with some disk spaces can add to the total storage space.
 * Adding/Removing servers does **not** cause any data re-balancing unless triggered by admin commands.
-* Optional picture resizing.
 * Support ETag, Accept-Range, Last-Modified, etc.
 * Support in-memory/leveldb/readonly mode tuning for memory/performance balance.
 * Support rebalancing the writable and readonly volumes.
 * [Customizable Multiple Storage Tiers][TieredStorage]: Customizable storage disk types to balance performance and cost.
-* [Transparent cloud integration][CloudTier]: unlimited capacity via tiered cloud storage for warm data.
 * [Erasure Coding for warm storage][ErasureCoding]  Rack-Aware 10.4 erasure coding reduces storage cost and increases availability.
 
 [Back to TOC](#table-of-contents)
@@ -103,8 +83,6 @@ Faster and Cheaper than direct cloud storage!
 * [Async Replication To Cloud][BackupToCloud] has extremely fast local access and backups to Amazon S3.
 * [AES256-GCM Encrypted Storage][FilerDataEncryption] safely stores the encrypted data.
 * [Super Large Files][SuperLargeFiles] stores large or super large files in tens of TB.
-* [Cloud Drive][CloudDrive] mounts cloud storage to local cluster, cached for fast read and write with asynchronous write back.
-* [Gateway to Remote Object Store][GatewayToRemoteObjectStore] mirrors bucket operations to remote object storage, in addition to [Cloud Drive][CloudDrive]
 
 [Filer]: https://github.com/martyanov/seaweedfs/wiki/Directories-and-Files
 [SuperLargeFiles]: https://github.com/martyanov/seaweedfs/wiki/Data-Structure-for-Large-Files
@@ -112,15 +90,12 @@ Faster and Cheaper than direct cloud storage!
 [BackupToCloud]: https://github.com/martyanov/seaweedfs/wiki/Async-Replication-to-Cloud
 [ErasureCoding]: https://github.com/martyanov/seaweedfs/wiki/Erasure-coding-for-warm-storage
 [TieredStorage]: https://github.com/martyanov/seaweedfs/wiki/Tiered-Storage
-[CloudTier]: https://github.com/martyanov/seaweedfs/wiki/Cloud-Tier
 [FilerDataEncryption]: https://github.com/martyanov/seaweedfs/wiki/Filer-Data-Encryption
 [FilerTTL]: https://github.com/martyanov/seaweedfs/wiki/Filer-Stores
 [VolumeServerTTL]: https://github.com/martyanov/seaweedfs/wiki/Store-file-with-a-Time-To-Live
 [ActiveActiveAsyncReplication]: https://github.com/martyanov/seaweedfs/wiki/Filer-Active-Active-cross-cluster-continuous-synchronization
 [FilerStoreReplication]: https://github.com/martyanov/seaweedfs/wiki/Filer-Store-Replication
 [KeyLargeValueStore]: https://github.com/martyanov/seaweedfs/wiki/Filer-as-a-Key-Large-Value-Store
-[CloudDrive]: https://github.com/martyanov/seaweedfs/wiki/Cloud-Drive-Architecture
-[GatewayToRemoteObjectStore]: https://github.com/martyanov/seaweedfs/wiki/Gateway-to-Remote-Object-Storage
 
 [Back to TOC](#table-of-contents)
 
@@ -337,11 +312,11 @@ https://golang.org/doc/install
 
 make sure to define your $GOPATH
 
-
 Step 2: checkout this repo:
 ```bash
-git clone https://github.com/seaweedfs/seaweedfs.git
+git clone https://github.com/martyanov/seaweedfs.git
 ```
+
 Step 3: download, compile, and install the project by executing the following command
 
 ```bash
