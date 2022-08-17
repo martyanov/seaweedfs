@@ -8,8 +8,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
+
 	"github.com/seaweedfs/seaweedfs/weed/filer"
 	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/pb/remote_pb"
@@ -110,15 +110,8 @@ func (c *commandRemoteConfigure) listExistingRemoteStorages(commandEnv *CommandE
 		// change secret key to stars
 		conf.S3SecretKey = strings.Repeat("*", len(conf.S3SecretKey))
 
-		m := jsonpb.Marshaler{
-			EmitDefaults: false,
-			Indent:       "  ",
-		}
+		return filer.ProtoToText(writer, conf)
 
-		err := m.Marshal(writer, conf)
-		fmt.Fprintln(writer)
-
-		return err
 	})
 
 }
