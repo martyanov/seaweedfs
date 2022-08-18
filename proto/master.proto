@@ -4,8 +4,6 @@ package master_pb;
 
 option go_package = "github.com/seaweedfs/seaweedfs/weed/pb/master_pb";
 
-//////////////////////////////////////////////////
-
 service Seaweed {
   rpc SendHeartbeat (stream Heartbeat) returns (stream HeartbeatResponse) {
   }
@@ -44,8 +42,6 @@ service Seaweed {
   rpc RaftRemoveServer (RaftRemoveServerRequest) returns (RaftRemoveServerResponse) {
   }
 }
-
-//////////////////////////////////////////////////
 
 message Heartbeat {
   string ip = 1;

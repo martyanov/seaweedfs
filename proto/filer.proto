@@ -3,10 +3,6 @@ syntax = "proto3";
 package filer_pb;
 
 option go_package = "github.com/seaweedfs/seaweedfs/weed/pb/filer_pb";
-option java_package = "seaweedfs.client";
-option java_outer_classname = "FilerProto";
-
-//////////////////////////////////////////////////
 
 service SeaweedFiler {
 
@@ -69,8 +65,6 @@ service SeaweedFiler {
     rpc CacheRemoteObjectToLocalCluster (CacheRemoteObjectToLocalClusterRequest) returns (CacheRemoteObjectToLocalClusterResponse) {
     }
 }
-
-//////////////////////////////////////////////////
 
 message LookupDirectoryEntryRequest {
     string directory = 1;

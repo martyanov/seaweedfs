@@ -1,11 +1,10 @@
 syntax = "proto3";
 
 package volume_server_pb;
+
 option go_package = "github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb";
 
 import "remote.proto";
-
-//////////////////////////////////////////////////
 
 service VolumeServer {
     //Experts only: takes multiple fid parameters. This function does not propagate deletes to replicas.
@@ -112,8 +111,6 @@ service VolumeServer {
     }
 
 }
-
-//////////////////////////////////////////////////
 
 message BatchDeleteRequest {
     repeated string file_ids = 1;
