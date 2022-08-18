@@ -378,6 +378,18 @@ func (s3a *S3ApiServer) proxyToFiler(w http.ResponseWriter, r *http.Request, des
 			return
 		}
 	}
+
+	if resp.StatusCode == http.StatusNotFound {
+		s3err.WriteErrorResponse(w, r, s3err.ErrNoSuchKey)
+		return
+	}
+
+	// when HEAD a directory, it should be reported as no such key
+	// https://github.com/seaweedfs/seaweedfs/issues/3457
+	if resp.ContentLength == -1 && resp.StatusCode != http.StatusNotModified {
+		s3err.WriteErrorResponse(w, r, s3err.ErrNoSuchKey)
+		return
+	}
 }
 
 func passThroughResponse(proxyResponse *http.Response, w http.ResponseWriter) (statusCode int) {
