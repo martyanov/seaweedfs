@@ -2,14 +2,16 @@ package remote_storage
 
 import (
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/remote_pb"
-	"google.golang.org/protobuf/proto"
 	"io"
 	"sort"
 	"strings"
 	"sync"
 	"time"
+
+	"google.golang.org/protobuf/proto"
+
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 )
 
 const slash = "/"
@@ -23,8 +25,8 @@ func ParseLocationName(remote string) (locationName string) {
 	return
 }
 
-func parseBucketLocation(remote string) (loc *remote_pb.RemoteStorageLocation) {
-	loc = &remote_pb.RemoteStorageLocation{}
+func parseBucketLocation(remote string) (loc *rpc.RemoteStorageLocation) {
+	loc = &rpc.RemoteStorageLocation{}
 	remote = strings.TrimSuffix(remote, slash)
 	parts := strings.SplitN(remote, slash, 3)
 	if len(parts) >= 1 {
@@ -40,8 +42,8 @@ func parseBucketLocation(remote string) (loc *remote_pb.RemoteStorageLocation) {
 	return
 }
 
-func parseNoBucketLocation(remote string) (loc *remote_pb.RemoteStorageLocation) {
-	loc = &remote_pb.RemoteStorageLocation{}
+func parseNoBucketLocation(remote string) (loc *rpc.RemoteStorageLocation) {
+	loc = &rpc.RemoteStorageLocation{}
 	remote = strings.TrimSuffix(remote, slash)
 	parts := strings.SplitN(remote, slash, 2)
 	if len(parts) >= 1 {
@@ -54,7 +56,7 @@ func parseNoBucketLocation(remote string) (loc *remote_pb.RemoteStorageLocation)
 	return
 }
 
-func FormatLocation(loc *remote_pb.RemoteStorageLocation) string {
+func FormatLocation(loc *rpc.RemoteStorageLocation) string {
 	if loc.Bucket == "" {
 		return fmt.Sprintf("%s%s", loc.Name, loc.Path)
 	}
@@ -69,25 +71,25 @@ type Bucket struct {
 }
 
 type RemoteStorageClient interface {
-	Traverse(loc *remote_pb.RemoteStorageLocation, visitFn VisitFunc) error
-	ReadFile(loc *remote_pb.RemoteStorageLocation, offset int64, size int64) (data []byte, err error)
-	WriteDirectory(loc *remote_pb.RemoteStorageLocation, entry *filer_pb.Entry) (err error)
-	RemoveDirectory(loc *remote_pb.RemoteStorageLocation) (err error)
-	WriteFile(loc *remote_pb.RemoteStorageLocation, entry *filer_pb.Entry, reader io.Reader) (remoteEntry *filer_pb.RemoteEntry, err error)
-	UpdateFileMetadata(loc *remote_pb.RemoteStorageLocation, oldEntry *filer_pb.Entry, newEntry *filer_pb.Entry) (err error)
-	DeleteFile(loc *remote_pb.RemoteStorageLocation) (err error)
+	Traverse(loc *rpc.RemoteStorageLocation, visitFn VisitFunc) error
+	ReadFile(loc *rpc.RemoteStorageLocation, offset int64, size int64) (data []byte, err error)
+	WriteDirectory(loc *rpc.RemoteStorageLocation, entry *filer_pb.Entry) (err error)
+	RemoveDirectory(loc *rpc.RemoteStorageLocation) (err error)
+	WriteFile(loc *rpc.RemoteStorageLocation, entry *filer_pb.Entry, reader io.Reader) (remoteEntry *filer_pb.RemoteEntry, err error)
+	UpdateFileMetadata(loc *rpc.RemoteStorageLocation, oldEntry *filer_pb.Entry, newEntry *filer_pb.Entry) (err error)
+	DeleteFile(loc *rpc.RemoteStorageLocation) (err error)
 	ListBuckets() ([]*Bucket, error)
 	CreateBucket(name string) (err error)
 	DeleteBucket(name string) (err error)
 }
 
 type RemoteStorageClientMaker interface {
-	Make(remoteConf *remote_pb.RemoteConf) (RemoteStorageClient, error)
+	Make(remoteConf *rpc.RemoteConf) (RemoteStorageClient, error)
 	HasBucket() bool
 }
 
 type CachedRemoteStorageClient struct {
-	*remote_pb.RemoteConf
+	*rpc.RemoteConfiguration
 	RemoteStorageClient
 }
 
@@ -117,7 +119,7 @@ func GetRemoteStorageNamesHasBucket() string {
 	return strings.Join(storageNames, "|")
 }
 
-func ParseRemoteLocation(remoteConfType string, remote string) (remoteStorageLocation *remote_pb.RemoteStorageLocation, err error) {
+func ParseRemoteLocation(remoteConfType string, remote string) (remoteStorageLocation *rpc.RemoteStorageLocation, err error) {
 	maker, found := RemoteStorageClientMakers[remoteConfType]
 	if !found {
 		return nil, fmt.Errorf("remote storage type %s not found", remoteConfType)
@@ -129,7 +131,7 @@ func ParseRemoteLocation(remoteConfType string, remote string) (remoteStorageLoc
 	return parseBucketLocation(remote), nil
 }
 
-func makeRemoteStorageClient(remoteConf *remote_pb.RemoteConf) (RemoteStorageClient, error) {
+func makeRemoteStorageClient(remoteConf *rpc.RemoteConf) (RemoteStorageClient, error) {
 	maker, found := RemoteStorageClientMakers[remoteConf.Type]
 	if !found {
 		return nil, fmt.Errorf("remote storage type %s not found", remoteConf.Type)
@@ -137,7 +139,7 @@ func makeRemoteStorageClient(remoteConf *remote_pb.RemoteConf) (RemoteStorageCli
 	return maker.Make(remoteConf)
 }
 
-func GetRemoteStorage(remoteConf *remote_pb.RemoteConf) (RemoteStorageClient, error) {
+func GetRemoteStorage(remoteConf *rpc.RemoteConfiguration) (RemoteStorageClient, error) {
 	remoteStorageClientsLock.Lock()
 	defer remoteStorageClientsLock.Unlock()
 

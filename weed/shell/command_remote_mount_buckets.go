@@ -3,13 +3,14 @@ package shell
 import (
 	"flag"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/filer"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/remote_pb"
-	"github.com/seaweedfs/seaweedfs/weed/remote_storage"
-	"github.com/seaweedfs/seaweedfs/weed/util"
 	"io"
 	"path/filepath"
 	"regexp"
+
+	"github.com/seaweedfs/seaweedfs/weed/filer"
+	"github.com/seaweedfs/seaweedfs/weed/remote_storage"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
 func init() {
@@ -98,7 +99,7 @@ func (c *commandRemoteMountBuckets) Do(args []string, commandEnv *CommandEnv, wr
 		if *apply {
 
 			dir := util.FullPath(fillerBucketsPath).Child(localBucketName)
-			remoteStorageLocation := &remote_pb.RemoteStorageLocation{
+			remoteStorageLocation := &rpc.RemoteStorageLocation{
 				Name:   *remote,
 				Bucket: bucket.Name,
 				Path:   "/",

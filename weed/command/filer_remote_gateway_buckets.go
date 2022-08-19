@@ -16,7 +16,6 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/replication/source"
 	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/remote_pb"
 	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
@@ -101,7 +100,7 @@ func (option *RemoteGatewayOptions) makeBucketedEventProcessor(filerSource *sour
 				}
 				bucketName = fmt.Sprintf("%s-%04d", bucketName, rand.Uint32()%10000)
 			}
-			remoteLocation = &remote_pb.RemoteStorageLocation{
+			remoteLocation = &rpc.RemoteStorageLocation{
 				Name:   *option.createBucketAt,
 				Bucket: bucketName,
 				Path:   "/",
@@ -152,7 +151,7 @@ func (option *RemoteGatewayOptions) makeBucketedEventProcessor(filerSource *sour
 				option.mappings = newMappings
 			}
 			if strings.HasSuffix(message.NewEntry.Name, filer.REMOTE_STORAGE_CONF_SUFFIX) {
-				conf := &remote_pb.RemoteConf{}
+				conf := &rpc.RemoteConfiguration{}
 				if err := proto.Unmarshal(message.NewEntry.Content, conf); err != nil {
 					return fmt.Errorf("unmarshal %s/%s: %v", filer.DirectoryEtcRemote, message.NewEntry.Name, err)
 				}
@@ -161,7 +160,7 @@ func (option *RemoteGatewayOptions) makeBucketedEventProcessor(filerSource *sour
 		} else if message.OldEntry != nil {
 			// deletion
 			if strings.HasSuffix(message.OldEntry.Name, filer.REMOTE_STORAGE_CONF_SUFFIX) {
-				conf := &remote_pb.RemoteConf{}
+				conf := &rpc.RemoteConfiguration{}
 				if err := proto.Unmarshal(message.OldEntry.Content, conf); err != nil {
 					return fmt.Errorf("unmarshal %s/%s: %v", filer.DirectoryEtcRemote, message.OldEntry.Name, err)
 				}
@@ -324,7 +323,7 @@ func (option *RemoteGatewayOptions) makeBucketedEventProcessor(filerSource *sour
 	return eachEntryFunc, nil
 }
 
-func (option *RemoteGatewayOptions) findRemoteStorageClient(bucketName string) (client remote_storage.RemoteStorageClient, remoteStorageMountLocation *remote_pb.RemoteStorageLocation, err error) {
+func (option *RemoteGatewayOptions) findRemoteStorageClient(bucketName string) (client remote_storage.RemoteStorageClient, remoteStorageMountLocation *rpc.RemoteStorageLocation, err error) {
 	bucket := util.FullPath(option.bucketsDir).Child(bucketName)
 
 	var isMounted bool
@@ -344,7 +343,7 @@ func (option *RemoteGatewayOptions) findRemoteStorageClient(bucketName string) (
 	return client, remoteStorageMountLocation, nil
 }
 
-func (option *RemoteGatewayOptions) detectBucketInfo(actualDir string) (bucket util.FullPath, remoteStorageMountLocation *remote_pb.RemoteStorageLocation, remoteConf *remote_pb.RemoteConf, ok bool) {
+func (option *RemoteGatewayOptions) detectBucketInfo(actualDir string) (bucket util.FullPath, remoteStorageMountLocation *rpc.RemoteStorageLocation, remoteConf *rpc.RemoteConfiguration, ok bool) {
 	bucket, ok = extractBucketPath(option.bucketsDir, actualDir)
 	if !ok {
 		return "", nil, nil, false
@@ -380,13 +379,13 @@ func (option *RemoteGatewayOptions) collectRemoteStorageConf() (err error) {
 		option.mappings = mappings
 	}
 
-	option.remoteConfs = make(map[string]*remote_pb.RemoteConf)
+	option.remoteConfs = make(map[string]*rpc.RemoteConfiguration)
 	var lastConfName string
 	err = filer_pb.List(option, filer.DirectoryEtcRemote, "", func(entry *filer_pb.Entry, isLast bool) error {
 		if !strings.HasSuffix(entry.Name, filer.REMOTE_STORAGE_CONF_SUFFIX) {
 			return nil
 		}
-		conf := &remote_pb.RemoteConf{}
+		conf := &rpc.RemoteConfiguration{}
 		if err := proto.Unmarshal(entry.Content, conf); err != nil {
 			return fmt.Errorf("unmarshal %s/%s: %v", filer.DirectoryEtcRemote, entry.Name, err)
 		}

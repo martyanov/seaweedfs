@@ -12,9 +12,9 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/seaweedfs/seaweedfs/weed/filer"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/remote_pb"
 	"github.com/seaweedfs/seaweedfs/weed/remote_storage"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
@@ -87,7 +87,7 @@ func (c *commandRemoteMount) Do(args []string, commandEnv *CommandEnv, writer io
 	return nil
 }
 
-func listExistingRemoteStorageMounts(commandEnv *CommandEnv, writer io.Writer) (mappings *remote_pb.RemoteStorageMapping, err error) {
+func listExistingRemoteStorageMounts(commandEnv *CommandEnv, writer io.Writer) (mappings *rpc.RemoteStorageMapping, err error) {
 
 	// read current mapping
 	mappings, err = filer.ReadMountMappings(commandEnv.option.GrpcDialOption, commandEnv.option.FilerAddress)
@@ -105,7 +105,7 @@ func jsonPrintln(writer io.Writer, message proto.Message) error {
 	return filer.ProtoToText(writer, message)
 }
 
-func syncMetadata(commandEnv *CommandEnv, writer io.Writer, dir string, nonEmpty bool, remoteConf *remote_pb.RemoteConf, remote *remote_pb.RemoteStorageLocation) error {
+func syncMetadata(commandEnv *CommandEnv, writer io.Writer, dir string, nonEmpty bool, remoteConf *rpc.RemoteConfiguration, remote *rpc.RemoteStorageLocation) error {
 
 	// find existing directory, and ensure the directory is empty
 	err := commandEnv.WithFilerClient(false, func(client filer_pb.SeaweedFilerClient) error {

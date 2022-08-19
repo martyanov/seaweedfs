@@ -1,19 +1,19 @@
 syntax = "proto3";
 
-package remote_pb;
+package weed.remote;
 
-option go_package = "github.com/seaweedfs/seaweedfs/weed/rpc/remote_pb";
+option go_package = "github.com/seaweedfs/seaweedfs/weed/rpc";
 
-message RemoteConf {
+message RemoteConfiguration {
   string type = 1;
   string name = 2;
-  string s3_access_key = 4;
-  string s3_secret_key = 5;
-  string s3_region = 6;
-  string s3_endpoint = 7;
-  string s3_storage_class = 8;
-  bool s3_force_path_style = 9;
-  bool s3_v4_signature = 11;
+  string s3_access_key = 3;
+  string s3_secret_key = 4;
+  string s3_region = 5;
+  string s3_endpoint = 6;
+  string s3_storage_class = 7;
+  bool s3_force_path_style = 8;
+  bool s3_v4_signature = 9;
 }
 
 message RemoteStorageMapping {

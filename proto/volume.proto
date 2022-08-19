@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-package volume_server_pb;
+package weed.volume;
 
-option go_package = "github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb";
+option go_package = "github.com/seaweedfs/seaweedfs/weed/rpc";
 
 import "remote.proto";
 
-service VolumeServer {
+service Volume {
     //Experts only: takes multiple fid parameters. This function does not propagate deletes to replicas.
     rpc BatchDelete (BatchDeleteRequest) returns (BatchDeleteResponse) {
     }
@@ -502,8 +502,8 @@ message FetchAndWriteNeedleRequest {
     repeated Replica replicas = 6;
     string auth = 7;
     // remote conf
-    remote_pb.RemoteConf remote_conf = 15;
-    remote_pb.RemoteStorageLocation remote_location = 16;
+    weed.remote.RemoteConfiguration remote_configuration = 15;
+    weed.remote.RemoteStorageLocation remote_location = 16;
 }
 message FetchAndWriteNeedleResponse {
 }

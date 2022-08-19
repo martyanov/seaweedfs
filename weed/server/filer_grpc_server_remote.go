@@ -13,7 +13,6 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/operation"
 	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/remote_pb"
 	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	"github.com/seaweedfs/seaweedfs/weed/util"
@@ -32,7 +31,7 @@ func (fs *FilerServer) CacheRemoteObjectToLocalCluster(ctx context.Context, req 
 	}
 
 	// find mapping
-	var remoteStorageMountedLocation *remote_pb.RemoteStorageLocation
+	var remoteStorageMountedLocation *rpc.RemoteStorageLocation
 	var localMountedDir string
 	for k, loc := range mappings.Mappings {
 		if strings.HasPrefix(req.Directory, k) {
@@ -48,7 +47,7 @@ func (fs *FilerServer) CacheRemoteObjectToLocalCluster(ctx context.Context, req 
 	if err != nil {
 		return nil, err
 	}
-	storageConf := &remote_pb.RemoteConf{}
+	storageConf := &rpc.RemoteConfiguration{}
 	if unMarshalErr := proto.Unmarshal(storageConfEntry.Content, storageConf); unMarshalErr != nil {
 		return nil, fmt.Errorf("unmarshal remote storage conf %s/%s: %v", filer.DirectoryEtcRemote, remoteStorageMountedLocation.Name+filer.REMOTE_STORAGE_CONF_SUFFIX, unMarshalErr)
 	}
@@ -134,7 +133,7 @@ func (fs *FilerServer) CacheRemoteObjectToLocalCluster(ctx context.Context, req 
 					Replicas:   replicas,
 					Auth:       string(assignResult.Auth),
 					RemoteConf: storageConf,
-					RemoteLocation: &remote_pb.RemoteStorageLocation{
+					RemoteLocation: &rpc.RemoteStorageLocation{
 						Name:   remoteStorageMountedLocation.Name,
 						Bucket: remoteStorageMountedLocation.Bucket,
 						Path:   string(dest),

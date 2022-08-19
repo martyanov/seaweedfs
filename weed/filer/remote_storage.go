@@ -14,7 +14,6 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/remote_storage"
 	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/remote_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
@@ -23,13 +22,13 @@ const REMOTE_STORAGE_MOUNT_FILE = "mount.mapping"
 
 type FilerRemoteStorage struct {
 	rules             ptrie.Trie
-	storageNameToConf map[string]*remote_pb.RemoteConf
+	storageNameToConf map[string]*rpc.RemoteConfiguration
 }
 
 func NewFilerRemoteStorage() (rs *FilerRemoteStorage) {
 	rs = &FilerRemoteStorage{
 		rules:             ptrie.New(),
-		storageNameToConf: make(map[string]*remote_pb.RemoteConf),
+		storageNameToConf: make(map[string]*rpc.RemoteConfiguration),
 	}
 	return rs
 }
@@ -58,7 +57,7 @@ func (rs *FilerRemoteStorage) LoadRemoteStorageConfigurationsAndMapping(filer *F
 		if !strings.HasSuffix(entry.Name(), REMOTE_STORAGE_CONF_SUFFIX) {
 			return nil
 		}
-		conf := &remote_pb.RemoteConf{}
+		conf := &rpc.RemoteConfiguration{}
 		if err := proto.Unmarshal(entry.Content, conf); err != nil {
 			return fmt.Errorf("unmarshal %s/%s: %v", DirectoryEtcRemote, entry.Name(), err)
 		}
@@ -68,7 +67,7 @@ func (rs *FilerRemoteStorage) LoadRemoteStorageConfigurationsAndMapping(filer *F
 }
 
 func (rs *FilerRemoteStorage) loadRemoteStorageMountMapping(data []byte) (err error) {
-	mappings := &remote_pb.RemoteStorageMapping{}
+	mappings := &rpc.RemoteStorageMapping{}
 	if err := proto.Unmarshal(data, mappings); err != nil {
 		return fmt.Errorf("unmarshal %s/%s: %v", DirectoryEtcRemote, REMOTE_STORAGE_MOUNT_FILE, err)
 	}
@@ -78,23 +77,23 @@ func (rs *FilerRemoteStorage) loadRemoteStorageMountMapping(data []byte) (err er
 	return nil
 }
 
-func (rs *FilerRemoteStorage) mapDirectoryToRemoteStorage(dir util.FullPath, loc *remote_pb.RemoteStorageLocation) {
+func (rs *FilerRemoteStorage) mapDirectoryToRemoteStorage(dir util.FullPath, loc *rpc.RemoteStorageLocation) {
 	rs.rules.Put([]byte(dir+"/"), loc)
 }
 
-func (rs *FilerRemoteStorage) FindMountDirectory(p util.FullPath) (mountDir util.FullPath, remoteLocation *remote_pb.RemoteStorageLocation) {
+func (rs *FilerRemoteStorage) FindMountDirectory(p util.FullPath) (mountDir util.FullPath, remoteLocation *rpc.RemoteStorageLocation) {
 	rs.rules.MatchPrefix([]byte(p), func(key []byte, value interface{}) bool {
 		mountDir = util.FullPath(string(key[:len(key)-1]))
-		remoteLocation = value.(*remote_pb.RemoteStorageLocation)
+		remoteLocation = value.(*rpc.RemoteStorageLocation)
 		return true
 	})
 	return
 }
 
-func (rs *FilerRemoteStorage) FindRemoteStorageClient(p util.FullPath) (client remote_storage.RemoteStorageClient, remoteConf *remote_pb.RemoteConf, found bool) {
-	var storageLocation *remote_pb.RemoteStorageLocation
+func (rs *FilerRemoteStorage) FindRemoteStorageClient(p util.FullPath) (client remote_storage.RemoteStorageClient, remoteConf *rpc.RemoteConfiguration, found bool) {
+	var storageLocation *rpc.RemoteStorageLocation
 	rs.rules.MatchPrefix([]byte(p), func(key []byte, value interface{}) bool {
-		storageLocation = value.(*remote_pb.RemoteStorageLocation)
+		storageLocation = value.(*rpc.RemoteStorageLocation)
 		return true
 	})
 
@@ -106,7 +105,7 @@ func (rs *FilerRemoteStorage) FindRemoteStorageClient(p util.FullPath) (client r
 	return rs.GetRemoteStorageClient(storageLocation.Name)
 }
 
-func (rs *FilerRemoteStorage) GetRemoteStorageClient(storageName string) (client remote_storage.RemoteStorageClient, remoteConf *remote_pb.RemoteConf, found bool) {
+func (rs *FilerRemoteStorage) GetRemoteStorageClient(storageName string) (client remote_storage.RemoteStorageClient, remoteConf *rpc.RemoteConfiguration, found bool) {
 	remoteConf, found = rs.storageNameToConf[storageName]
 	if !found {
 		return
@@ -120,9 +119,9 @@ func (rs *FilerRemoteStorage) GetRemoteStorageClient(storageName string) (client
 	return
 }
 
-func UnmarshalRemoteStorageMappings(oldContent []byte) (mappings *remote_pb.RemoteStorageMapping, err error) {
-	mappings = &remote_pb.RemoteStorageMapping{
-		Mappings: make(map[string]*remote_pb.RemoteStorageLocation),
+func UnmarshalRemoteStorageMappings(oldContent []byte) (mappings *rpc.RemoteStorageMapping, err error) {
+	mappings = &rpc.RemoteStorageMapping{
+		Mappings: make(map[string]*rpc.RemoteStorageLocation),
 	}
 	if len(oldContent) > 0 {
 		if err = proto.Unmarshal(oldContent, mappings); err != nil {
@@ -132,7 +131,7 @@ func UnmarshalRemoteStorageMappings(oldContent []byte) (mappings *remote_pb.Remo
 	return
 }
 
-func ReadRemoteStorageConf(grpcDialOption grpc.DialOption, filerAddress rpc.ServerAddress, storageName string) (conf *remote_pb.RemoteConf, readErr error) {
+func ReadRemoteStorageConf(grpcDialOption grpc.DialOption, filerAddress rpc.ServerAddress, storageName string) (conf *rpc.RemoteConfiguration, readErr error) {
 	var oldContent []byte
 	if readErr = rpc.WithFilerClient(false, filerAddress, grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 		oldContent, readErr = ReadInsideFiler(client, DirectoryEtcRemote, storageName+REMOTE_STORAGE_CONF_SUFFIX)
@@ -142,7 +141,7 @@ func ReadRemoteStorageConf(grpcDialOption grpc.DialOption, filerAddress rpc.Serv
 	}
 
 	// unmarshal storage configuration
-	conf = &remote_pb.RemoteConf{}
+	conf = &rpc.RemoteConfiguration{}
 	if unMarshalErr := proto.Unmarshal(oldContent, conf); unMarshalErr != nil {
 		readErr = fmt.Errorf("unmarshal %s/%s: %v", DirectoryEtcRemote, storageName+REMOTE_STORAGE_CONF_SUFFIX, unMarshalErr)
 		return
@@ -151,7 +150,7 @@ func ReadRemoteStorageConf(grpcDialOption grpc.DialOption, filerAddress rpc.Serv
 	return
 }
 
-func DetectMountInfo(grpcDialOption grpc.DialOption, filerAddress rpc.ServerAddress, dir string) (*remote_pb.RemoteStorageMapping, string, *remote_pb.RemoteStorageLocation, *remote_pb.RemoteConf, error) {
+func DetectMountInfo(grpcDialOption grpc.DialOption, filerAddress rpc.ServerAddress, dir string) (*rpc.RemoteStorageMapping, string, *rpc.RemoteStorageLocation, *rpc.RemoteConfiguration, error) {
 
 	mappings, listErr := ReadMountMappings(grpcDialOption, filerAddress)
 	if listErr != nil {
@@ -162,7 +161,7 @@ func DetectMountInfo(grpcDialOption grpc.DialOption, filerAddress rpc.ServerAddr
 	}
 
 	var localMountedDir string
-	var remoteStorageMountedLocation *remote_pb.RemoteStorageLocation
+	var remoteStorageMountedLocation *rpc.RemoteStorageLocation
 	for k, loc := range mappings.Mappings {
 		if strings.HasPrefix(dir, k) {
 			localMountedDir, remoteStorageMountedLocation = k, loc

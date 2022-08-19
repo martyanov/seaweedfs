@@ -16,7 +16,6 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/replication/source"
 	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/remote_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
@@ -46,7 +45,7 @@ func followUpdatesAndUploadToRemote(option *RemoteSyncOptions, filerSource *sour
 		mountedDir, []string{filer.DirectoryEtcRemote}, lastOffsetTs.UnixNano(), 0, 0, processEventFnWithOffset, rpc.TrivialOnError)
 }
 
-func makeEventProcessor(remoteStorage *remote_pb.RemoteConf, mountedDir string, remoteStorageMountLocation *remote_pb.RemoteStorageLocation, filerSource *source.FilerSource) (rpc.ProcessMetadataFunc, error) {
+func makeEventProcessor(remoteStorage *rpc.RemoteConfiguration, mountedDir string, remoteStorageMountLocation *rpc.RemoteStorageLocation, filerSource *source.FilerSource) (rpc.ProcessMetadataFunc, error) {
 	client, err := remote_storage.GetRemoteStorage(remoteStorage)
 	if err != nil {
 		return nil, err
@@ -72,7 +71,7 @@ func makeEventProcessor(remoteStorage *remote_pb.RemoteConf, mountedDir string, 
 			}
 		}
 		if message.NewEntry.Name == remoteStorage.Name+filer.REMOTE_STORAGE_CONF_SUFFIX {
-			conf := &remote_pb.RemoteConf{}
+			conf := &rpc.RemoteConfiguration{}
 			if err := proto.Unmarshal(message.NewEntry.Content, conf); err != nil {
 				return fmt.Errorf("unmarshal %s/%s: %v", filer.DirectoryEtcRemote, message.NewEntry.Name, err)
 			}
@@ -160,7 +159,7 @@ func makeEventProcessor(remoteStorage *remote_pb.RemoteConf, mountedDir string, 
 	return eachEntryFunc, nil
 }
 
-func retriedWriteFile(client remote_storage.RemoteStorageClient, filerSource *source.FilerSource, newEntry *filer_pb.Entry, dest *remote_pb.RemoteStorageLocation) (remoteEntry *filer_pb.RemoteEntry, err error) {
+func retriedWriteFile(client remote_storage.RemoteStorageClient, filerSource *source.FilerSource, newEntry *filer_pb.Entry, dest *rpc.RemoteStorageLocation) (remoteEntry *filer_pb.RemoteEntry, err error) {
 	var writeErr error
 	err = util.Retry("writeFile", func() error {
 		reader := filer.NewFileReader(filerSource, newEntry)
@@ -206,10 +205,10 @@ func collectLastSyncOffset(filerClient filer_pb.FilerClient, grpcDialOption grpc
 	return lastOffsetTs
 }
 
-func toRemoteStorageLocation(mountDir, sourcePath util.FullPath, remoteMountLocation *remote_pb.RemoteStorageLocation) *remote_pb.RemoteStorageLocation {
+func toRemoteStorageLocation(mountDir, sourcePath util.FullPath, remoteMountLocation *rpc.RemoteStorageLocation) *rpc.RemoteStorageLocation {
 	source := string(sourcePath[len(mountDir):])
 	dest := util.FullPath(remoteMountLocation.Path).Child(source)
-	return &remote_pb.RemoteStorageLocation{
+	return &rpc.RemoteStorageLocation{
 		Name:   remoteMountLocation.Name,
 		Bucket: remoteMountLocation.Bucket,
 		Path:   string(dest),

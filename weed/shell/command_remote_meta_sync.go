@@ -7,9 +7,9 @@ import (
 	"io"
 
 	"github.com/seaweedfs/seaweedfs/weed/filer"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/remote_pb"
 	"github.com/seaweedfs/seaweedfs/weed/remote_storage"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
@@ -69,7 +69,7 @@ func (c *commandRemoteMetaSync) Do(args []string, commandEnv *CommandEnv, writer
 	return nil
 }
 
-func detectMountInfo(commandEnv *CommandEnv, writer io.Writer, dir string) (*remote_pb.RemoteStorageMapping, string, *remote_pb.RemoteStorageLocation, *remote_pb.RemoteConf, error) {
+func detectMountInfo(commandEnv *CommandEnv, writer io.Writer, dir string) (*rpc.RemoteStorageMapping, string, *rpc.RemoteStorageLocation, *rpc.RemoteConf, error) {
 	return filer.DetectMountInfo(commandEnv.option.GrpcDialOption, commandEnv.option.FilerAddress, dir)
 }
 
@@ -108,7 +108,7 @@ func detectMountInfo(commandEnv *CommandEnv, writer io.Writer, dir string) (*rem
     the remote version is updated, need to pull meta
   }
 */
-func pullMetadata(commandEnv *CommandEnv, writer io.Writer, localMountedDir util.FullPath, remoteMountedLocation *remote_pb.RemoteStorageLocation, dirToCache util.FullPath, remoteConf *remote_pb.RemoteConf) error {
+func pullMetadata(commandEnv *CommandEnv, writer io.Writer, localMountedDir util.FullPath, remoteMountedLocation *rpc.RemoteStorageLocation, dirToCache util.FullPath, remoteConf *rpc.RemoteConfiguration) error {
 
 	// visit remote storage
 	remoteStorage, err := remote_storage.GetRemoteStorage(remoteConf)

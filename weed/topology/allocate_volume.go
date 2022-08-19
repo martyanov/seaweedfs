@@ -3,10 +3,11 @@ package topology
 import (
 	"context"
 
-	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
-	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	"google.golang.org/grpc"
+
+	"github.com/seaweedfs/seaweedfs/weed/operation"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 )
 
 type AllocateVolumeResult struct {
@@ -15,9 +16,9 @@ type AllocateVolumeResult struct {
 
 func AllocateVolume(dn *DataNode, grpcDialOption grpc.DialOption, vid needle.VolumeId, option *VolumeGrowOption) error {
 
-	return operation.WithVolumeServerClient(false, dn.ServerAddress(), grpcDialOption, func(client volume_server_pb.VolumeServerClient) error {
+	return operation.WithVolumeServerClient(false, dn.ServerAddress(), grpcDialOption, func(client rpc.VolumeServerClient) error {
 
-		_, allocateErr := client.AllocateVolume(context.Background(), &volume_server_pb.AllocateVolumeRequest{
+		_, allocateErr := client.AllocateVolume(context.Background(), &rpc.AllocateVolumeRequest{
 			VolumeId:           uint32(vid),
 			Collection:         option.Collection,
 			Replication:        option.ReplicaPlacement.String(),

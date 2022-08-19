@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/storage/backend"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 )
 
-func (vs *VolumeServer) VolumeIncrementalCopy(req *volume_server_pb.VolumeIncrementalCopyRequest, stream volume_server_pb.VolumeServer_VolumeIncrementalCopyServer) error {
+func (vs *VolumeServer) VolumeIncrementalCopy(req *rpc.VolumeIncrementalCopyRequest, stream rpc.VolumeServer_VolumeIncrementalCopyServer) error {
 
 	v := vs.store.GetVolume(needle.VolumeId(req.VolumeId))
 	if v == nil {
@@ -34,7 +34,7 @@ func (vs *VolumeServer) VolumeIncrementalCopy(req *volume_server_pb.VolumeIncrem
 
 }
 
-func (vs *VolumeServer) VolumeSyncStatus(ctx context.Context, req *volume_server_pb.VolumeSyncStatusRequest) (*volume_server_pb.VolumeSyncStatusResponse, error) {
+func (vs *VolumeServer) VolumeSyncStatus(ctx context.Context, req *rpc.VolumeSyncStatusRequest) (*rpc.VolumeSyncStatusResponse, error) {
 
 	v := vs.store.GetVolume(needle.VolumeId(req.VolumeId))
 	if v == nil {
@@ -47,12 +47,12 @@ func (vs *VolumeServer) VolumeSyncStatus(ctx context.Context, req *volume_server
 
 }
 
-func sendFileContent(datBackend backend.BackendStorageFile, buf []byte, startOffset, stopOffset int64, stream volume_server_pb.VolumeServer_VolumeIncrementalCopyServer) error {
+func sendFileContent(datBackend backend.BackendStorageFile, buf []byte, startOffset, stopOffset int64, stream rpc.VolumeServer_VolumeIncrementalCopyServer) error {
 	var blockSizeLimit = int64(len(buf))
 	for i := int64(0); i < stopOffset-startOffset; i += blockSizeLimit {
 		n, readErr := datBackend.ReadAt(buf, startOffset+i)
 		if readErr == nil || readErr == io.EOF {
-			resp := &volume_server_pb.VolumeIncrementalCopyResponse{}
+			resp := &rpc.VolumeIncrementalCopyResponse{}
 			resp.FileContent = buf[:int64(n)]
 			sendErr := stream.Send(resp)
 			if sendErr != nil {

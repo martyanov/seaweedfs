@@ -13,7 +13,6 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/replication/source"
 	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/remote_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
@@ -27,8 +26,8 @@ type RemoteGatewayOptions struct {
 	include                  *string
 	exclude                  *string
 
-	mappings    *remote_pb.RemoteStorageMapping
-	remoteConfs map[string]*remote_pb.RemoteConf
+	mappings    *rpc.RemoteStorageMapping
+	remoteConfs map[string]*rpc.RemoteConfiguration
 	bucketsDir  string
 	clientId    int32
 	clientEpoch int32

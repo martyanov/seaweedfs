@@ -1,20 +1,21 @@
 package filer
 
 import (
-	"github.com/seaweedfs/seaweedfs/weed/rpc/remote_pb"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFilerRemoteStorage_FindRemoteStorageClient(t *testing.T) {
-	conf := &remote_pb.RemoteConf{
+	conf := &rpc.RemoteConfiguration{
 		Name: "s7",
 		Type: "s3",
 	}
 	rs := NewFilerRemoteStorage()
 	rs.storageNameToConf[conf.Name] = conf
 
-	rs.mapDirectoryToRemoteStorage("/a/b/c", &remote_pb.RemoteStorageLocation{
+	rs.mapDirectoryToRemoteStorage("/a/b/c", &rpc.RemoteStorageLocation{
 		Name:   "s7",
 		Bucket: "some",
 		Path:   "/dir",

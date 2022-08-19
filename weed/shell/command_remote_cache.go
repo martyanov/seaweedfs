@@ -3,12 +3,13 @@ package shell
 import (
 	"flag"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/filer"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/remote_pb"
-	"github.com/seaweedfs/seaweedfs/weed/util"
 	"io"
 	"sync"
+
+	"github.com/seaweedfs/seaweedfs/weed/filer"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
 func init() {
@@ -141,7 +142,7 @@ func mayHaveCachedToLocal(entry *filer_pb.Entry) bool {
 	return false
 }
 
-func (c *commandRemoteCache) cacheContentData(commandEnv *CommandEnv, writer io.Writer, localMountedDir util.FullPath, remoteMountedLocation *remote_pb.RemoteStorageLocation, dirToCache util.FullPath, fileFilter *FileFilter, remoteConf *remote_pb.RemoteConf, concurrency int) error {
+func (c *commandRemoteCache) cacheContentData(commandEnv *CommandEnv, writer io.Writer, localMountedDir util.FullPath, remoteMountedLocation *rpc.RemoteStorageLocation, dirToCache util.FullPath, fileFilter *FileFilter, remoteConf *rpc.RemoteConfiguration, concurrency int) error {
 
 	var wg sync.WaitGroup
 	limitedConcurrentExecutor := util.NewLimitedConcurrentExecutor(concurrency)
