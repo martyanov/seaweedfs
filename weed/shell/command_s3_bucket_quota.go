@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 )
 
 func init() {

@@ -3,16 +3,16 @@ package weed_server
 import (
 	"context"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/cluster"
-	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
 	"math/rand"
 	"sync"
 	"time"
 
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/cluster"
+	"github.com/seaweedfs/seaweedfs/weed/glog"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 )
 
 /*
@@ -152,7 +152,7 @@ func (ms *MasterServer) Ping(ctx context.Context, req *master_pb.PingRequest) (r
 		StartTimeNs: time.Now().UnixNano(),
 	}
 	if req.TargetType == cluster.FilerType {
-		pingErr = pb.WithFilerClient(false, pb.ServerAddress(req.Target), ms.grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+		pingErr = rpc.WithFilerClient(false, rpc.ServerAddress(req.Target), ms.grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 			pingResp, err := client.Ping(ctx, &filer_pb.PingRequest{})
 			if pingResp != nil {
 				resp.RemoteTimeNs = pingResp.StartTimeNs
@@ -161,7 +161,7 @@ func (ms *MasterServer) Ping(ctx context.Context, req *master_pb.PingRequest) (r
 		})
 	}
 	if req.TargetType == cluster.VolumeServerType {
-		pingErr = pb.WithVolumeServerClient(false, pb.ServerAddress(req.Target), ms.grpcDialOption, func(client volume_server_pb.VolumeServerClient) error {
+		pingErr = rpc.WithVolumeServerClient(false, rpc.ServerAddress(req.Target), ms.grpcDialOption, func(client volume_server_pb.VolumeServerClient) error {
 			pingResp, err := client.Ping(ctx, &volume_server_pb.PingRequest{})
 			if pingResp != nil {
 				resp.RemoteTimeNs = pingResp.StartTimeNs
@@ -170,7 +170,7 @@ func (ms *MasterServer) Ping(ctx context.Context, req *master_pb.PingRequest) (r
 		})
 	}
 	if req.TargetType == cluster.MasterType {
-		pingErr = pb.WithMasterClient(false, pb.ServerAddress(req.Target), ms.grpcDialOption, func(client master_pb.SeaweedClient) error {
+		pingErr = rpc.WithMasterClient(false, rpc.ServerAddress(req.Target), ms.grpcDialOption, func(client master_pb.SeaweedClient) error {
 			pingResp, err := client.Ping(ctx, &master_pb.PingRequest{})
 			if pingResp != nil {
 				resp.RemoteTimeNs = pingResp.StartTimeNs

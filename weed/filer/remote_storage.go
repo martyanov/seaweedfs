@@ -3,18 +3,19 @@ package filer
 import (
 	"context"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/remote_pb"
-	"github.com/seaweedfs/seaweedfs/weed/remote_storage"
-	"github.com/seaweedfs/seaweedfs/weed/util"
-	"google.golang.org/grpc"
-	"google.golang.org/protobuf/proto"
 	"math"
 	"strings"
 
-	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
 	"github.com/viant/ptrie"
+	"google.golang.org/grpc"
+	"google.golang.org/protobuf/proto"
+
+	"github.com/seaweedfs/seaweedfs/weed/glog"
+	"github.com/seaweedfs/seaweedfs/weed/remote_storage"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/remote_pb"
+	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
 const REMOTE_STORAGE_CONF_SUFFIX = ".conf"
@@ -131,9 +132,9 @@ func UnmarshalRemoteStorageMappings(oldContent []byte) (mappings *remote_pb.Remo
 	return
 }
 
-func ReadRemoteStorageConf(grpcDialOption grpc.DialOption, filerAddress pb.ServerAddress, storageName string) (conf *remote_pb.RemoteConf, readErr error) {
+func ReadRemoteStorageConf(grpcDialOption grpc.DialOption, filerAddress rpc.ServerAddress, storageName string) (conf *remote_pb.RemoteConf, readErr error) {
 	var oldContent []byte
-	if readErr = pb.WithFilerClient(false, filerAddress, grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+	if readErr = rpc.WithFilerClient(false, filerAddress, grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 		oldContent, readErr = ReadInsideFiler(client, DirectoryEtcRemote, storageName+REMOTE_STORAGE_CONF_SUFFIX)
 		return readErr
 	}); readErr != nil {
@@ -150,7 +151,7 @@ func ReadRemoteStorageConf(grpcDialOption grpc.DialOption, filerAddress pb.Serve
 	return
 }
 
-func DetectMountInfo(grpcDialOption grpc.DialOption, filerAddress pb.ServerAddress, dir string) (*remote_pb.RemoteStorageMapping, string, *remote_pb.RemoteStorageLocation, *remote_pb.RemoteConf, error) {
+func DetectMountInfo(grpcDialOption grpc.DialOption, filerAddress rpc.ServerAddress, dir string) (*remote_pb.RemoteStorageMapping, string, *remote_pb.RemoteStorageLocation, *remote_pb.RemoteConf, error) {
 
 	mappings, listErr := ReadMountMappings(grpcDialOption, filerAddress)
 	if listErr != nil {

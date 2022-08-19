@@ -1,7 +1,7 @@
 package s3api
 
 import (
-	"github.com/seaweedfs/seaweedfs/weed/pb/s3_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/s3_pb"
 	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 	"github.com/seaweedfs/seaweedfs/weed/s3api/s3err"
 	"net/http"

@@ -1,7 +1,7 @@
 package topology
 
 import (
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/types"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 	"golang.org/x/exp/slices"

@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	"github.com/seaweedfs/seaweedfs/weed/storage/super_block"
 )

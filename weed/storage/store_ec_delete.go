@@ -3,11 +3,11 @@ package storage
 import (
 	"context"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/erasure_coding"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	"github.com/seaweedfs/seaweedfs/weed/storage/types"
@@ -86,7 +86,7 @@ func (s *Store) doDeleteNeedleFromRemoteEcShardServers(shardId erasure_coding.Sh
 
 }
 
-func (s *Store) doDeleteNeedleFromRemoteEcShard(sourceDataNode pb.ServerAddress, vid needle.VolumeId, collection string, version needle.Version, needleId types.NeedleId) error {
+func (s *Store) doDeleteNeedleFromRemoteEcShard(sourceDataNode rpc.ServerAddress, vid needle.VolumeId, collection string, version needle.Version, needleId types.NeedleId) error {
 
 	return operation.WithVolumeServerClient(false, sourceDataNode, s.grpcDialOption, func(client volume_server_pb.VolumeServerClient) error {
 

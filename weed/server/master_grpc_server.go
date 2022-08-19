@@ -13,8 +13,8 @@ import (
 
 	"github.com/seaweedfs/seaweedfs/weed/cluster"
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 	"github.com/seaweedfs/seaweedfs/weed/stats"
 	"github.com/seaweedfs/seaweedfs/weed/storage/backend"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
@@ -243,7 +243,7 @@ func (ms *MasterServer) KeepConnected(stream master_pb.Seaweed_KeepConnectedServ
 		return ms.informNewLeader(stream)
 	}
 
-	peerAddress := pb.ServerAddress(req.ClientAddress)
+	peerAddress := rpc.ServerAddress(req.ClientAddress)
 
 	// buffer by 1 so we don't end up getting stuck writing to stopChan forever
 	stopChan := make(chan bool, 1)
@@ -327,7 +327,7 @@ func (ms *MasterServer) informNewLeader(stream master_pb.Seaweed_KeepConnectedSe
 	return nil
 }
 
-func (ms *MasterServer) addClient(filerGroup, clientType string, clientAddress pb.ServerAddress) (clientName string, messageChan chan *master_pb.KeepConnectedResponse) {
+func (ms *MasterServer) addClient(filerGroup, clientType string, clientAddress rpc.ServerAddress) (clientName string, messageChan chan *master_pb.KeepConnectedResponse) {
 	clientName = filerGroup + "." + clientType + "@" + string(clientAddress)
 	glog.V(0).Infof("+ client %v", clientName)
 

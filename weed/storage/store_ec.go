@@ -3,19 +3,19 @@ package storage
 import (
 	"context"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"golang.org/x/exp/slices"
 	"io"
 	"os"
 	"sync"
 	"time"
 
 	"github.com/klauspost/reedsolomon"
+	"golang.org/x/exp/slices"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 	"github.com/seaweedfs/seaweedfs/weed/stats"
 	"github.com/seaweedfs/seaweedfs/weed/storage/erasure_coding"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
@@ -256,7 +256,7 @@ func (s *Store) cachedLookupEcShardLocations(ecVolume *erasure_coding.EcVolume) 
 			shardId := erasure_coding.ShardId(shardIdLocations.ShardId)
 			delete(ecVolume.ShardLocations, shardId)
 			for _, loc := range shardIdLocations.Locations {
-				ecVolume.ShardLocations[shardId] = append(ecVolume.ShardLocations[shardId], pb.NewServerAddressFromLocation(loc))
+				ecVolume.ShardLocations[shardId] = append(ecVolume.ShardLocations[shardId], rpc.NewServerAddressFromLocation(loc))
 			}
 		}
 		ecVolume.ShardLocationsRefreshTime = time.Now()
@@ -267,7 +267,7 @@ func (s *Store) cachedLookupEcShardLocations(ecVolume *erasure_coding.EcVolume) 
 	return
 }
 
-func (s *Store) readRemoteEcShardInterval(sourceDataNodes []pb.ServerAddress, needleId types.NeedleId, vid needle.VolumeId, shardId erasure_coding.ShardId, buf []byte, offset int64) (n int, is_deleted bool, err error) {
+func (s *Store) readRemoteEcShardInterval(sourceDataNodes []rpc.ServerAddress, needleId types.NeedleId, vid needle.VolumeId, shardId erasure_coding.ShardId, buf []byte, offset int64) (n int, is_deleted bool, err error) {
 
 	if len(sourceDataNodes) == 0 {
 		return 0, false, fmt.Errorf("failed to find ec shard %d.%d", vid, shardId)
@@ -285,7 +285,7 @@ func (s *Store) readRemoteEcShardInterval(sourceDataNodes []pb.ServerAddress, ne
 	return
 }
 
-func (s *Store) doReadRemoteEcShardInterval(sourceDataNode pb.ServerAddress, needleId types.NeedleId, vid needle.VolumeId, shardId erasure_coding.ShardId, buf []byte, offset int64) (n int, is_deleted bool, err error) {
+func (s *Store) doReadRemoteEcShardInterval(sourceDataNode rpc.ServerAddress, needleId types.NeedleId, vid needle.VolumeId, shardId erasure_coding.ShardId, buf []byte, offset int64) (n int, is_deleted bool, err error) {
 
 	err = operation.WithVolumeServerClient(false, sourceDataNode, s.grpcDialOption, func(client volume_server_pb.VolumeServerClient) error {
 
@@ -350,7 +350,7 @@ func (s *Store) recoverOneRemoteEcShardInterval(needleId types.NeedleId, ecVolum
 
 		// read from remote locations
 		wg.Add(1)
-		go func(shardId erasure_coding.ShardId, locations []pb.ServerAddress) {
+		go func(shardId erasure_coding.ShardId, locations []rpc.ServerAddress) {
 			defer wg.Done()
 			data := make([]byte, len(buf))
 			nRead, isDeleted, readErr := s.readRemoteEcShardInterval(locations, needleId, ecVolume.VolumeId, shardId, data, offset)

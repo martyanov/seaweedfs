@@ -3,15 +3,15 @@ package weed_server
 import (
 	"net/http"
 
-	"github.com/seaweedfs/seaweedfs/weed/pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 )
 
 type ClusterStatusResult struct {
-	IsLeader    bool             `json:"IsLeader,omitempty"`
-	Leader      pb.ServerAddress `json:"Leader,omitempty"`
-	Peers       []string         `json:"Peers,omitempty"`
-	MaxVolumeId needle.VolumeId  `json:"MaxVolumeId,omitempty"`
+	IsLeader    bool              `json:"IsLeader,omitempty"`
+	Leader      rpc.ServerAddress `json:"Leader,omitempty"`
+	Peers       []string          `json:"Peers,omitempty"`
+	MaxVolumeId needle.VolumeId   `json:"MaxVolumeId,omitempty"`
 }
 
 func (s *RaftServer) StatusHandler(w http.ResponseWriter, r *http.Request) {

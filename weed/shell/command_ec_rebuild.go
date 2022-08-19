@@ -4,14 +4,15 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"io"
 
+	"google.golang.org/grpc"
+
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/erasure_coding"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
-	"google.golang.org/grpc"
 )
 
 func init() {
@@ -143,7 +144,7 @@ func rebuildOneEcVolume(commandEnv *CommandEnv, rebuilder *EcNode, collection st
 		// clean up working files
 
 		// ask the rebuilder to delete the copied shards
-		err = sourceServerDeleteEcShards(commandEnv.option.GrpcDialOption, collection, volumeId, pb.NewServerAddressFromDataNode(rebuilder.info), copiedShardIds)
+		err = sourceServerDeleteEcShards(commandEnv.option.GrpcDialOption, collection, volumeId, rpc.NewServerAddressFromDataNode(rebuilder.info), copiedShardIds)
 		if err != nil {
 			fmt.Fprintf(writer, "%s delete copied ec shards %s %d.%v\n", rebuilder.info.Id, collection, volumeId, copiedShardIds)
 		}
@@ -155,13 +156,13 @@ func rebuildOneEcVolume(commandEnv *CommandEnv, rebuilder *EcNode, collection st
 	}
 
 	// generate ec shards, and maybe ecx file
-	generatedShardIds, err = generateMissingShards(commandEnv.option.GrpcDialOption, collection, volumeId, pb.NewServerAddressFromDataNode(rebuilder.info))
+	generatedShardIds, err = generateMissingShards(commandEnv.option.GrpcDialOption, collection, volumeId, rpc.NewServerAddressFromDataNode(rebuilder.info))
 	if err != nil {
 		return err
 	}
 
 	// mount the generated shards
-	err = mountEcShards(commandEnv.option.GrpcDialOption, collection, volumeId, pb.NewServerAddressFromDataNode(rebuilder.info), generatedShardIds)
+	err = mountEcShards(commandEnv.option.GrpcDialOption, collection, volumeId, rpc.NewServerAddressFromDataNode(rebuilder.info), generatedShardIds)
 	if err != nil {
 		return err
 	}
@@ -171,7 +172,7 @@ func rebuildOneEcVolume(commandEnv *CommandEnv, rebuilder *EcNode, collection st
 	return nil
 }
 
-func generateMissingShards(grpcDialOption grpc.DialOption, collection string, volumeId needle.VolumeId, sourceLocation pb.ServerAddress) (rebuiltShardIds []uint32, err error) {
+func generateMissingShards(grpcDialOption grpc.DialOption, collection string, volumeId needle.VolumeId, sourceLocation rpc.ServerAddress) (rebuiltShardIds []uint32, err error) {
 
 	err = operation.WithVolumeServerClient(false, sourceLocation, grpcDialOption, func(volumeServerClient volume_server_pb.VolumeServerClient) error {
 		resp, rebultErr := volumeServerClient.VolumeEcShardsRebuild(context.Background(), &volume_server_pb.VolumeEcShardsRebuildRequest{
@@ -214,7 +215,7 @@ func prepareDataToRecover(commandEnv *CommandEnv, rebuilder *EcNode, collection 
 
 		var copyErr error
 		if applyBalancing {
-			copyErr = operation.WithVolumeServerClient(false, pb.NewServerAddressFromDataNode(rebuilder.info), commandEnv.option.GrpcDialOption, func(volumeServerClient volume_server_pb.VolumeServerClient) error {
+			copyErr = operation.WithVolumeServerClient(false, rpc.NewServerAddressFromDataNode(rebuilder.info), commandEnv.option.GrpcDialOption, func(volumeServerClient volume_server_pb.VolumeServerClient) error {
 				_, copyErr := volumeServerClient.VolumeEcShardsCopy(context.Background(), &volume_server_pb.VolumeEcShardsCopyRequest{
 					VolumeId:       uint32(volumeId),
 					Collection:     collection,

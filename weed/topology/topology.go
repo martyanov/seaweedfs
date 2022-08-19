@@ -11,8 +11,8 @@ import (
 	"github.com/hashicorp/raft"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 	"github.com/seaweedfs/seaweedfs/weed/sequence"
 	"github.com/seaweedfs/seaweedfs/weed/storage"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
@@ -78,11 +78,11 @@ func (t *Topology) IsLeader() bool {
 	return false
 }
 
-func (t *Topology) Leader() (pb.ServerAddress, error) {
-	var l pb.ServerAddress
+func (t *Topology) Leader() (rpc.ServerAddress, error) {
+	var l rpc.ServerAddress
 	for count := 0; count < 3; count++ {
 		if t.Raft != nil {
-			l = pb.ServerAddress(t.Raft.Leader())
+			l = rpc.ServerAddress(t.Raft.Leader())
 		} else {
 			return "", errors.New("Raft Server not ready yet!")
 		}

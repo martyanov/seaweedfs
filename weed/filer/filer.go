@@ -8,14 +8,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/seaweedfs/seaweedfs/weed/cluster"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-
 	"google.golang.org/grpc"
 
+	"github.com/seaweedfs/seaweedfs/weed/cluster"
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 	"github.com/seaweedfs/seaweedfs/weed/util/log_buffer"
 	"github.com/seaweedfs/seaweedfs/weed/wdclient"
@@ -50,7 +49,7 @@ type Filer struct {
 	UniqueFilerEpoch    int32
 }
 
-func NewFiler(masters map[string]pb.ServerAddress, grpcDialOption grpc.DialOption, filerHost pb.ServerAddress,
+func NewFiler(masters map[string]rpc.ServerAddress, grpcDialOption grpc.DialOption, filerHost rpc.ServerAddress,
 	filerGroup string, collection string, replication string, dataCenter string, notifyFn func()) *Filer {
 	f := &Filer{
 		MasterClient:        wdclient.NewMasterClient(grpcDialOption, filerGroup, cluster.FilerType, filerHost, dataCenter, "", masters),
@@ -73,7 +72,7 @@ func NewFiler(masters map[string]pb.ServerAddress, grpcDialOption grpc.DialOptio
 	return f
 }
 
-func (f *Filer) MaybeBootstrapFromPeers(self pb.ServerAddress, existingNodes []*master_pb.ClusterNodeUpdate, snapshotTime time.Time) (err error) {
+func (f *Filer) MaybeBootstrapFromPeers(self rpc.ServerAddress, existingNodes []*master_pb.ClusterNodeUpdate, snapshotTime time.Time) (err error) {
 	if len(existingNodes) == 0 {
 		return
 	}
@@ -87,14 +86,14 @@ func (f *Filer) MaybeBootstrapFromPeers(self pb.ServerAddress, existingNodes []*
 
 	glog.V(0).Infof("bootstrap from %v clientId:%d", earliestNode.Address, f.UniqueFilerId)
 	f.UniqueFilerEpoch++
-	err = pb.FollowMetadata(pb.ServerAddress(earliestNode.Address), f.GrpcDialOption, "bootstrap", f.UniqueFilerId, f.UniqueFilerEpoch, "/", nil,
+	err = rpc.FollowMetadata(rpc.ServerAddress(earliestNode.Address), f.GrpcDialOption, "bootstrap", f.UniqueFilerId, f.UniqueFilerEpoch, "/", nil,
 		0, snapshotTime.UnixNano(), f.Signature, func(resp *filer_pb.SubscribeMetadataResponse) error {
 			return Replay(f.Store, resp)
-		}, pb.FatalOnError)
+		}, rpc.FatalOnError)
 	return
 }
 
-func (f *Filer) AggregateFromPeers(self pb.ServerAddress, existingNodes []*master_pb.ClusterNodeUpdate, startFrom time.Time) {
+func (f *Filer) AggregateFromPeers(self rpc.ServerAddress, existingNodes []*master_pb.ClusterNodeUpdate, startFrom time.Time) {
 
 	f.MetaAggregator = NewMetaAggregator(f, self, f.GrpcDialOption)
 	f.MasterClient.OnPeerUpdate = f.MetaAggregator.OnPeerUpdate
@@ -139,7 +138,7 @@ func (f *Filer) GetStore() (store FilerStore) {
 	return f.Store
 }
 
-func (fs *Filer) GetMaster() pb.ServerAddress {
+func (fs *Filer) GetMaster() rpc.ServerAddress {
 	return fs.MasterClient.GetMaster()
 }
 

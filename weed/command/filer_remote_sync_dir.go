@@ -7,22 +7,23 @@ import (
 	"strings"
 	"time"
 
-	"github.com/seaweedfs/seaweedfs/weed/filer"
-	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/remote_pb"
-	"github.com/seaweedfs/seaweedfs/weed/remote_storage"
-	"github.com/seaweedfs/seaweedfs/weed/replication/source"
-	"github.com/seaweedfs/seaweedfs/weed/util"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/seaweedfs/seaweedfs/weed/filer"
+	"github.com/seaweedfs/seaweedfs/weed/glog"
+	"github.com/seaweedfs/seaweedfs/weed/remote_storage"
+	"github.com/seaweedfs/seaweedfs/weed/replication/source"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/remote_pb"
+	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
 func followUpdatesAndUploadToRemote(option *RemoteSyncOptions, filerSource *source.FilerSource, mountedDir string) error {
 
 	// read filer remote storage mount mappings
-	_, _, remoteStorageMountLocation, remoteStorage, detectErr := filer.DetectMountInfo(option.grpcDialOption, pb.ServerAddress(*option.filerAddress), mountedDir)
+	_, _, remoteStorageMountLocation, remoteStorage, detectErr := filer.DetectMountInfo(option.grpcDialOption, rpc.ServerAddress(*option.filerAddress), mountedDir)
 	if detectErr != nil {
 		return fmt.Errorf("read mount info: %v", detectErr)
 	}
@@ -32,20 +33,20 @@ func followUpdatesAndUploadToRemote(option *RemoteSyncOptions, filerSource *sour
 		return err
 	}
 
-	processEventFnWithOffset := pb.AddOffsetFunc(eachEntryFunc, 3*time.Second, func(counter int64, lastTsNs int64) error {
+	processEventFnWithOffset := rpc.AddOffsetFunc(eachEntryFunc, 3*time.Second, func(counter int64, lastTsNs int64) error {
 		lastTime := time.Unix(0, lastTsNs)
 		glog.V(0).Infof("remote sync %s progressed to %v %0.2f/sec", *option.filerAddress, lastTime, float64(counter)/float64(3))
-		return remote_storage.SetSyncOffset(option.grpcDialOption, pb.ServerAddress(*option.filerAddress), mountedDir, lastTsNs)
+		return remote_storage.SetSyncOffset(option.grpcDialOption, rpc.ServerAddress(*option.filerAddress), mountedDir, lastTsNs)
 	})
 
-	lastOffsetTs := collectLastSyncOffset(option, option.grpcDialOption, pb.ServerAddress(*option.filerAddress), mountedDir, *option.timeAgo)
+	lastOffsetTs := collectLastSyncOffset(option, option.grpcDialOption, rpc.ServerAddress(*option.filerAddress), mountedDir, *option.timeAgo)
 
 	option.clientEpoch++
-	return pb.FollowMetadata(pb.ServerAddress(*option.filerAddress), option.grpcDialOption, "filer.remote.sync", option.clientId, option.clientEpoch,
-		mountedDir, []string{filer.DirectoryEtcRemote}, lastOffsetTs.UnixNano(), 0, 0, processEventFnWithOffset, pb.TrivialOnError)
+	return rpc.FollowMetadata(rpc.ServerAddress(*option.filerAddress), option.grpcDialOption, "filer.remote.sync", option.clientId, option.clientEpoch,
+		mountedDir, []string{filer.DirectoryEtcRemote}, lastOffsetTs.UnixNano(), 0, 0, processEventFnWithOffset, rpc.TrivialOnError)
 }
 
-func makeEventProcessor(remoteStorage *remote_pb.RemoteConf, mountedDir string, remoteStorageMountLocation *remote_pb.RemoteStorageLocation, filerSource *source.FilerSource) (pb.ProcessMetadataFunc, error) {
+func makeEventProcessor(remoteStorage *remote_pb.RemoteConf, mountedDir string, remoteStorageMountLocation *remote_pb.RemoteStorageLocation, filerSource *source.FilerSource) (rpc.ProcessMetadataFunc, error) {
 	client, err := remote_storage.GetRemoteStorage(remoteStorage)
 	if err != nil {
 		return nil, err
@@ -176,7 +177,7 @@ func retriedWriteFile(client remote_storage.RemoteStorageClient, filerSource *so
 	return
 }
 
-func collectLastSyncOffset(filerClient filer_pb.FilerClient, grpcDialOption grpc.DialOption, filerAddress pb.ServerAddress, mountedDir string, timeAgo time.Duration) time.Time {
+func collectLastSyncOffset(filerClient filer_pb.FilerClient, grpcDialOption grpc.DialOption, filerAddress rpc.ServerAddress, mountedDir string, timeAgo time.Duration) time.Time {
 	// 1. specified by timeAgo
 	// 2. last offset timestamp for this directory
 	// 3. directory creation time

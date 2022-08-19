@@ -2,18 +2,17 @@ package topology
 
 import (
 	"context"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"io"
 	"sync/atomic"
 	"time"
 
 	"google.golang.org/grpc"
 
-	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
-
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 )
 
 func (t *Topology) batchVacuumVolumeCheck(grpcDialOption grpc.DialOption, vid needle.VolumeId,
@@ -21,7 +20,7 @@ func (t *Topology) batchVacuumVolumeCheck(grpcDialOption grpc.DialOption, vid ne
 	ch := make(chan int, locationlist.Length())
 	errCount := int32(0)
 	for index, dn := range locationlist.list {
-		go func(index int, url pb.ServerAddress, vid needle.VolumeId) {
+		go func(index int, url rpc.ServerAddress, vid needle.VolumeId) {
 			err := operation.WithVolumeServerClient(false, url, grpcDialOption, func(volumeServerClient volume_server_pb.VolumeServerClient) error {
 				resp, err := volumeServerClient.VacuumVolumeCheck(context.Background(), &volume_server_pb.VacuumVolumeCheckRequest{
 					VolumeId: uint32(vid),
@@ -69,7 +68,7 @@ func (t *Topology) batchVacuumVolumeCompact(grpcDialOption grpc.DialOption, vl *
 
 	ch := make(chan bool, locationlist.Length())
 	for index, dn := range locationlist.list {
-		go func(index int, url pb.ServerAddress, vid needle.VolumeId) {
+		go func(index int, url rpc.ServerAddress, vid needle.VolumeId) {
 			glog.V(0).Infoln(index, "Start vacuuming", vid, "on", url)
 			err := operation.WithVolumeServerClient(true, url, grpcDialOption, func(volumeServerClient volume_server_pb.VolumeServerClient) error {
 				stream, err := volumeServerClient.VacuumVolumeCompact(context.Background(), &volume_server_pb.VacuumVolumeCompactRequest{

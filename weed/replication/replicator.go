@@ -3,15 +3,16 @@ package replication
 import (
 	"context"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"google.golang.org/grpc"
 	"strings"
 	"time"
 
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"google.golang.org/grpc"
+
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/replication/sink"
 	"github.com/seaweedfs/seaweedfs/weed/replication/source"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
@@ -91,8 +92,8 @@ func (r *Replicator) Replicate(ctx context.Context, key string, message *filer_p
 	return r.sink.CreateEntry(key, message.NewEntry, message.Signatures)
 }
 
-func ReadFilerSignature(grpcDialOption grpc.DialOption, filer pb.ServerAddress) (filerSignature int32, readErr error) {
-	if readErr = pb.WithFilerClient(false, filer, grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+func ReadFilerSignature(grpcDialOption grpc.DialOption, filer rpc.ServerAddress) (filerSignature int32, readErr error) {
+	if readErr = rpc.WithFilerClient(false, filer, grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 		if resp, err := client.GetFilerConfiguration(context.Background(), &filer_pb.GetFilerConfigurationRequest{}); err != nil {
 			return fmt.Errorf("GetFilerConfiguration %s: %v", filer, err)
 		} else {

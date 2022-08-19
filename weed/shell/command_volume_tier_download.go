@@ -4,14 +4,14 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"io"
 
 	"google.golang.org/grpc"
 
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 )
 
@@ -122,7 +122,7 @@ func doVolumeTierDownload(commandEnv *CommandEnv, writer io.Writer, collection s
 	return nil
 }
 
-func downloadDatFromRemoteTier(grpcDialOption grpc.DialOption, writer io.Writer, volumeId needle.VolumeId, collection string, targetVolumeServer pb.ServerAddress) error {
+func downloadDatFromRemoteTier(grpcDialOption grpc.DialOption, writer io.Writer, volumeId needle.VolumeId, collection string, targetVolumeServer rpc.ServerAddress) error {
 
 	err := operation.WithVolumeServerClient(true, targetVolumeServer, grpcDialOption, func(volumeServerClient volume_server_pb.VolumeServerClient) error {
 		stream, downloadErr := volumeServerClient.VolumeTierMoveDatFromRemote(context.Background(), &volume_server_pb.VolumeTierMoveDatFromRemoteRequest{

@@ -4,19 +4,20 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
-	"github.com/seaweedfs/seaweedfs/weed/storage/types"
-	"golang.org/x/exp/slices"
 	"io"
 	"path/filepath"
 	"strconv"
 	"time"
 
+	"golang.org/x/exp/slices"
+
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	"github.com/seaweedfs/seaweedfs/weed/storage/super_block"
+	"github.com/seaweedfs/seaweedfs/weed/storage/types"
 )
 
 func init() {
@@ -217,7 +218,7 @@ func (c *commandVolumeFixReplication) deleteOneVolume(commandEnv *CommandEnv, wr
 			break
 		}
 
-		if err := deleteVolume(commandEnv.option.GrpcDialOption, needle.VolumeId(replica.info.Id), pb.NewServerAddressFromDataNode(replica.location.dataNode)); err != nil {
+		if err := deleteVolume(commandEnv.option.GrpcDialOption, needle.VolumeId(replica.info.Id), rpc.NewServerAddressFromDataNode(replica.location.dataNode)); err != nil {
 			return fmt.Errorf("deleting volume %d from %s : %v", replica.info.Id, replica.location.dataNode.Id, err)
 		}
 
@@ -276,10 +277,10 @@ func (c *commandVolumeFixReplication) fixOneUnderReplicatedVolume(commandEnv *Co
 				break
 			}
 
-			err := operation.WithVolumeServerClient(false, pb.NewServerAddressFromDataNode(dst.dataNode), commandEnv.option.GrpcDialOption, func(volumeServerClient volume_server_pb.VolumeServerClient) error {
+			err := operation.WithVolumeServerClient(false, rpc.NewServerAddressFromDataNode(dst.dataNode), commandEnv.option.GrpcDialOption, func(volumeServerClient volume_server_pb.VolumeServerClient) error {
 				stream, replicateErr := volumeServerClient.VolumeCopy(context.Background(), &volume_server_pb.VolumeCopyRequest{
 					VolumeId:       replica.info.Id,
-					SourceDataNode: string(pb.NewServerAddressFromDataNode(replica.location.dataNode)),
+					SourceDataNode: string(rpc.NewServerAddressFromDataNode(replica.location.dataNode)),
 				})
 				if replicateErr != nil {
 					return fmt.Errorf("copying from %s => %s : %v", replica.location.dataNode.Id, dst.dataNode.Id, replicateErr)

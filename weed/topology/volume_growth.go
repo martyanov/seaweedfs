@@ -3,7 +3,7 @@ package topology
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 	"math/rand"
 	"sync"
 

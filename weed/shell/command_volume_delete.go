@@ -2,9 +2,9 @@ package shell
 
 import (
 	"flag"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"io"
 
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 )
 
@@ -42,7 +42,7 @@ func (c *commandVolumeDelete) Do(args []string, commandEnv *CommandEnv, writer i
 		return
 	}
 
-	sourceVolumeServer := pb.ServerAddress(*nodeStr)
+	sourceVolumeServer := rpc.ServerAddress(*nodeStr)
 
 	volumeId := needle.VolumeId(*volumeIdInt)
 

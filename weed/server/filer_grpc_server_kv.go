@@ -3,7 +3,7 @@ package weed_server
 import (
 	"context"
 	"github.com/seaweedfs/seaweedfs/weed/filer"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 )
 
 func (fs *FilerServer) KvGet(ctx context.Context, req *filer_pb.KvGetRequest) (*filer_pb.KvGetResponse, error) {

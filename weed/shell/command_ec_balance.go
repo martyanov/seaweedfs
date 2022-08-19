@@ -3,12 +3,14 @@ package shell
 import (
 	"flag"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
+	"io"
+
+	"golang.org/x/exp/slices"
+
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/storage/erasure_coding"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	"github.com/seaweedfs/seaweedfs/weed/storage/types"
-	"golang.org/x/exp/slices"
-	"io"
 )
 
 func init() {
@@ -216,10 +218,10 @@ func doDeduplicateEcShards(commandEnv *CommandEnv, collection string, vid needle
 
 		duplicatedShardIds := []uint32{uint32(shardId)}
 		for _, ecNode := range ecNodes[1:] {
-			if err := unmountEcShards(commandEnv.option.GrpcDialOption, vid, pb.NewServerAddressFromDataNode(ecNode.info), duplicatedShardIds); err != nil {
+			if err := unmountEcShards(commandEnv.option.GrpcDialOption, vid, rpc.NewServerAddressFromDataNode(ecNode.info), duplicatedShardIds); err != nil {
 				return err
 			}
-			if err := sourceServerDeleteEcShards(commandEnv.option.GrpcDialOption, collection, vid, pb.NewServerAddressFromDataNode(ecNode.info), duplicatedShardIds); err != nil {
+			if err := sourceServerDeleteEcShards(commandEnv.option.GrpcDialOption, collection, vid, rpc.NewServerAddressFromDataNode(ecNode.info), duplicatedShardIds); err != nil {
 				return err
 			}
 			ecNode.deleteEcVolumeShards(vid, duplicatedShardIds)

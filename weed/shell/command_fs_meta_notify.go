@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"github.com/seaweedfs/seaweedfs/weed/notification"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 

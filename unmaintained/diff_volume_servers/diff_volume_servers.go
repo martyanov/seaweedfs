@@ -15,8 +15,8 @@ import (
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/idx"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	"github.com/seaweedfs/seaweedfs/weed/storage/types"
@@ -44,13 +44,13 @@ func main() {
 	grpcDialOption = grpc.WithTransportCredentials(insecure.NewCredentials())
 
 	vid := uint32(*volumeId)
-	servers := pb.ServerAddresses(*serversStr).ToAddresses()
+	servers := rpc.ServerAddresses(*serversStr).ToAddresses()
 	if len(servers) < 2 {
 		glog.Fatalf("You must specify more than 1 server\n")
 	}
-	var referenceServer pb.ServerAddress
+	var referenceServer rpc.ServerAddress
 	var maxOffset int64
-	allFiles := map[pb.ServerAddress]map[types.NeedleId]needleState{}
+	allFiles := map[rpc.ServerAddress]map[types.NeedleId]needleState{}
 	for _, addr := range servers {
 		files, offset, err := getVolumeFiles(vid, addr)
 		if err != nil {
@@ -120,7 +120,7 @@ type needleState struct {
 	size  types.Size
 }
 
-func getVolumeFiles(v uint32, addr pb.ServerAddress) (map[types.NeedleId]needleState, int64, error) {
+func getVolumeFiles(v uint32, addr rpc.ServerAddress) (map[types.NeedleId]needleState, int64, error) {
 	var idxFile *bytes.Reader
 	err := operation.WithVolumeServerClient(false, addr, grpcDialOption, func(vs volume_server_pb.VolumeServerClient) error {
 		ctx, cancel := context.WithCancel(context.Background())
@@ -178,7 +178,7 @@ func getVolumeFiles(v uint32, addr pb.ServerAddress) (map[types.NeedleId]needleS
 	return files, maxOffset, nil
 }
 
-func getNeedleFileId(v uint32, nid types.NeedleId, addr pb.ServerAddress) (string, error) {
+func getNeedleFileId(v uint32, nid types.NeedleId, addr rpc.ServerAddress) (string, error) {
 	var id string
 	err := operation.WithVolumeServerClient(false, addr, grpcDialOption, func(vs volume_server_pb.VolumeServerClient) error {
 		resp, err := vs.VolumeNeedleStatus(context.Background(), &volume_server_pb.VolumeNeedleStatusRequest{

@@ -7,7 +7,7 @@ import (
 
 	jsonpb "google.golang.org/protobuf/encoding/protojson"
 
-	"github.com/seaweedfs/seaweedfs/weed/pb/iam_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/iam_pb"
 )
 
 func TestIdentityListFileFormat(t *testing.T) {

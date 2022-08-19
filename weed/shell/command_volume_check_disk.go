@@ -5,13 +5,15 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
-	"github.com/seaweedfs/seaweedfs/weed/storage/needle_map"
-	"golang.org/x/exp/slices"
 	"io"
 	"math"
+
+	"golang.org/x/exp/slices"
+
+	"github.com/seaweedfs/seaweedfs/weed/operation"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/storage/needle_map"
 )
 
 func init() {
@@ -120,10 +122,10 @@ func (c *commandVolumeCheckDisk) checkBoth(a *VolumeReplica, b *VolumeReplica, a
 	}()
 
 	// read index db
-	if err = c.readIndexDatabase(aDB, a.info.Collection, a.info.Id, pb.NewServerAddressFromDataNode(a.location.dataNode), verbose, writer); err != nil {
+	if err = c.readIndexDatabase(aDB, a.info.Collection, a.info.Id, rpc.NewServerAddressFromDataNode(a.location.dataNode), verbose, writer); err != nil {
 		return true, true, fmt.Errorf("readIndexDatabase %s volume %d: %v", a.location.dataNode, a.info.Id, err)
 	}
-	if err := c.readIndexDatabase(bDB, b.info.Collection, b.info.Id, pb.NewServerAddressFromDataNode(b.location.dataNode), verbose, writer); err != nil {
+	if err := c.readIndexDatabase(bDB, b.info.Collection, b.info.Id, rpc.NewServerAddressFromDataNode(b.location.dataNode), verbose, writer); err != nil {
 		return true, true, fmt.Errorf("readIndexDatabase %s volume %d: %v", b.location.dataNode, b.info.Id, err)
 	}
 
@@ -166,7 +168,7 @@ func (c *commandVolumeCheckDisk) doVolumeCheckDisk(minuend, subtrahend *needle_m
 
 	for _, needleValue := range missingNeedles {
 
-		needleBlob, err := c.readSourceNeedleBlob(pb.NewServerAddressFromDataNode(source.location.dataNode), source.info.Id, needleValue)
+		needleBlob, err := c.readSourceNeedleBlob(rpc.NewServerAddressFromDataNode(source.location.dataNode), source.info.Id, needleValue)
 		if err != nil {
 			return hasChanges, err
 		}
@@ -181,7 +183,7 @@ func (c *commandVolumeCheckDisk) doVolumeCheckDisk(minuend, subtrahend *needle_m
 
 		hasChanges = true
 
-		if err = c.writeNeedleBlobToTarget(pb.NewServerAddressFromDataNode(target.location.dataNode), source.info.Id, needleValue, needleBlob); err != nil {
+		if err = c.writeNeedleBlobToTarget(rpc.NewServerAddressFromDataNode(target.location.dataNode), source.info.Id, needleValue, needleBlob); err != nil {
 			return hasChanges, err
 		}
 
@@ -190,7 +192,7 @@ func (c *commandVolumeCheckDisk) doVolumeCheckDisk(minuend, subtrahend *needle_m
 	return
 }
 
-func (c *commandVolumeCheckDisk) readSourceNeedleBlob(sourceVolumeServer pb.ServerAddress, volumeId uint32, needleValue needle_map.NeedleValue) (needleBlob []byte, err error) {
+func (c *commandVolumeCheckDisk) readSourceNeedleBlob(sourceVolumeServer rpc.ServerAddress, volumeId uint32, needleValue needle_map.NeedleValue) (needleBlob []byte, err error) {
 
 	err = operation.WithVolumeServerClient(false, sourceVolumeServer, c.env.option.GrpcDialOption, func(client volume_server_pb.VolumeServerClient) error {
 		resp, err := client.ReadNeedleBlob(context.Background(), &volume_server_pb.ReadNeedleBlobRequest{
@@ -208,7 +210,7 @@ func (c *commandVolumeCheckDisk) readSourceNeedleBlob(sourceVolumeServer pb.Serv
 	return
 }
 
-func (c *commandVolumeCheckDisk) writeNeedleBlobToTarget(targetVolumeServer pb.ServerAddress, volumeId uint32, needleValue needle_map.NeedleValue, needleBlob []byte) error {
+func (c *commandVolumeCheckDisk) writeNeedleBlobToTarget(targetVolumeServer rpc.ServerAddress, volumeId uint32, needleValue needle_map.NeedleValue, needleBlob []byte) error {
 
 	return operation.WithVolumeServerClient(false, targetVolumeServer, c.env.option.GrpcDialOption, func(client volume_server_pb.VolumeServerClient) error {
 		_, err := client.WriteNeedleBlob(context.Background(), &volume_server_pb.WriteNeedleBlobRequest{
@@ -222,7 +224,7 @@ func (c *commandVolumeCheckDisk) writeNeedleBlobToTarget(targetVolumeServer pb.S
 
 }
 
-func (c *commandVolumeCheckDisk) readIndexDatabase(db *needle_map.MemDb, collection string, volumeId uint32, volumeServer pb.ServerAddress, verbose bool, writer io.Writer) error {
+func (c *commandVolumeCheckDisk) readIndexDatabase(db *needle_map.MemDb, collection string, volumeId uint32, volumeServer rpc.ServerAddress, verbose bool, writer io.Writer) error {
 
 	var buf bytes.Buffer
 	if err := c.copyVolumeIndexFile(collection, volumeId, volumeServer, &buf, verbose, writer); err != nil {
@@ -237,7 +239,7 @@ func (c *commandVolumeCheckDisk) readIndexDatabase(db *needle_map.MemDb, collect
 
 }
 
-func (c *commandVolumeCheckDisk) copyVolumeIndexFile(collection string, volumeId uint32, volumeServer pb.ServerAddress, buf *bytes.Buffer, verbose bool, writer io.Writer) error {
+func (c *commandVolumeCheckDisk) copyVolumeIndexFile(collection string, volumeId uint32, volumeServer rpc.ServerAddress, buf *bytes.Buffer, verbose bool, writer io.Writer) error {
 
 	return operation.WithVolumeServerClient(true, volumeServer, c.env.option.GrpcDialOption, func(volumeServerClient volume_server_pb.VolumeServerClient) error {
 

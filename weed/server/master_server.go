@@ -18,8 +18,8 @@ import (
 
 	"github.com/seaweedfs/seaweedfs/weed/cluster"
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 	"github.com/seaweedfs/seaweedfs/weed/security"
 	"github.com/seaweedfs/seaweedfs/weed/sequence"
 	"github.com/seaweedfs/seaweedfs/weed/shell"
@@ -35,7 +35,7 @@ const (
 )
 
 type MasterOption struct {
-	Master            pb.ServerAddress
+	Master            rpc.ServerAddress
 	MetaFolder        string
 	VolumeSizeLimitMB uint32
 	VolumePreallocate bool
@@ -75,7 +75,7 @@ type MasterServer struct {
 	Cluster *cluster.Cluster
 }
 
-func NewMasterServer(r *mux.Router, option *MasterOption, peers map[string]pb.ServerAddress) *MasterServer {
+func NewMasterServer(r *mux.Router, option *MasterOption, peers map[string]rpc.ServerAddress) *MasterServer {
 	v := util.GetViper()
 	signingKey := v.GetString("jwt.signing.key")
 	v.SetDefault("jwt.signing.expires_after_seconds", 10)
@@ -324,7 +324,7 @@ func (ms *MasterServer) OnPeerUpdate(update *master_pb.ClusterNodeUpdate, startF
 	}
 	glog.V(4).Infof("OnPeerUpdate: %+v", update)
 
-	peerAddress := pb.ServerAddress(update.Address)
+	peerAddress := rpc.ServerAddress(update.Address)
 	peerName := string(peerAddress)
 	isLeader := ms.Topo.Raft.State() == raft.Leader
 	if update.IsAdd && isLeader {

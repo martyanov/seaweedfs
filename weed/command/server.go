@@ -10,7 +10,7 @@ import (
 	stats_collect "github.com/seaweedfs/seaweedfs/weed/stats"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 	"github.com/seaweedfs/seaweedfs/weed/util/grace"
 )
@@ -158,7 +158,7 @@ func runServer(cmd *Command, args []string) bool {
 
 	if *isStartingMasterServer {
 		_, peerList := checkPeers(*serverIp, *masterOptions.port, *masterOptions.portGrpc, *masterOptions.peers)
-		peers := strings.Join(pb.ToAddressStrings(peerList), ",")
+		peers := strings.Join(rpc.ToAddressStrings(peerList), ",")
 		masterOptions.peers = &peers
 	}
 
@@ -169,7 +169,7 @@ func runServer(cmd *Command, args []string) bool {
 	// ip address
 	masterOptions.ip = serverIp
 	masterOptions.ipBind = serverBindIp
-	filerOptions.masters = pb.ServerAddresses(*masterOptions.peers).ToAddressMap()
+	filerOptions.masters = rpc.ServerAddresses(*masterOptions.peers).ToAddressMap()
 	filerOptions.ip = serverIp
 	filerOptions.bindIp = serverBindIp
 	s3Options.bindIp = serverBindIp
@@ -177,7 +177,7 @@ func runServer(cmd *Command, args []string) bool {
 	iamOptions.masters = masterOptions.peers
 	serverOptions.v.ip = serverIp
 	serverOptions.v.bindIp = serverBindIp
-	serverOptions.v.masters = pb.ServerAddresses(*masterOptions.peers).ToAddresses()
+	serverOptions.v.masters = rpc.ServerAddresses(*masterOptions.peers).ToAddresses()
 	serverOptions.v.idleConnectionTimeout = serverTimeout
 	serverOptions.v.dataCenter = serverDataCenter
 	serverOptions.v.rack = serverRack
@@ -193,7 +193,7 @@ func runServer(cmd *Command, args []string) bool {
 	filerOptions.disableHttp = serverDisableHttp
 	masterOptions.disableHttp = serverDisableHttp
 
-	filerAddress := string(pb.NewServerAddress(*serverIp, *filerOptions.port, *filerOptions.portGrpc))
+	filerAddress := string(rpc.NewServerAddress(*serverIp, *filerOptions.port, *filerOptions.portGrpc))
 	s3Options.filer = &filerAddress
 	iamOptions.filer = &filerAddress
 

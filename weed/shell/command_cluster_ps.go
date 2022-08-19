@@ -7,10 +7,10 @@ import (
 	"io"
 
 	"github.com/seaweedfs/seaweedfs/weed/cluster"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 )
 
 func init() {
@@ -67,7 +67,7 @@ func (c *commandClusterPs) Do(args []string, commandEnv *CommandEnv, writer io.W
 		if node.Rack != "" {
 			fmt.Fprintf(writer, "    Rack: %v\n", node.Rack)
 		}
-		pb.WithFilerClient(false, pb.ServerAddress(node.Address), commandEnv.option.GrpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+		rpc.WithFilerClient(false, rpc.ServerAddress(node.Address), commandEnv.option.GrpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 			resp, err := client.GetFilerConfiguration(context.Background(), &filer_pb.GetFilerConfigurationRequest{})
 			if err == nil {
 				if resp.FilerGroup != "" {
@@ -82,7 +82,7 @@ func (c *commandClusterPs) Do(args []string, commandEnv *CommandEnv, writer io.W
 	}
 
 	// collect volume servers
-	var volumeServers []pb.ServerAddress
+	var volumeServers []rpc.ServerAddress
 	t, _, err := collectTopologyInfo(commandEnv, 0)
 	if err != nil {
 		return err
@@ -90,7 +90,7 @@ func (c *commandClusterPs) Do(args []string, commandEnv *CommandEnv, writer io.W
 	for _, dc := range t.DataCenterInfos {
 		for _, r := range dc.RackInfos {
 			for _, dn := range r.DataNodeInfos {
-				volumeServers = append(volumeServers, pb.NewServerAddressFromDataNode(dn))
+				volumeServers = append(volumeServers, rpc.NewServerAddressFromDataNode(dn))
 			}
 		}
 	}
@@ -101,7 +101,7 @@ func (c *commandClusterPs) Do(args []string, commandEnv *CommandEnv, writer io.W
 		for _, r := range dc.RackInfos {
 			fmt.Fprintf(writer, "    * rack: %s\n", r.Id)
 			for _, dn := range r.DataNodeInfos {
-				pb.WithVolumeServerClient(false, pb.NewServerAddressFromDataNode(dn), commandEnv.option.GrpcDialOption, func(client volume_server_pb.VolumeServerClient) error {
+				rpc.WithVolumeServerClient(false, rpc.NewServerAddressFromDataNode(dn), commandEnv.option.GrpcDialOption, func(client volume_server_pb.VolumeServerClient) error {
 					resp, err := client.VolumeServerStatus(context.Background(), &volume_server_pb.VolumeServerStatusRequest{})
 					if err == nil {
 						fmt.Fprintf(writer, "      * %s (%v)\n", dn.Id, resp.Version)

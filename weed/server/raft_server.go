@@ -19,7 +19,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/topology"
 )
 
@@ -31,8 +31,8 @@ const (
 
 type RaftServerOption struct {
 	GrpcDialOption    grpc.DialOption
-	Peers             map[string]pb.ServerAddress
-	ServerAddr        pb.ServerAddress
+	Peers             map[string]rpc.ServerAddress
+	ServerAddr        rpc.ServerAddress
 	DataDir           string
 	Topo              *topology.Topology
 	RaftResumeState   bool
@@ -42,11 +42,11 @@ type RaftServerOption struct {
 }
 
 type RaftServer struct {
-	peers            map[string]pb.ServerAddress // initial peers to join with
+	peers            map[string]rpc.ServerAddress // initial peers to join with
 	Raft             *raft.Raft
 	TransportManager *transport.Manager
 	dataDir          string
-	serverAddr       pb.ServerAddress
+	serverAddr       rpc.ServerAddress
 	topo             *topology.Topology
 }
 
@@ -115,8 +115,8 @@ func (s *RaftServer) Peers() (members []string) {
 	return
 }
 
-func getPeerIdx(self pb.ServerAddress, mapPeers map[string]pb.ServerAddress) int {
-	peers := make([]pb.ServerAddress, 0, len(mapPeers))
+func getPeerIdx(self rpc.ServerAddress, mapPeers map[string]rpc.ServerAddress) int {
+	peers := make([]rpc.ServerAddress, 0, len(mapPeers))
 	for _, peer := range mapPeers {
 		peers = append(peers, peer)
 	}

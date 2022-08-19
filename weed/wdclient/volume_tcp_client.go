@@ -4,13 +4,14 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/util"
-	"github.com/seaweedfs/seaweedfs/weed/wdclient/net2"
 	"io"
 	"net"
 	"time"
+
+	"github.com/seaweedfs/seaweedfs/weed/glog"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/util"
+	"github.com/seaweedfs/seaweedfs/weed/wdclient/net2"
 )
 
 // VolumeTcpClient put/get/delete file chunks directly on volume servers without replication
@@ -48,7 +49,7 @@ func NewVolumeTcpClient() *VolumeTcpClient {
 }
 func (c *VolumeTcpClient) PutFileChunk(volumeServerAddress string, fileId string, fileSize uint32, fileReader io.Reader) (err error) {
 
-	tcpAddress, parseErr := pb.ParseServerAddress(volumeServerAddress, 20000)
+	tcpAddress, parseErr := rpc.ParseServerAddress(volumeServerAddress, 20000)
 	if parseErr != nil {
 		return parseErr
 	}

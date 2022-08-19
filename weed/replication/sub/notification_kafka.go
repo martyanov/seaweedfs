@@ -9,7 +9,7 @@ import (
 
 	"github.com/Shopify/sarama"
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 	"google.golang.org/protobuf/proto"
 )

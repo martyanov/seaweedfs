@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package filer_pb;
 
-option go_package = "github.com/seaweedfs/seaweedfs/weed/pb/filer_pb";
+option go_package = "github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb";
 
 service SeaweedFiler {
 

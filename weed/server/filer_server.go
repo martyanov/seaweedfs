@@ -22,9 +22,9 @@ import (
 	_ "github.com/seaweedfs/seaweedfs/weed/notification/kafka"
 	_ "github.com/seaweedfs/seaweedfs/weed/notification/log"
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 	"github.com/seaweedfs/seaweedfs/weed/security"
 	"github.com/seaweedfs/seaweedfs/weed/stats"
 	"github.com/seaweedfs/seaweedfs/weed/util"
@@ -32,7 +32,7 @@ import (
 )
 
 type FilerOption struct {
-	Masters               map[string]pb.ServerAddress
+	Masters               map[string]rpc.ServerAddress
 	FilerGroup            string
 	Collection            string
 	DefaultReplication    string
@@ -44,7 +44,7 @@ type FilerOption struct {
 	DataNode              string
 	DefaultLevelDbDir     string
 	DisableHttp           bool
-	Host                  pb.ServerAddress
+	Host                  rpc.ServerAddress
 	recursiveDelete       bool
 	Cipher                bool
 	SaveToFilerLimit      int64

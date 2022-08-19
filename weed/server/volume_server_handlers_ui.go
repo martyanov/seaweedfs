@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 	ui "github.com/seaweedfs/seaweedfs/weed/server/volume_server_ui"
 	"github.com/seaweedfs/seaweedfs/weed/stats"
 	"github.com/seaweedfs/seaweedfs/weed/storage"
@@ -36,7 +36,7 @@ func (vs *VolumeServer) uiStatusHandler(w http.ResponseWriter, r *http.Request) 
 	}
 	args := struct {
 		Version       string
-		Masters       []pb.ServerAddress
+		Masters       []rpc.ServerAddress
 		Volumes       interface{}
 		EcVolumes     interface{}
 		RemoteVolumes interface{}

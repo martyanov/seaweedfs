@@ -3,14 +3,15 @@ package weed_server
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/seaweedfs/seaweedfs/weed/cluster"
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
-	"time"
 )
 
 func (fs *FilerServer) Statistics(ctx context.Context, req *filer_pb.StatisticsRequest) (resp *filer_pb.StatisticsResponse, err error) {
@@ -48,7 +49,7 @@ func (fs *FilerServer) Ping(ctx context.Context, req *filer_pb.PingRequest) (res
 		StartTimeNs: time.Now().UnixNano(),
 	}
 	if req.TargetType == cluster.FilerType {
-		pingErr = pb.WithFilerClient(false, pb.ServerAddress(req.Target), fs.grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+		pingErr = rpc.WithFilerClient(false, rpc.ServerAddress(req.Target), fs.grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 			pingResp, err := client.Ping(ctx, &filer_pb.PingRequest{})
 			if pingResp != nil {
 				resp.RemoteTimeNs = pingResp.StartTimeNs
@@ -57,7 +58,7 @@ func (fs *FilerServer) Ping(ctx context.Context, req *filer_pb.PingRequest) (res
 		})
 	}
 	if req.TargetType == cluster.VolumeServerType {
-		pingErr = pb.WithVolumeServerClient(false, pb.ServerAddress(req.Target), fs.grpcDialOption, func(client volume_server_pb.VolumeServerClient) error {
+		pingErr = rpc.WithVolumeServerClient(false, rpc.ServerAddress(req.Target), fs.grpcDialOption, func(client volume_server_pb.VolumeServerClient) error {
 			pingResp, err := client.Ping(ctx, &volume_server_pb.PingRequest{})
 			if pingResp != nil {
 				resp.RemoteTimeNs = pingResp.StartTimeNs
@@ -66,7 +67,7 @@ func (fs *FilerServer) Ping(ctx context.Context, req *filer_pb.PingRequest) (res
 		})
 	}
 	if req.TargetType == cluster.MasterType {
-		pingErr = pb.WithMasterClient(false, pb.ServerAddress(req.Target), fs.grpcDialOption, func(client master_pb.SeaweedClient) error {
+		pingErr = rpc.WithMasterClient(false, rpc.ServerAddress(req.Target), fs.grpcDialOption, func(client master_pb.SeaweedClient) error {
 			pingResp, err := client.Ping(ctx, &master_pb.PingRequest{})
 			if pingResp != nil {
 				resp.RemoteTimeNs = pingResp.StartTimeNs
@@ -86,7 +87,7 @@ func (fs *FilerServer) GetFilerConfiguration(ctx context.Context, req *filer_pb.
 	clusterId, _ := fs.filer.Store.KvGet(context.Background(), []byte("clusterId"))
 
 	t := &filer_pb.GetFilerConfigurationResponse{
-		Masters:            pb.ToAddressStringsFromMap(fs.option.Masters),
+		Masters:            rpc.ToAddressStringsFromMap(fs.option.Masters),
 		Collection:         fs.option.Collection,
 		Replication:        fs.option.DefaultReplication,
 		MaxMb:              uint32(fs.option.MaxMB),

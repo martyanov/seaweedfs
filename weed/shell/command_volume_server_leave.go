@@ -4,11 +4,13 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
-	"google.golang.org/grpc"
 	"io"
+
+	"google.golang.org/grpc"
+
+	"github.com/seaweedfs/seaweedfs/weed/operation"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 )
 
 func init() {
@@ -51,11 +53,11 @@ func (c *commandVolumeServerLeave) Do(args []string, commandEnv *CommandEnv, wri
 		return fmt.Errorf("need to specify volume server by -node=<host>:<port>")
 	}
 
-	return volumeServerLeave(commandEnv.option.GrpcDialOption, pb.ServerAddress(*volumeServer), writer)
+	return volumeServerLeave(commandEnv.option.GrpcDialOption, rpc.ServerAddress(*volumeServer), writer)
 
 }
 
-func volumeServerLeave(grpcDialOption grpc.DialOption, volumeServer pb.ServerAddress, writer io.Writer) (err error) {
+func volumeServerLeave(grpcDialOption grpc.DialOption, volumeServer rpc.ServerAddress, writer io.Writer) (err error) {
 	return operation.WithVolumeServerClient(false, volumeServer, grpcDialOption, func(volumeServerClient volume_server_pb.VolumeServerClient) error {
 		_, leaveErr := volumeServerClient.VolumeServerLeave(context.Background(), &volume_server_pb.VolumeServerLeaveRequest{})
 		if leaveErr != nil {

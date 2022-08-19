@@ -3,14 +3,14 @@ package storage
 import (
 	"context"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"io"
 	"os"
 
 	"google.golang.org/grpc"
 
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/idx"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	"github.com/seaweedfs/seaweedfs/weed/storage/super_block"
@@ -63,7 +63,7 @@ update needle map when receiving new .dat bytes. But seems not necessary now.)
 
 */
 
-func (v *Volume) IncrementalBackup(volumeServer pb.ServerAddress, grpcDialOption grpc.DialOption) error {
+func (v *Volume) IncrementalBackup(volumeServer rpc.ServerAddress, grpcDialOption grpc.DialOption) error {
 
 	startFromOffset, _, _ := v.FileStat()
 	appendAtNs, err := v.findLastAppendAtNs()

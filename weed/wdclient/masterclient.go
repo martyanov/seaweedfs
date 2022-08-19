@@ -3,25 +3,26 @@ package wdclient
 import (
 	"context"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/stats"
 	"math/rand"
 	"time"
+
+	"github.com/seaweedfs/seaweedfs/weed/stats"
 
 	"github.com/seaweedfs/seaweedfs/weed/util"
 	"google.golang.org/grpc"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 )
 
 type MasterClient struct {
 	FilerGroup     string
 	clientType     string
-	clientHost     pb.ServerAddress
+	clientHost     rpc.ServerAddress
 	rack           string
-	currentMaster  pb.ServerAddress
-	masters        map[string]pb.ServerAddress
+	currentMaster  rpc.ServerAddress
+	masters        map[string]rpc.ServerAddress
 	grpcDialOption grpc.DialOption
 
 	vidMap
@@ -30,7 +31,7 @@ type MasterClient struct {
 	OnPeerUpdate func(update *master_pb.ClusterNodeUpdate, startFrom time.Time)
 }
 
-func NewMasterClient(grpcDialOption grpc.DialOption, filerGroup string, clientType string, clientHost pb.ServerAddress, clientDataCenter string, rack string, masters map[string]pb.ServerAddress) *MasterClient {
+func NewMasterClient(grpcDialOption grpc.DialOption, filerGroup string, clientType string, clientHost rpc.ServerAddress, clientDataCenter string, rack string, masters map[string]rpc.ServerAddress) *MasterClient {
 	return &MasterClient{
 		FilerGroup:      filerGroup,
 		clientType:      clientType,
@@ -52,7 +53,7 @@ func (mc *MasterClient) LookupFileIdWithFallback(fileId string) (fullUrls []stri
 	if err == nil && len(fullUrls) > 0 {
 		return
 	}
-	err = pb.WithMasterClient(false, mc.currentMaster, mc.grpcDialOption, func(client master_pb.SeaweedClient) error {
+	err = rpc.WithMasterClient(false, mc.currentMaster, mc.grpcDialOption, func(client master_pb.SeaweedClient) error {
 		resp, err := client.LookupVolume(context.Background(), &master_pb.LookupVolumeRequest{
 			VolumeOrFileIds: []string{fileId},
 		})
@@ -82,12 +83,12 @@ func (mc *MasterClient) LookupFileIdWithFallback(fileId string) (fullUrls []stri
 	return
 }
 
-func (mc *MasterClient) GetMaster() pb.ServerAddress {
+func (mc *MasterClient) GetMaster() rpc.ServerAddress {
 	mc.WaitUntilConnected()
 	return mc.currentMaster
 }
 
-func (mc *MasterClient) GetMasters() map[string]pb.ServerAddress {
+func (mc *MasterClient) GetMasters() map[string]rpc.ServerAddress {
 	mc.WaitUntilConnected()
 	return mc.masters
 }
@@ -109,12 +110,12 @@ func (mc *MasterClient) KeepConnectedToMaster() {
 	}
 }
 
-func (mc *MasterClient) FindLeaderFromOtherPeers(myMasterAddress pb.ServerAddress) (leader string) {
+func (mc *MasterClient) FindLeaderFromOtherPeers(myMasterAddress rpc.ServerAddress) (leader string) {
 	for _, master := range mc.masters {
 		if master == myMasterAddress {
 			continue
 		}
-		if grpcErr := pb.WithMasterClient(false, master, mc.grpcDialOption, func(client master_pb.SeaweedClient) error {
+		if grpcErr := rpc.WithMasterClient(false, master, mc.grpcDialOption, func(client master_pb.SeaweedClient) error {
 			ctx, cancel := context.WithTimeout(context.Background(), 120*time.Millisecond)
 			defer cancel()
 			resp, err := client.GetMasterConfiguration(ctx, &master_pb.GetMasterConfigurationRequest{})
@@ -136,7 +137,7 @@ func (mc *MasterClient) FindLeaderFromOtherPeers(myMasterAddress pb.ServerAddres
 }
 
 func (mc *MasterClient) tryAllMasters() {
-	var nextHintedLeader pb.ServerAddress
+	var nextHintedLeader rpc.ServerAddress
 	for _, master := range mc.masters {
 		nextHintedLeader = mc.tryConnectToMaster(master)
 		for nextHintedLeader != "" {
@@ -147,10 +148,10 @@ func (mc *MasterClient) tryAllMasters() {
 	}
 }
 
-func (mc *MasterClient) tryConnectToMaster(master pb.ServerAddress) (nextHintedLeader pb.ServerAddress) {
+func (mc *MasterClient) tryConnectToMaster(master rpc.ServerAddress) (nextHintedLeader rpc.ServerAddress) {
 	glog.V(1).Infof("%s.%s masterClient Connecting to master %v", mc.FilerGroup, mc.clientType, master)
 	stats.MasterClientConnectCounter.WithLabelValues("total").Inc()
-	gprcErr := pb.WithMasterClient(true, master, mc.grpcDialOption, func(client master_pb.SeaweedClient) error {
+	gprcErr := rpc.WithMasterClient(true, master, mc.grpcDialOption, func(client master_pb.SeaweedClient) error {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
@@ -186,7 +187,7 @@ func (mc *MasterClient) tryConnectToMaster(master pb.ServerAddress) (nextHintedL
 		if resp.VolumeLocation != nil {
 			if resp.VolumeLocation.Leader != "" && string(master) != resp.VolumeLocation.Leader {
 				glog.V(0).Infof("master %v redirected to leader %v", master, resp.VolumeLocation.Leader)
-				nextHintedLeader = pb.ServerAddress(resp.VolumeLocation.Leader)
+				nextHintedLeader = rpc.ServerAddress(resp.VolumeLocation.Leader)
 				stats.MasterClientConnectCounter.WithLabelValues(stats.RedirectedToLeader).Inc()
 				return nil
 			}
@@ -209,7 +210,7 @@ func (mc *MasterClient) tryConnectToMaster(master pb.ServerAddress) (nextHintedL
 				// maybe the leader is changed
 				if resp.VolumeLocation.Leader != "" && string(mc.currentMaster) != resp.VolumeLocation.Leader {
 					glog.V(0).Infof("currentMaster %v redirected to leader %v", mc.currentMaster, resp.VolumeLocation.Leader)
-					nextHintedLeader = pb.ServerAddress(resp.VolumeLocation.Leader)
+					nextHintedLeader = rpc.ServerAddress(resp.VolumeLocation.Leader)
 					stats.MasterClientConnectCounter.WithLabelValues(stats.RedirectedToLeader).Inc()
 					return nil
 				}
@@ -271,7 +272,7 @@ func (mc *MasterClient) WithClient(streamingMode bool, fn func(client master_pb.
 		for mc.currentMaster == "" {
 			time.Sleep(3 * time.Second)
 		}
-		return pb.WithMasterClient(streamingMode, mc.currentMaster, mc.grpcDialOption, func(client master_pb.SeaweedClient) error {
+		return rpc.WithMasterClient(streamingMode, mc.currentMaster, mc.grpcDialOption, func(client master_pb.SeaweedClient) error {
 			return fn(client)
 		})
 	})

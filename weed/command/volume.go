@@ -15,8 +15,8 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 	weed_server "github.com/seaweedfs/seaweedfs/weed/server"
 	stats_collect "github.com/seaweedfs/seaweedfs/weed/stats"
 	"github.com/seaweedfs/seaweedfs/weed/storage"
@@ -40,7 +40,7 @@ type VolumeServerOptions struct {
 	publicUrl                 *string
 	bindIp                    *string
 	mastersString             *string
-	masters                   []pb.ServerAddress
+	masters                   []rpc.ServerAddress
 	idleConnectionTimeout     *int
 	dataCenter                *string
 	rack                      *string
@@ -121,7 +121,7 @@ func runVolume(cmd *Command, args []string) bool {
 	go stats_collect.StartMetricsServer(*v.metricsHttpPort)
 
 	minFreeSpaces := util.MustParseMinFreeSpace(*minFreeSpace, *minFreeSpacePercent)
-	v.masters = pb.ServerAddresses(*v.mastersString).ToAddresses()
+	v.masters = rpc.ServerAddresses(*v.mastersString).ToAddresses()
 	v.startVolumeServer(*volumeFolders, *maxVolumeCounts, *volumeWhiteListOption, minFreeSpaces)
 
 	return true
@@ -314,7 +314,7 @@ func (v VolumeServerOptions) startGrpcService(vs volume_server_pb.VolumeServerSe
 	if err != nil {
 		glog.Fatalf("failed to listen on grpc port %d: %v", grpcPort, err)
 	}
-	grpcS := pb.NewGrpcServer()
+	grpcS := rpc.NewGrpcServer()
 	volume_server_pb.RegisterVolumeServerServer(grpcS, vs)
 	reflection.Register(grpcS)
 	go func() {

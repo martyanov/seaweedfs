@@ -18,7 +18,7 @@ import (
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/security"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 	"github.com/seaweedfs/seaweedfs/weed/wdclient"
@@ -128,7 +128,7 @@ func runBenchmark(cmd *Command, args []string) bool {
 		defer pprof.StopCPUProfile()
 	}
 
-	b.masterClient = wdclient.NewMasterClient(b.grpcDialOption, "", "client", "", "", "", pb.ServerAddresses(*b.masters).ToAddressMap())
+	b.masterClient = wdclient.NewMasterClient(b.grpcDialOption, "", "client", "", "", "", rpc.ServerAddresses(*b.masters).ToAddressMap())
 	go b.masterClient.KeepConnectedToMaster()
 	b.masterClient.WaitUntilConnected()
 

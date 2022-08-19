@@ -3,15 +3,15 @@ package weed_server
 import (
 	"context"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
 	"math/rand"
 	"net/http"
 	"strconv"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/backend/memory_map"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	"github.com/seaweedfs/seaweedfs/weed/storage/super_block"
@@ -124,13 +124,13 @@ func (ms *MasterServer) redirectHandler(w http.ResponseWriter, r *http.Request) 
 
 func (ms *MasterServer) submitFromMasterServerHandler(w http.ResponseWriter, r *http.Request) {
 	if ms.Topo.IsLeader() {
-		submitForClientHandler(w, r, func() pb.ServerAddress { return ms.option.Master }, ms.grpcDialOption)
+		submitForClientHandler(w, r, func() rpc.ServerAddress { return ms.option.Master }, ms.grpcDialOption)
 	} else {
 		masterUrl, err := ms.Topo.Leader()
 		if err != nil {
 			writeJsonError(w, r, http.StatusInternalServerError, err)
 		} else {
-			submitForClientHandler(w, r, func() pb.ServerAddress { return masterUrl }, ms.grpcDialOption)
+			submitForClientHandler(w, r, func() rpc.ServerAddress { return masterUrl }, ms.grpcDialOption)
 		}
 	}
 }

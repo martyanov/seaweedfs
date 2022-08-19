@@ -2,12 +2,13 @@ package shell
 
 import (
 	"flag"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	"io"
 	"log"
 	"time"
+
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 )
 
 func init() {
@@ -60,7 +61,7 @@ func (c *commandVolumeDeleteEmpty) Do(args []string, commandEnv *CommandEnv, wri
 				if v.Size <= 8 && v.ModifiedAtSecond+quietSeconds < nowUnixSeconds {
 					if *applyBalancing {
 						log.Printf("deleting empty volume %d from %s", v.Id, dn.Id)
-						if deleteErr := deleteVolume(commandEnv.option.GrpcDialOption, needle.VolumeId(v.Id), pb.NewServerAddressFromDataNode(dn)); deleteErr != nil {
+						if deleteErr := deleteVolume(commandEnv.option.GrpcDialOption, needle.VolumeId(v.Id), rpc.NewServerAddressFromDataNode(dn)); deleteErr != nil {
 							err = deleteErr
 						}
 						continue

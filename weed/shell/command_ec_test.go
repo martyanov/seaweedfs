@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 )
 

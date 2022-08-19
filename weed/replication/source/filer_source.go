@@ -11,8 +11,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
@@ -42,7 +42,7 @@ func (fs *FilerSource) Initialize(configuration util.Configuration, prefix strin
 func (fs *FilerSource) DoInitialize(address, grpcAddress string, dir string, readChunkFromFiler bool) (err error) {
 	fs.address = address
 	if fs.address == "" {
-		fs.address = pb.GrpcAddressToServerAddress(grpcAddress)
+		fs.address = rpc.GrpcAddressToServerAddress(grpcAddress)
 	}
 	fs.grpcAddress = grpcAddress
 	fs.Dir = dir
@@ -127,7 +127,7 @@ var _ = filer_pb.FilerClient(&FilerSource{})
 
 func (fs *FilerSource) WithFilerClient(streamingMode bool, fn func(filer_pb.SeaweedFilerClient) error) error {
 
-	return pb.WithGrpcClient(streamingMode, func(grpcConnection *grpc.ClientConn) error {
+	return rpc.WithGrpcClient(streamingMode, func(grpcConnection *grpc.ClientConn) error {
 		client := filer_pb.NewSeaweedFilerClient(grpcConnection)
 		return fn(client)
 	}, fs.grpcAddress, fs.grpcDialOption)

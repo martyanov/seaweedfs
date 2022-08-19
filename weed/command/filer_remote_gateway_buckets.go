@@ -2,21 +2,23 @@ package command
 
 import (
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/filer"
-	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/remote_pb"
-	"github.com/seaweedfs/seaweedfs/weed/remote_storage"
-	"github.com/seaweedfs/seaweedfs/weed/replication/source"
-	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
-	"github.com/seaweedfs/seaweedfs/weed/util"
-	"google.golang.org/protobuf/proto"
 	"math"
 	"math/rand"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"google.golang.org/protobuf/proto"
+
+	"github.com/seaweedfs/seaweedfs/weed/filer"
+	"github.com/seaweedfs/seaweedfs/weed/glog"
+	"github.com/seaweedfs/seaweedfs/weed/remote_storage"
+	"github.com/seaweedfs/seaweedfs/weed/replication/source"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/remote_pb"
+	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
+	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
 func (option *RemoteGatewayOptions) followBucketUpdatesAndUploadToRemote(filerSource *source.FilerSource) error {
@@ -31,20 +33,20 @@ func (option *RemoteGatewayOptions) followBucketUpdatesAndUploadToRemote(filerSo
 		return err
 	}
 
-	processEventFnWithOffset := pb.AddOffsetFunc(eachEntryFunc, 3*time.Second, func(counter int64, lastTsNs int64) error {
+	processEventFnWithOffset := rpc.AddOffsetFunc(eachEntryFunc, 3*time.Second, func(counter int64, lastTsNs int64) error {
 		lastTime := time.Unix(0, lastTsNs)
 		glog.V(0).Infof("remote sync %s progressed to %v %0.2f/sec", *option.filerAddress, lastTime, float64(counter)/float64(3))
-		return remote_storage.SetSyncOffset(option.grpcDialOption, pb.ServerAddress(*option.filerAddress), option.bucketsDir, lastTsNs)
+		return remote_storage.SetSyncOffset(option.grpcDialOption, rpc.ServerAddress(*option.filerAddress), option.bucketsDir, lastTsNs)
 	})
 
-	lastOffsetTs := collectLastSyncOffset(option, option.grpcDialOption, pb.ServerAddress(*option.filerAddress), option.bucketsDir, *option.timeAgo)
+	lastOffsetTs := collectLastSyncOffset(option, option.grpcDialOption, rpc.ServerAddress(*option.filerAddress), option.bucketsDir, *option.timeAgo)
 
 	option.clientEpoch++
-	return pb.FollowMetadata(pb.ServerAddress(*option.filerAddress), option.grpcDialOption, "filer.remote.sync", option.clientId, option.clientEpoch,
-		option.bucketsDir, []string{filer.DirectoryEtcRemote}, lastOffsetTs.UnixNano(), 0, 0, processEventFnWithOffset, pb.TrivialOnError)
+	return rpc.FollowMetadata(rpc.ServerAddress(*option.filerAddress), option.grpcDialOption, "filer.remote.sync", option.clientId, option.clientEpoch,
+		option.bucketsDir, []string{filer.DirectoryEtcRemote}, lastOffsetTs.UnixNano(), 0, 0, processEventFnWithOffset, rpc.TrivialOnError)
 }
 
-func (option *RemoteGatewayOptions) makeBucketedEventProcessor(filerSource *source.FilerSource) (pb.ProcessMetadataFunc, error) {
+func (option *RemoteGatewayOptions) makeBucketedEventProcessor(filerSource *source.FilerSource) (rpc.ProcessMetadataFunc, error) {
 
 	handleCreateBucket := func(entry *filer_pb.Entry) error {
 		if !entry.IsDirectory {
@@ -372,7 +374,7 @@ func extractBucketPath(bucketsDir, dir string) (util.FullPath, bool) {
 
 func (option *RemoteGatewayOptions) collectRemoteStorageConf() (err error) {
 
-	if mappings, err := filer.ReadMountMappings(option.grpcDialOption, pb.ServerAddress(*option.filerAddress)); err != nil {
+	if mappings, err := filer.ReadMountMappings(option.grpcDialOption, rpc.ServerAddress(*option.filerAddress)); err != nil {
 		return err
 	} else {
 		option.mappings = mappings

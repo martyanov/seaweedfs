@@ -12,7 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/copier"
-	"github.com/seaweedfs/seaweedfs/weed/pb/iam_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/iam_pb"
 	"github.com/stretchr/testify/assert"
 )
 

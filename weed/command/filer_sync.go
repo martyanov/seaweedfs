@@ -12,12 +12,12 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/replication"
 	"github.com/seaweedfs/seaweedfs/weed/replication/sink"
 	"github.com/seaweedfs/seaweedfs/weed/replication/sink/filersink"
 	"github.com/seaweedfs/seaweedfs/weed/replication/source"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	statsCollect "github.com/seaweedfs/seaweedfs/weed/stats"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 	"github.com/seaweedfs/seaweedfs/weed/util/grace"
@@ -108,8 +108,8 @@ func runFilerSynchronize(cmd *Command, args []string) bool {
 
 	grace.SetupProfiling(*syncCpuProfile, *syncMemProfile)
 
-	filerA := pb.ServerAddress(*syncOptions.filerA)
-	filerB := pb.ServerAddress(*syncOptions.filerB)
+	filerA := rpc.ServerAddress(*syncOptions.filerA)
+	filerB := rpc.ServerAddress(*syncOptions.filerB)
 
 	// start filer.sync metrics server
 	go statsCollect.StartMetricsServer(*syncOptions.metricsHttpPort)
@@ -205,7 +205,7 @@ func runFilerSynchronize(cmd *Command, args []string) bool {
 }
 
 // initOffsetFromTsMs Initialize offset
-func initOffsetFromTsMs(grpcDialOption grpc.DialOption, targetFiler pb.ServerAddress, sourceFilerSignature int32, fromTsMs int64, signaturePrefix string) error {
+func initOffsetFromTsMs(grpcDialOption grpc.DialOption, targetFiler rpc.ServerAddress, sourceFilerSignature int32, fromTsMs int64, signaturePrefix string) error {
 	if fromTsMs <= 0 {
 		return nil
 	}
@@ -220,7 +220,7 @@ func initOffsetFromTsMs(grpcDialOption grpc.DialOption, targetFiler pb.ServerAdd
 	return nil
 }
 
-func doSubscribeFilerMetaChanges(clientId int32, clientEpoch int32, grpcDialOption grpc.DialOption, sourceFiler pb.ServerAddress, sourcePath string, sourceExcludePaths []string, sourceReadChunkFromFiler bool, targetFiler pb.ServerAddress, targetPath string,
+func doSubscribeFilerMetaChanges(clientId int32, clientEpoch int32, grpcDialOption grpc.DialOption, sourceFiler rpc.ServerAddress, sourcePath string, sourceExcludePaths []string, sourceReadChunkFromFiler bool, targetFiler rpc.ServerAddress, targetPath string,
 	replicationStr, collection string, ttlSec int, sinkWriteChunkByFiler bool, diskType string, debug bool, sourceFilerSignature int32, targetFilerSignature int32) error {
 
 	// if first time, start from now
@@ -255,7 +255,7 @@ func doSubscribeFilerMetaChanges(clientId int32, clientEpoch int32, grpcDialOpti
 
 	var lastLogTsNs = time.Now().UnixNano()
 	var clientName = fmt.Sprintf("syncFrom_%s_To_%s", string(sourceFiler), string(targetFiler))
-	processEventFnWithOffset := pb.AddOffsetFunc(func(resp *filer_pb.SubscribeMetadataResponse) error {
+	processEventFnWithOffset := rpc.AddOffsetFunc(func(resp *filer_pb.SubscribeMetadataResponse) error {
 		processor.AddSyncJob(resp)
 		return nil
 	}, 3*time.Second, func(counter int64, lastTsNs int64) error {
@@ -271,8 +271,8 @@ func doSubscribeFilerMetaChanges(clientId int32, clientEpoch int32, grpcDialOpti
 		return setOffset(grpcDialOption, targetFiler, getSignaturePrefixByPath(sourcePath), sourceFilerSignature, processor.processedTsWatermark)
 	})
 
-	return pb.FollowMetadata(sourceFiler, grpcDialOption, clientName, clientId, clientEpoch,
-		sourcePath, nil, sourceFilerOffsetTsNs, 0, targetFilerSignature, processEventFnWithOffset, pb.RetryForeverOnError)
+	return rpc.FollowMetadata(sourceFiler, grpcDialOption, clientName, clientId, clientEpoch,
+		sourcePath, nil, sourceFilerOffsetTsNs, 0, targetFilerSignature, processEventFnWithOffset, rpc.RetryForeverOnError)
 
 }
 
@@ -290,9 +290,9 @@ func getSignaturePrefixByPath(path string) string {
 	}
 }
 
-func getOffset(grpcDialOption grpc.DialOption, filer pb.ServerAddress, signaturePrefix string, signature int32) (lastOffsetTsNs int64, readErr error) {
+func getOffset(grpcDialOption grpc.DialOption, filer rpc.ServerAddress, signaturePrefix string, signature int32) (lastOffsetTsNs int64, readErr error) {
 
-	readErr = pb.WithFilerClient(false, filer, grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+	readErr = rpc.WithFilerClient(false, filer, grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 		syncKey := []byte(signaturePrefix + "____")
 		util.Uint32toBytes(syncKey[len(signaturePrefix):len(signaturePrefix)+4], uint32(signature))
 
@@ -317,8 +317,8 @@ func getOffset(grpcDialOption grpc.DialOption, filer pb.ServerAddress, signature
 
 }
 
-func setOffset(grpcDialOption grpc.DialOption, filer pb.ServerAddress, signaturePrefix string, signature int32, offsetTsNs int64) error {
-	return pb.WithFilerClient(false, filer, grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+func setOffset(grpcDialOption grpc.DialOption, filer rpc.ServerAddress, signaturePrefix string, signature int32, offsetTsNs int64) error {
+	return rpc.WithFilerClient(false, filer, grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 
 		syncKey := []byte(signaturePrefix + "____")
 		util.Uint32toBytes(syncKey[len(signaturePrefix):len(signaturePrefix)+4], uint32(signature))

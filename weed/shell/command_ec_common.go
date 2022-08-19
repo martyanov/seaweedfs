@@ -3,17 +3,19 @@ package shell
 import (
 	"context"
 	"fmt"
+	"math"
+
+	"golang.org/x/exp/slices"
+	"google.golang.org/grpc"
+
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/erasure_coding"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	"github.com/seaweedfs/seaweedfs/weed/storage/types"
-	"golang.org/x/exp/slices"
-	"google.golang.org/grpc"
-	"math"
 )
 
 func moveMountedShardToEcNode(commandEnv *CommandEnv, existingLocation *EcNode, collection string, vid needle.VolumeId, shardId erasure_coding.ShardId, destinationEcNode *EcNode, applyBalancing bool) (err error) {
@@ -22,7 +24,7 @@ func moveMountedShardToEcNode(commandEnv *CommandEnv, existingLocation *EcNode, 
 
 	if applyBalancing {
 
-		existingServerAddress := pb.NewServerAddressFromDataNode(existingLocation.info)
+		existingServerAddress := rpc.NewServerAddressFromDataNode(existingLocation.info)
 
 		// ask destination node to copy shard and the ecx file from source node, and mount it
 		copiedShardIds, err = oneServerCopyAndMountEcShardsFromSource(commandEnv.option.GrpcDialOption, destinationEcNode, []uint32{uint32(shardId)}, vid, collection, existingServerAddress)
@@ -55,11 +57,11 @@ func moveMountedShardToEcNode(commandEnv *CommandEnv, existingLocation *EcNode, 
 
 func oneServerCopyAndMountEcShardsFromSource(grpcDialOption grpc.DialOption,
 	targetServer *EcNode, shardIdsToCopy []uint32,
-	volumeId needle.VolumeId, collection string, existingLocation pb.ServerAddress) (copiedShardIds []uint32, err error) {
+	volumeId needle.VolumeId, collection string, existingLocation rpc.ServerAddress) (copiedShardIds []uint32, err error) {
 
 	fmt.Printf("allocate %d.%v %s => %s\n", volumeId, shardIdsToCopy, existingLocation, targetServer.info.Id)
 
-	targetAddress := pb.NewServerAddressFromDataNode(targetServer.info)
+	targetAddress := rpc.NewServerAddressFromDataNode(targetServer.info)
 	err = operation.WithVolumeServerClient(false, targetAddress, grpcDialOption, func(volumeServerClient volume_server_pb.VolumeServerClient) error {
 
 		if targetAddress != existingLocation {
@@ -236,7 +238,7 @@ func collectEcVolumeServersByDc(topo *master_pb.TopologyInfo, selectedDataCenter
 	return
 }
 
-func sourceServerDeleteEcShards(grpcDialOption grpc.DialOption, collection string, volumeId needle.VolumeId, sourceLocation pb.ServerAddress, toBeDeletedShardIds []uint32) error {
+func sourceServerDeleteEcShards(grpcDialOption grpc.DialOption, collection string, volumeId needle.VolumeId, sourceLocation rpc.ServerAddress, toBeDeletedShardIds []uint32) error {
 
 	fmt.Printf("delete %d.%v from %s\n", volumeId, toBeDeletedShardIds, sourceLocation)
 
@@ -251,7 +253,7 @@ func sourceServerDeleteEcShards(grpcDialOption grpc.DialOption, collection strin
 
 }
 
-func unmountEcShards(grpcDialOption grpc.DialOption, volumeId needle.VolumeId, sourceLocation pb.ServerAddress, toBeUnmountedhardIds []uint32) error {
+func unmountEcShards(grpcDialOption grpc.DialOption, volumeId needle.VolumeId, sourceLocation rpc.ServerAddress, toBeUnmountedhardIds []uint32) error {
 
 	fmt.Printf("unmount %d.%v from %s\n", volumeId, toBeUnmountedhardIds, sourceLocation)
 
@@ -264,7 +266,7 @@ func unmountEcShards(grpcDialOption grpc.DialOption, volumeId needle.VolumeId, s
 	})
 }
 
-func mountEcShards(grpcDialOption grpc.DialOption, collection string, volumeId needle.VolumeId, sourceLocation pb.ServerAddress, toBeMountedhardIds []uint32) error {
+func mountEcShards(grpcDialOption grpc.DialOption, collection string, volumeId needle.VolumeId, sourceLocation rpc.ServerAddress, toBeMountedhardIds []uint32) error {
 
 	fmt.Printf("mount %d.%v on %s\n", volumeId, toBeMountedhardIds, sourceLocation)
 

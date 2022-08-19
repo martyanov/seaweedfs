@@ -3,17 +3,17 @@ package shell
 import (
 	"flag"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-	"github.com/seaweedfs/seaweedfs/weed/storage/types"
-	"github.com/seaweedfs/seaweedfs/weed/wdclient"
 	"io"
 	"path/filepath"
 	"sync"
 	"time"
 
+	"github.com/seaweedfs/seaweedfs/weed/glog"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
+	"github.com/seaweedfs/seaweedfs/weed/storage/types"
+	"github.com/seaweedfs/seaweedfs/weed/wdclient"
 )
 
 func init() {
@@ -21,14 +21,14 @@ func init() {
 }
 
 type volumeTierMoveJob struct {
-	src pb.ServerAddress
+	src rpc.ServerAddress
 	vid needle.VolumeId
 }
 
 type commandVolumeTierMove struct {
 	activeServers sync.Map
-	queues        map[pb.ServerAddress]chan volumeTierMoveJob
-	//activeServers     map[pb.ServerAddress]struct{}
+	queues        map[rpc.ServerAddress]chan volumeTierMoveJob
+	//activeServers     map[rpc.ServerAddress]struct{}
 	//activeServersLock sync.Mutex
 	//activeServersCond *sync.Cond
 }
@@ -97,10 +97,10 @@ func (c *commandVolumeTierMove) Do(args []string, commandEnv *CommandEnv, writer
 
 	wg := sync.WaitGroup{}
 	bufferLen := len(allLocations)
-	c.queues = make(map[pb.ServerAddress]chan volumeTierMoveJob)
+	c.queues = make(map[rpc.ServerAddress]chan volumeTierMoveJob)
 
 	for _, dst := range allLocations {
-		destServerAddress := pb.NewServerAddressFromDataNode(dst.dataNode)
+		destServerAddress := rpc.NewServerAddressFromDataNode(dst.dataNode)
 		c.queues[destServerAddress] = make(chan volumeTierMoveJob, bufferLen)
 
 		wg.Add(1)
@@ -142,7 +142,7 @@ func (c *commandVolumeTierMove) Do(args []string, commandEnv *CommandEnv, writer
 	return nil
 }
 
-func (c *commandVolumeTierMove) Lock(key pb.ServerAddress) func() {
+func (c *commandVolumeTierMove) Lock(key rpc.ServerAddress) func() {
 	value, _ := c.activeServers.LoadOrStore(key, &sync.Mutex{})
 	mtx := value.(*sync.Mutex)
 	mtx.Lock()
@@ -193,7 +193,7 @@ func (c *commandVolumeTierMove) doVolumeTierMove(commandEnv *CommandEnv, writer 
 			if isOneOf(dst.dataNode.Id, locations) {
 				continue
 			}
-			var sourceVolumeServer pb.ServerAddress
+			var sourceVolumeServer rpc.ServerAddress
 			for _, loc := range locations {
 				if loc.Url != dst.dataNode.Id {
 					sourceVolumeServer = loc.ServerAddress()
@@ -207,7 +207,7 @@ func (c *commandVolumeTierMove) doVolumeTierMove(commandEnv *CommandEnv, writer 
 			// adjust volume count
 			dst.dataNode.DiskInfos[string(toDiskType)].VolumeCount++
 
-			destServerAddress := pb.NewServerAddressFromDataNode(dst.dataNode)
+			destServerAddress := rpc.NewServerAddressFromDataNode(dst.dataNode)
 			c.queues[destServerAddress] <- volumeTierMoveJob{sourceVolumeServer, vid}
 		}
 	}
@@ -219,13 +219,13 @@ func (c *commandVolumeTierMove) doVolumeTierMove(commandEnv *CommandEnv, writer 
 	return nil
 }
 
-func (c *commandVolumeTierMove) doMoveOneVolume(commandEnv *CommandEnv, writer io.Writer, vid needle.VolumeId, toDiskType types.DiskType, locations []wdclient.Location, sourceVolumeServer pb.ServerAddress, dst location) (err error) {
+func (c *commandVolumeTierMove) doMoveOneVolume(commandEnv *CommandEnv, writer io.Writer, vid needle.VolumeId, toDiskType types.DiskType, locations []wdclient.Location, sourceVolumeServer rpc.ServerAddress, dst location) (err error) {
 
 	// mark all replicas as read only
 	if err = markVolumeReplicasWritable(commandEnv.option.GrpcDialOption, vid, locations, false); err != nil {
 		return fmt.Errorf("mark volume %d as readonly on %s: %v", vid, locations[0].Url, err)
 	}
-	if err = LiveMoveVolume(commandEnv.option.GrpcDialOption, writer, vid, sourceVolumeServer, pb.NewServerAddressFromDataNode(dst.dataNode), 5*time.Second, toDiskType.ReadableString(), true); err != nil {
+	if err = LiveMoveVolume(commandEnv.option.GrpcDialOption, writer, vid, sourceVolumeServer, rpc.NewServerAddressFromDataNode(dst.dataNode), 5*time.Second, toDiskType.ReadableString(), true); err != nil {
 
 		// mark all replicas as writable
 		if err = markVolumeReplicasWritable(commandEnv.option.GrpcDialOption, vid, locations, true); err != nil {

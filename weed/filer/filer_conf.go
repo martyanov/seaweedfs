@@ -4,16 +4,17 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/wdclient"
-	"google.golang.org/grpc"
 	"io"
 
-	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/util"
 	"github.com/viant/ptrie"
-	jsonpb "google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/grpc"
+	"google.golang.org/protobuf/encoding/protojson"
+
+	"github.com/seaweedfs/seaweedfs/weed/glog"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/util"
+	"github.com/seaweedfs/seaweedfs/weed/wdclient"
 )
 
 const (
@@ -30,9 +31,9 @@ type FilerConf struct {
 	rules ptrie.Trie
 }
 
-func ReadFilerConf(filerGrpcAddress pb.ServerAddress, grpcDialOption grpc.DialOption, masterClient *wdclient.MasterClient) (*FilerConf, error) {
+func ReadFilerConf(filerGrpcAddress rpc.ServerAddress, grpcDialOption grpc.DialOption, masterClient *wdclient.MasterClient) (*FilerConf, error) {
 	var buf bytes.Buffer
-	if err := pb.WithGrpcFilerClient(false, filerGrpcAddress, grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+	if err := rpc.WithGrpcFilerClient(false, filerGrpcAddress, grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 		if masterClient != nil {
 			return ReadEntry(masterClient, client, DirectoryEtcSeaweedFS, FilerConfName, &buf)
 		} else {
@@ -93,7 +94,7 @@ func (fc *FilerConf) loadFromChunks(filer *Filer, content []byte, chunks []*file
 func (fc *FilerConf) LoadFromBytes(data []byte) (err error) {
 	conf := &filer_pb.FilerConf{}
 
-	if err := jsonpb.Unmarshal(data, conf); err != nil {
+	if err := protojson.Unmarshal(data, conf); err != nil {
 		return err
 	}
 

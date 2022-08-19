@@ -4,12 +4,13 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/cluster"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
 	"io"
+
+	"github.com/seaweedfs/seaweedfs/weed/cluster"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 )
 
 func init() {
@@ -55,7 +56,7 @@ func (c *commandClusterCheck) Do(args []string, commandEnv *CommandEnv, writer i
 	}
 
 	// collect filers
-	var filers []pb.ServerAddress
+	var filers []rpc.ServerAddress
 	err = commandEnv.MasterClient.WithClient(false, func(client master_pb.SeaweedClient) error {
 		resp, err := client.ListClusterNodes(context.Background(), &master_pb.ListClusterNodesRequest{
 			ClientType: cluster.FilerType,
@@ -63,7 +64,7 @@ func (c *commandClusterCheck) Do(args []string, commandEnv *CommandEnv, writer i
 		})
 
 		for _, node := range resp.ClusterNodes {
-			filers = append(filers, pb.ServerAddress(node.Address))
+			filers = append(filers, rpc.ServerAddress(node.Address))
 		}
 		return err
 	})
@@ -73,7 +74,7 @@ func (c *commandClusterCheck) Do(args []string, commandEnv *CommandEnv, writer i
 	fmt.Fprintf(writer, "the cluster has %d filers: %+v\n", len(filers), filers)
 
 	// collect volume servers
-	var volumeServers []pb.ServerAddress
+	var volumeServers []rpc.ServerAddress
 	t, _, err := collectTopologyInfo(commandEnv, 0)
 	if err != nil {
 		return err
@@ -81,14 +82,14 @@ func (c *commandClusterCheck) Do(args []string, commandEnv *CommandEnv, writer i
 	for _, dc := range t.DataCenterInfos {
 		for _, r := range dc.RackInfos {
 			for _, dn := range r.DataNodeInfos {
-				volumeServers = append(volumeServers, pb.NewServerAddressFromDataNode(dn))
+				volumeServers = append(volumeServers, rpc.NewServerAddressFromDataNode(dn))
 			}
 		}
 	}
 	fmt.Fprintf(writer, "the cluster has %d volume servers: %+v\n", len(volumeServers), volumeServers)
 
 	// collect all masters
-	var masters []pb.ServerAddress
+	var masters []rpc.ServerAddress
 	for _, master := range commandEnv.MasterClient.GetMasters() {
 		masters = append(masters, master)
 	}
@@ -97,7 +98,7 @@ func (c *commandClusterCheck) Do(args []string, commandEnv *CommandEnv, writer i
 	for _, master := range masters {
 		for _, volumeServer := range volumeServers {
 			fmt.Fprintf(writer, "checking master %s to volume server %s ... ", string(master), string(volumeServer))
-			err := pb.WithMasterClient(false, master, commandEnv.option.GrpcDialOption, func(client master_pb.SeaweedClient) error {
+			err := rpc.WithMasterClient(false, master, commandEnv.option.GrpcDialOption, func(client master_pb.SeaweedClient) error {
 				pong, err := client.Ping(context.Background(), &master_pb.PingRequest{
 					Target:     string(volumeServer),
 					TargetType: cluster.VolumeServerType,
@@ -120,7 +121,7 @@ func (c *commandClusterCheck) Do(args []string, commandEnv *CommandEnv, writer i
 				continue
 			}
 			fmt.Fprintf(writer, "checking master %s to %s ... ", string(sourceMaster), string(targetMaster))
-			err := pb.WithMasterClient(false, sourceMaster, commandEnv.option.GrpcDialOption, func(client master_pb.SeaweedClient) error {
+			err := rpc.WithMasterClient(false, sourceMaster, commandEnv.option.GrpcDialOption, func(client master_pb.SeaweedClient) error {
 				pong, err := client.Ping(context.Background(), &master_pb.PingRequest{
 					Target:     string(targetMaster),
 					TargetType: cluster.MasterType,
@@ -140,7 +141,7 @@ func (c *commandClusterCheck) Do(args []string, commandEnv *CommandEnv, writer i
 	for _, volumeServer := range volumeServers {
 		for _, master := range masters {
 			fmt.Fprintf(writer, "checking volume server %s to master %s ... ", string(volumeServer), string(master))
-			err := pb.WithVolumeServerClient(false, volumeServer, commandEnv.option.GrpcDialOption, func(client volume_server_pb.VolumeServerClient) error {
+			err := rpc.WithVolumeServerClient(false, volumeServer, commandEnv.option.GrpcDialOption, func(client volume_server_pb.VolumeServerClient) error {
 				pong, err := client.Ping(context.Background(), &volume_server_pb.PingRequest{
 					Target:     string(master),
 					TargetType: cluster.MasterType,
@@ -160,7 +161,7 @@ func (c *commandClusterCheck) Do(args []string, commandEnv *CommandEnv, writer i
 	for _, filer := range filers {
 		for _, master := range masters {
 			fmt.Fprintf(writer, "checking filer %s to master %s ... ", string(filer), string(master))
-			err := pb.WithFilerClient(false, filer, commandEnv.option.GrpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+			err := rpc.WithFilerClient(false, filer, commandEnv.option.GrpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 				pong, err := client.Ping(context.Background(), &filer_pb.PingRequest{
 					Target:     string(master),
 					TargetType: cluster.MasterType,
@@ -180,7 +181,7 @@ func (c *commandClusterCheck) Do(args []string, commandEnv *CommandEnv, writer i
 	for _, filer := range filers {
 		for _, volumeServer := range volumeServers {
 			fmt.Fprintf(writer, "checking filer %s to volume server %s ... ", string(filer), string(volumeServer))
-			err := pb.WithFilerClient(false, filer, commandEnv.option.GrpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+			err := rpc.WithFilerClient(false, filer, commandEnv.option.GrpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 				pong, err := client.Ping(context.Background(), &filer_pb.PingRequest{
 					Target:     string(volumeServer),
 					TargetType: cluster.VolumeServerType,
@@ -203,7 +204,7 @@ func (c *commandClusterCheck) Do(args []string, commandEnv *CommandEnv, writer i
 				continue
 			}
 			fmt.Fprintf(writer, "checking volume server %s to %s ... ", string(sourceVolumeServer), string(targetVolumeServer))
-			err := pb.WithVolumeServerClient(false, sourceVolumeServer, commandEnv.option.GrpcDialOption, func(client volume_server_pb.VolumeServerClient) error {
+			err := rpc.WithVolumeServerClient(false, sourceVolumeServer, commandEnv.option.GrpcDialOption, func(client volume_server_pb.VolumeServerClient) error {
 				pong, err := client.Ping(context.Background(), &volume_server_pb.PingRequest{
 					Target:     string(targetVolumeServer),
 					TargetType: cluster.VolumeServerType,
@@ -223,7 +224,7 @@ func (c *commandClusterCheck) Do(args []string, commandEnv *CommandEnv, writer i
 	for _, sourceFiler := range filers {
 		for _, targetFiler := range filers {
 			fmt.Fprintf(writer, "checking filer %s to %s ... ", string(sourceFiler), string(targetFiler))
-			err := pb.WithFilerClient(false, sourceFiler, commandEnv.option.GrpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+			err := rpc.WithFilerClient(false, sourceFiler, commandEnv.option.GrpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 				pong, err := client.Ping(context.Background(), &filer_pb.PingRequest{
 					Target:     string(targetFiler),
 					TargetType: cluster.FilerType,

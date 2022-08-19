@@ -12,16 +12,14 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 
-	stats_collect "github.com/seaweedfs/seaweedfs/weed/stats"
-
-	"github.com/seaweedfs/seaweedfs/weed/util/grace"
-
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 	weed_server "github.com/seaweedfs/seaweedfs/weed/server"
+	stats_collect "github.com/seaweedfs/seaweedfs/weed/stats"
 	"github.com/seaweedfs/seaweedfs/weed/storage/backend"
 	"github.com/seaweedfs/seaweedfs/weed/util"
+	"github.com/seaweedfs/seaweedfs/weed/util/grace"
 )
 
 var (
@@ -124,7 +122,7 @@ func startMaster(masterOption MasterOptions, masterWhiteList []string) {
 
 	myMasterAddress, peers := checkPeers(*masterOption.ip, *masterOption.port, *masterOption.portGrpc, *masterOption.peers)
 
-	masterPeers := make(map[string]pb.ServerAddress)
+	masterPeers := make(map[string]rpc.ServerAddress)
 	for _, peer := range peers {
 		masterPeers[string(peer)] = peer
 	}
@@ -167,7 +165,7 @@ func startMaster(masterOption MasterOptions, masterWhiteList []string) {
 	if err != nil {
 		glog.Fatalf("master failed to listen on grpc port %d: %v", grpcPort, err)
 	}
-	grpcS := pb.NewGrpcServer()
+	grpcS := rpc.NewGrpcServer()
 	master_pb.RegisterSeaweedServer(grpcS, ms)
 
 	raftServer.TransportManager.Register(grpcS)
@@ -191,10 +189,10 @@ func startMaster(masterOption MasterOptions, masterWhiteList []string) {
 	select {}
 }
 
-func checkPeers(masterIp string, masterPort int, masterGrpcPort int, peers string) (masterAddress pb.ServerAddress, cleanedPeers []pb.ServerAddress) {
+func checkPeers(masterIp string, masterPort int, masterGrpcPort int, peers string) (masterAddress rpc.ServerAddress, cleanedPeers []rpc.ServerAddress) {
 	glog.V(0).Infof("current: %s:%d peers:%s", masterIp, masterPort, peers)
-	masterAddress = pb.NewServerAddress(masterIp, masterPort, masterGrpcPort)
-	cleanedPeers = pb.ServerAddresses(peers).ToAddresses()
+	masterAddress = rpc.NewServerAddress(masterIp, masterPort, masterGrpcPort)
+	cleanedPeers = rpc.ServerAddresses(peers).ToAddresses()
 
 	hasSelf := false
 	for _, peer := range cleanedPeers {
@@ -214,7 +212,7 @@ func checkPeers(masterIp string, masterPort int, masterGrpcPort int, peers strin
 }
 
 func (m *MasterOptions) toMasterOption(whiteList []string) *weed_server.MasterOption {
-	masterAddress := pb.NewServerAddress(*m.ip, *m.port, *m.portGrpc)
+	masterAddress := rpc.NewServerAddress(*m.ip, *m.port, *m.portGrpc)
 	return &weed_server.MasterOption{
 		Master:            masterAddress,
 		MetaFolder:        *m.metaFolder,

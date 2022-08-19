@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"io"
 	"math/rand"
 	"sync"
@@ -13,8 +12,9 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/erasure_coding"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	"github.com/seaweedfs/seaweedfs/weed/wdclient"
@@ -122,7 +122,7 @@ func doEcEncode(commandEnv *CommandEnv, collection string, vid needle.VolumeId, 
 	return nil
 }
 
-func generateEcShards(grpcDialOption grpc.DialOption, volumeId needle.VolumeId, collection string, sourceVolumeServer pb.ServerAddress) error {
+func generateEcShards(grpcDialOption grpc.DialOption, volumeId needle.VolumeId, collection string, sourceVolumeServer rpc.ServerAddress) error {
 
 	fmt.Printf("generateEcShards %s %d on %s ...\n", collection, volumeId, sourceVolumeServer)
 
@@ -205,10 +205,10 @@ func parallelCopyEcShardsFromSource(grpcDialOption grpc.DialOption, targetServer
 		}
 	}
 	cleanupFunc := func(server *EcNode, allocatedEcShardIds []uint32) {
-		if err := unmountEcShards(grpcDialOption, volumeId, pb.NewServerAddressFromDataNode(server.info), allocatedEcShardIds); err != nil {
+		if err := unmountEcShards(grpcDialOption, volumeId, rpc.NewServerAddressFromDataNode(server.info), allocatedEcShardIds); err != nil {
 			fmt.Printf("unmount aborted shards %d.%v on %s: %v\n", volumeId, allocatedEcShardIds, server.info.Id, err)
 		}
-		if err := sourceServerDeleteEcShards(grpcDialOption, collection, volumeId, pb.NewServerAddressFromDataNode(server.info), allocatedEcShardIds); err != nil {
+		if err := sourceServerDeleteEcShards(grpcDialOption, collection, volumeId, rpc.NewServerAddressFromDataNode(server.info), allocatedEcShardIds); err != nil {
 			fmt.Printf("remove aborted shards %d.%v on %s: %v\n", volumeId, allocatedEcShardIds, server.info.Id, err)
 		}
 	}

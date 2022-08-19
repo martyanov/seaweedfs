@@ -3,13 +3,14 @@ package shell
 import (
 	"context"
 	"flag"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"io"
 
-	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
-	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	"google.golang.org/grpc"
+
+	"github.com/seaweedfs/seaweedfs/weed/operation"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 )
 
 func init() {
@@ -46,7 +47,7 @@ func (c *commandVolumeMount) Do(args []string, commandEnv *CommandEnv, writer io
 		return
 	}
 
-	sourceVolumeServer := pb.ServerAddress(*nodeStr)
+	sourceVolumeServer := rpc.ServerAddress(*nodeStr)
 
 	volumeId := needle.VolumeId(*volumeIdInt)
 
@@ -54,7 +55,7 @@ func (c *commandVolumeMount) Do(args []string, commandEnv *CommandEnv, writer io
 
 }
 
-func mountVolume(grpcDialOption grpc.DialOption, volumeId needle.VolumeId, sourceVolumeServer pb.ServerAddress) (err error) {
+func mountVolume(grpcDialOption grpc.DialOption, volumeId needle.VolumeId, sourceVolumeServer rpc.ServerAddress) (err error) {
 	return operation.WithVolumeServerClient(false, sourceVolumeServer, grpcDialOption, func(volumeServerClient volume_server_pb.VolumeServerClient) error {
 		_, mountErr := volumeServerClient.VolumeMount(context.Background(), &volume_server_pb.VolumeMountRequest{
 			VolumeId: uint32(volumeId),

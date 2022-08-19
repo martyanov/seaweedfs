@@ -3,20 +3,20 @@ package weed_server
 import (
 	"context"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/cluster"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-	"github.com/seaweedfs/seaweedfs/weed/util"
 	"path/filepath"
 	"time"
 
+	"github.com/seaweedfs/seaweedfs/weed/cluster"
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 	"github.com/seaweedfs/seaweedfs/weed/stats"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	"github.com/seaweedfs/seaweedfs/weed/storage/super_block"
 	"github.com/seaweedfs/seaweedfs/weed/storage/types"
+	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
 func (vs *VolumeServer) DeleteCollection(ctx context.Context, req *volume_server_pb.DeleteCollectionRequest) (*volume_server_pb.DeleteCollectionResponse, error) {
@@ -262,7 +262,7 @@ func (vs *VolumeServer) Ping(ctx context.Context, req *volume_server_pb.PingRequ
 		StartTimeNs: time.Now().UnixNano(),
 	}
 	if req.TargetType == cluster.FilerType {
-		pingErr = pb.WithFilerClient(false, pb.ServerAddress(req.Target), vs.grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+		pingErr = rpc.WithFilerClient(false, rpc.ServerAddress(req.Target), vs.grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 			pingResp, err := client.Ping(ctx, &filer_pb.PingRequest{})
 			if pingResp != nil {
 				resp.RemoteTimeNs = pingResp.StartTimeNs
@@ -271,7 +271,7 @@ func (vs *VolumeServer) Ping(ctx context.Context, req *volume_server_pb.PingRequ
 		})
 	}
 	if req.TargetType == cluster.VolumeServerType {
-		pingErr = pb.WithVolumeServerClient(false, pb.ServerAddress(req.Target), vs.grpcDialOption, func(client volume_server_pb.VolumeServerClient) error {
+		pingErr = rpc.WithVolumeServerClient(false, rpc.ServerAddress(req.Target), vs.grpcDialOption, func(client volume_server_pb.VolumeServerClient) error {
 			pingResp, err := client.Ping(ctx, &volume_server_pb.PingRequest{})
 			if pingResp != nil {
 				resp.RemoteTimeNs = pingResp.StartTimeNs
@@ -280,7 +280,7 @@ func (vs *VolumeServer) Ping(ctx context.Context, req *volume_server_pb.PingRequ
 		})
 	}
 	if req.TargetType == cluster.MasterType {
-		pingErr = pb.WithMasterClient(false, pb.ServerAddress(req.Target), vs.grpcDialOption, func(client master_pb.SeaweedClient) error {
+		pingErr = rpc.WithMasterClient(false, rpc.ServerAddress(req.Target), vs.grpcDialOption, func(client master_pb.SeaweedClient) error {
 			pingResp, err := client.Ping(ctx, &master_pb.PingRequest{})
 			if pingResp != nil {
 				resp.RemoteTimeNs = pingResp.StartTimeNs

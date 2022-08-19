@@ -13,8 +13,8 @@ import (
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/iamapi"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
@@ -48,11 +48,11 @@ func runIam(cmd *Command, args []string) bool {
 }
 
 func (iamopt *IamOptions) startIamServer() bool {
-	filerAddress := pb.ServerAddress(*iamopt.filer)
+	filerAddress := rpc.ServerAddress(*iamopt.filer)
 
 	grpcDialOption := grpc.WithTransportCredentials(insecure.NewCredentials())
 	for {
-		err := pb.WithGrpcFilerClient(false, filerAddress, grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+		err := rpc.WithGrpcFilerClient(false, filerAddress, grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 			resp, err := client.GetFilerConfiguration(context.Background(), &filer_pb.GetFilerConfigurationRequest{})
 			if err != nil {
 				return fmt.Errorf("get filer %s configuration: %v", filerAddress, err)
@@ -69,7 +69,7 @@ func (iamopt *IamOptions) startIamServer() bool {
 		}
 	}
 
-	masters := pb.ServerAddresses(*iamopt.masters).ToAddressMap()
+	masters := rpc.ServerAddresses(*iamopt.masters).ToAddressMap()
 	router := mux.NewRouter().SkipClean(true)
 	_, iamApiServer_err := iamapi.NewIamApiServer(router, &iamapi.IamServerOption{
 		Masters:        masters,

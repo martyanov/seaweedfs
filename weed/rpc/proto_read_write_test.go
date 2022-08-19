@@ -1,11 +1,12 @@
-package pb
+package rpc
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
-	jsonpb "google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/encoding/protojson"
+
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 )
 
 func TestJsonpMarshalUnmarshal(t *testing.T) {
@@ -16,7 +17,7 @@ func TestJsonpMarshalUnmarshal(t *testing.T) {
 		FileSize:    12,
 	}
 
-	m := jsonpb.MarshalOptions{
+	m := protojson.MarshalOptions{
 		EmitUnpopulated: true,
 		Indent:          "  ",
 	}
@@ -34,7 +35,7 @@ func TestJsonpMarshalUnmarshal(t *testing.T) {
 	}`
 
 	tv1 := &volume_server_pb.RemoteFile{}
-	if err := jsonpb.Unmarshal([]byte(rawJson), tv1); err != nil {
+	if err := protojson.Unmarshal([]byte(rawJson), tv1); err != nil {
 		fmt.Printf("unmarshal error: %v\n", err)
 	}
 

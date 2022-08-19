@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	util2 "github.com/seaweedfs/seaweedfs/weed/util"
 )
@@ -39,7 +39,7 @@ func main() {
 		sinceTimeNs = time.Now().Add(-*rewindDuration).UnixNano()
 	}
 
-	err := operation.TailVolume(func() pb.ServerAddress { return pb.ServerAddress(*master) }, grpcDialOption, vid, uint64(sinceTimeNs), *timeoutSeconds, func(n *needle.Needle) (err error) {
+	err := operation.TailVolume(func() rpc.ServerAddress { return rpc.ServerAddress(*master) }, grpcDialOption, vid, uint64(sinceTimeNs), *timeoutSeconds, func(n *needle.Needle) (err error) {
 		if n.Size == 0 {
 			println("-", n.String())
 			return nil

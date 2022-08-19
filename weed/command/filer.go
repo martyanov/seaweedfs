@@ -13,8 +13,8 @@ import (
 
 	"github.com/seaweedfs/seaweedfs/weed/filer"
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	weed_server "github.com/seaweedfs/seaweedfs/weed/server"
 	stats_collect "github.com/seaweedfs/seaweedfs/weed/stats"
 	"github.com/seaweedfs/seaweedfs/weed/util"
@@ -29,7 +29,7 @@ var (
 )
 
 type FilerOptions struct {
-	masters                 map[string]pb.ServerAddress
+	masters                 map[string]rpc.ServerAddress
 	mastersString           *string
 	ip                      *string
 	bindIp                  *string
@@ -171,7 +171,7 @@ func runFiler(cmd *Command, args []string) bool {
 		}()
 	}
 
-	f.masters = pb.ServerAddresses(*f.mastersString).ToAddressMap()
+	f.masters = rpc.ServerAddresses(*f.mastersString).ToAddressMap()
 
 	f.startFiler()
 
@@ -195,7 +195,7 @@ func (fo *FilerOptions) startFiler() {
 
 	defaultLevelDbDirectory := util.ResolvePath(*fo.defaultLevelDbDirectory + "/filerldb2")
 
-	filerAddress := pb.NewServerAddress(*fo.ip, *fo.port, *fo.portGrpc)
+	filerAddress := rpc.NewServerAddress(*fo.ip, *fo.port, *fo.portGrpc)
 
 	fs, nfs_err := weed_server.NewFilerServer(defaultMux, publicVolumeMux, &weed_server.FilerOption{
 		Masters:               fo.masters,
@@ -256,7 +256,7 @@ func (fo *FilerOptions) startFiler() {
 	if err != nil {
 		glog.Fatalf("failed to listen on grpc port %d: %v", grpcPort, err)
 	}
-	grpcS := pb.NewGrpcServer()
+	grpcS := rpc.NewGrpcServer()
 	filer_pb.RegisterSeaweedFilerServer(grpcS, fs)
 	reflection.Register(grpcS)
 	if grpcLocalL != nil {

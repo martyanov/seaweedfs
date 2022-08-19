@@ -11,8 +11,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/seaweedfs/seaweedfs/weed/filer"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 	"github.com/seaweedfs/seaweedfs/weed/wdclient"
 )
@@ -23,7 +23,7 @@ var (
 
 type FilerCatOptions struct {
 	grpcDialOption grpc.DialOption
-	filerAddress   pb.ServerAddress
+	filerAddress   rpc.ServerAddress
 	filerClient    filer_pb.SeaweedFilerClient
 	output         *string
 }
@@ -75,7 +75,7 @@ func runFilerCat(cmd *Command, args []string) bool {
 		return false
 	}
 
-	filerCat.filerAddress = pb.ServerAddress(filerUrl.Host)
+	filerCat.filerAddress = rpc.ServerAddress(filerUrl.Host)
 	filerCat.grpcDialOption = grpc.WithTransportCredentials(insecure.NewCredentials())
 
 	dir, name := util.FullPath(urlPath).DirAndName()
@@ -94,7 +94,7 @@ func runFilerCat(cmd *Command, args []string) bool {
 		writer = f
 	}
 
-	pb.WithFilerClient(false, filerCat.filerAddress, filerCat.grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+	rpc.WithFilerClient(false, filerCat.filerAddress, filerCat.grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 
 		request := &filer_pb.LookupDirectoryEntryRequest{
 			Name:      name,

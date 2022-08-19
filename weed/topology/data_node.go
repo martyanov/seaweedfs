@@ -2,9 +2,10 @@ package topology
 
 import (
 	"fmt"
+
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	"github.com/seaweedfs/seaweedfs/weed/storage/types"
@@ -220,8 +221,8 @@ func (dn *DataNode) Url() string {
 	return util.JoinHostPort(dn.Ip, dn.Port)
 }
 
-func (dn *DataNode) ServerAddress() pb.ServerAddress {
-	return pb.NewServerAddress(dn.Ip, dn.Port, dn.GrpcPort)
+func (dn *DataNode) ServerAddress() rpc.ServerAddress {
+	return rpc.NewServerAddress(dn.Ip, dn.Port, dn.GrpcPort)
 }
 
 type DataNodeInfo struct {

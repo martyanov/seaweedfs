@@ -2,17 +2,19 @@ package s3api
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
-	"github.com/seaweedfs/seaweedfs/weed/filer"
-	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/s3_pb"
-	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
-	"github.com/seaweedfs/seaweedfs/weed/s3api/s3err"
 	"net/http"
 	"sync"
 	"sync/atomic"
+
+	"github.com/gorilla/mux"
+
+	"github.com/seaweedfs/seaweedfs/weed/filer"
+	"github.com/seaweedfs/seaweedfs/weed/glog"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/s3_pb"
+	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
+	"github.com/seaweedfs/seaweedfs/weed/s3api/s3err"
 )
 
 type CircuitBreaker struct {
@@ -28,7 +30,7 @@ func NewCircuitBreaker(option *S3ApiServerOption) *CircuitBreaker {
 		limitations: make(map[string]int64),
 	}
 
-	err := pb.WithFilerClient(false, option.Filer, option.GrpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+	err := rpc.WithFilerClient(false, option.Filer, option.GrpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 		content, err := filer.ReadInsideFiler(client, s3_constants.CircuitBreakerConfigDir, s3_constants.CircuitBreakerConfigFile)
 		if err != nil {
 			return fmt.Errorf("read S3 circuit breaker config: %v", err)

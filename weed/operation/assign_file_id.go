@@ -3,12 +3,13 @@ package operation
 import (
 	"context"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
+
 	"google.golang.org/grpc"
 
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 	"github.com/seaweedfs/seaweedfs/weed/security"
+	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 )
 
 type VolumeAssignRequest struct {
@@ -103,7 +104,7 @@ func Assign(masterFn GetMasterFn, grpcDialOption grpc.DialOption, primaryRequest
 	return ret, lastError
 }
 
-func LookupJwt(master pb.ServerAddress, grpcDialOption grpc.DialOption, fileId string) (token security.EncodedJwt) {
+func LookupJwt(master rpc.ServerAddress, grpcDialOption grpc.DialOption, fileId string) (token security.EncodedJwt) {
 
 	WithMasterServerClient(false, master, grpcDialOption, func(masterClient master_pb.SeaweedClient) error {
 

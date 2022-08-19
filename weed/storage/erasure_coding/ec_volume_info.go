@@ -1,7 +1,7 @@
 package erasure_coding
 
 import (
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 )
 

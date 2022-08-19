@@ -4,13 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"google.golang.org/grpc"
 	"math/rand"
 	"strings"
 	"time"
 
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
+	"google.golang.org/grpc"
+
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 )
 
 type Location struct {
@@ -20,8 +21,8 @@ type Location struct {
 	GrpcPort   int    `json:"grpcPort,omitempty"`
 }
 
-func (l *Location) ServerAddress() pb.ServerAddress {
-	return pb.NewServerAddressWithGrpcPort(l.Url, l.GrpcPort)
+func (l *Location) ServerAddress() rpc.ServerAddress {
+	return rpc.NewServerAddressWithGrpcPort(l.Url, l.GrpcPort)
 }
 
 type LookupResult struct {

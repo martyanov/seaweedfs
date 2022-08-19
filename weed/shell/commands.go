@@ -7,8 +7,8 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 	"github.com/seaweedfs/seaweedfs/weed/wdclient"
 	"github.com/seaweedfs/seaweedfs/weed/wdclient/exclusive_locks"
@@ -21,7 +21,7 @@ type ShellOptions struct {
 	FilerHost    string
 	FilerPort    int64
 	FilerGroup   *string
-	FilerAddress pb.ServerAddress
+	FilerAddress rpc.ServerAddress
 	Directory    string
 }
 
@@ -45,7 +45,7 @@ var (
 func NewCommandEnv(options *ShellOptions) *CommandEnv {
 	ce := &CommandEnv{
 		env:          make(map[string]string),
-		MasterClient: wdclient.NewMasterClient(options.GrpcDialOption, *options.FilerGroup, pb.AdminShellClient, "", "", "", pb.ServerAddresses(*options.Masters).ToAddressMap()),
+		MasterClient: wdclient.NewMasterClient(options.GrpcDialOption, *options.FilerGroup, "shell", "", "", "", rpc.ServerAddresses(*options.Masters).ToAddressMap()),
 		option:       options,
 	}
 	ce.locker = exclusive_locks.NewExclusiveLocker(ce.MasterClient, "admin")
@@ -98,7 +98,7 @@ var _ = filer_pb.FilerClient(&CommandEnv{})
 
 func (ce *CommandEnv) WithFilerClient(streamingMode bool, fn func(filer_pb.SeaweedFilerClient) error) error {
 
-	return pb.WithGrpcFilerClient(streamingMode, ce.option.FilerAddress, ce.option.GrpcDialOption, fn)
+	return rpc.WithGrpcFilerClient(streamingMode, ce.option.FilerAddress, ce.option.GrpcDialOption, fn)
 
 }
 

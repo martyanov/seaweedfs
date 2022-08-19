@@ -8,8 +8,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"github.com/seaweedfs/seaweedfs/weed/replication/source"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
@@ -84,7 +84,7 @@ func doFilerBackup(grpcDialOption grpc.DialOption, backupOption *FilerBackupOpti
 		return fmt.Errorf("no data sink configured in replication.toml")
 	}
 
-	sourceFiler := pb.ServerAddress(*backupOption.filer)
+	sourceFiler := rpc.ServerAddress(*backupOption.filer)
 	sourcePath := *backupOption.path
 	excludePaths := util.StringSplit(*backupOption.excludePaths, ",")
 	timeAgo := *backupOption.timeAgo
@@ -118,11 +118,11 @@ func doFilerBackup(grpcDialOption grpc.DialOption, backupOption *FilerBackupOpti
 
 	processEventFn := genProcessFunction(sourcePath, targetPath, excludePaths, dataSink, debug)
 
-	processEventFnWithOffset := pb.AddOffsetFunc(processEventFn, 3*time.Second, func(counter int64, lastTsNs int64) error {
+	processEventFnWithOffset := rpc.AddOffsetFunc(processEventFn, 3*time.Second, func(counter int64, lastTsNs int64) error {
 		glog.V(0).Infof("backup %s progressed to %v %0.2f/sec", sourceFiler, time.Unix(0, lastTsNs), float64(counter)/float64(3))
 		return setOffset(grpcDialOption, sourceFiler, BackupKeyPrefix, int32(sinkId), lastTsNs)
 	})
 
-	return pb.FollowMetadata(sourceFiler, grpcDialOption, "backup_"+dataSink.GetName(), clientId, clientEpoch, sourcePath, nil, startFrom.UnixNano(), 0, 0, processEventFnWithOffset, pb.TrivialOnError)
+	return rpc.FollowMetadata(sourceFiler, grpcDialOption, "backup_"+dataSink.GetName(), clientId, clientEpoch, sourcePath, nil, startFrom.UnixNano(), 0, 0, processEventFnWithOffset, rpc.TrivialOnError)
 
 }

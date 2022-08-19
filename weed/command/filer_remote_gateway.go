@@ -10,10 +10,10 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/remote_pb"
 	"github.com/seaweedfs/seaweedfs/weed/replication/source"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/remote_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
@@ -37,7 +37,7 @@ type RemoteGatewayOptions struct {
 var _ = filer_pb.FilerClient(&RemoteGatewayOptions{})
 
 func (option *RemoteGatewayOptions) WithFilerClient(streamingMode bool, fn func(filer_pb.SeaweedFilerClient) error) error {
-	return pb.WithFilerClient(streamingMode, pb.ServerAddress(*option.filerAddress), option.grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+	return rpc.WithFilerClient(streamingMode, rpc.ServerAddress(*option.filerAddress), option.grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 		return fn(client)
 	})
 }
@@ -82,7 +82,7 @@ func runFilerRemoteGateway(cmd *Command, args []string) bool {
 	grpcDialOption := grpc.WithTransportCredentials(insecure.NewCredentials())
 	remoteGatewayOptions.grpcDialOption = grpcDialOption
 
-	filerAddress := pb.ServerAddress(*remoteGatewayOptions.filerAddress)
+	filerAddress := rpc.ServerAddress(*remoteGatewayOptions.filerAddress)
 
 	filerSource := &source.FilerSource{}
 	filerSource.DoInitialize(

@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
@@ -32,7 +32,7 @@ func main() {
 	go func() {
 		for {
 			println("vacuum threshold", *garbageThreshold)
-			_, _, err := util.Get(fmt.Sprintf("http://%s/vol/vacuum?garbageThreshold=%f", pb.ServerAddress(*master).ToHttpAddress(), *garbageThreshold))
+			_, _, err := util.Get(fmt.Sprintf("http://%s/vol/vacuum?garbageThreshold=%f", rpc.ServerAddress(*master).ToHttpAddress(), *garbageThreshold))
 			if err != nil {
 				log.Fatalf("vacuum: %v", err)
 			}
@@ -52,7 +52,7 @@ func main() {
 }
 
 func genFile(grpcDialOption grpc.DialOption, i int) (*operation.AssignResult, string) {
-	assignResult, err := operation.Assign(func() pb.ServerAddress { return pb.ServerAddress(*master) }, grpcDialOption, &operation.VolumeAssignRequest{
+	assignResult, err := operation.Assign(func() rpc.ServerAddress { return rpc.ServerAddress(*master) }, grpcDialOption, &operation.VolumeAssignRequest{
 		Count:       1,
 		Replication: *replication,
 	})

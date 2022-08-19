@@ -7,7 +7,7 @@ import (
 	"golang.org/x/exp/slices"
 	"math"
 
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 

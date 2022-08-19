@@ -1,4 +1,4 @@
-package pb
+package rpc
 
 import (
 	"context"
@@ -10,15 +10,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
-	"github.com/seaweedfs/seaweedfs/weed/util"
-
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/glog"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
 const (

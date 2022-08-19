@@ -3,8 +3,9 @@ package remote_storage
 import (
 	"context"
 	"errors"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 	"google.golang.org/grpc"
 )
@@ -13,11 +14,11 @@ const (
 	SyncKeyPrefix = "remote.sync."
 )
 
-func GetSyncOffset(grpcDialOption grpc.DialOption, filer pb.ServerAddress, dir string) (lastOffsetTsNs int64, readErr error) {
+func GetSyncOffset(grpcDialOption grpc.DialOption, filer rpc.ServerAddress, dir string) (lastOffsetTsNs int64, readErr error) {
 
 	dirHash := uint32(util.HashStringToLong(dir))
 
-	readErr = pb.WithFilerClient(false, filer, grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+	readErr = rpc.WithFilerClient(false, filer, grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 		syncKey := []byte(SyncKeyPrefix + "____")
 		util.Uint32toBytes(syncKey[len(SyncKeyPrefix):len(SyncKeyPrefix)+4], dirHash)
 
@@ -42,11 +43,11 @@ func GetSyncOffset(grpcDialOption grpc.DialOption, filer pb.ServerAddress, dir s
 
 }
 
-func SetSyncOffset(grpcDialOption grpc.DialOption, filer pb.ServerAddress, dir string, offsetTsNs int64) error {
+func SetSyncOffset(grpcDialOption grpc.DialOption, filer rpc.ServerAddress, dir string, offsetTsNs int64) error {
 
 	dirHash := uint32(util.HashStringToLong(dir))
 
-	return pb.WithFilerClient(false, filer, grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+	return rpc.WithFilerClient(false, filer, grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 
 		syncKey := []byte(SyncKeyPrefix + "____")
 		util.Uint32toBytes(syncKey[len(SyncKeyPrefix):len(SyncKeyPrefix)+4], dirHash)

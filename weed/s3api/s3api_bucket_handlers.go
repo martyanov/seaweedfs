@@ -19,7 +19,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 )
 
 type ListAllMyBucketsResult struct {

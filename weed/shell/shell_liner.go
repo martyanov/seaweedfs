@@ -3,13 +3,6 @@ package shell
 import (
 	"context"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/cluster"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-	"github.com/seaweedfs/seaweedfs/weed/util"
-	"github.com/seaweedfs/seaweedfs/weed/util/grace"
-	"golang.org/x/exp/slices"
 	"io"
 	"math/rand"
 	"os"
@@ -18,6 +11,14 @@ import (
 	"strings"
 
 	"github.com/peterh/liner"
+	"golang.org/x/exp/slices"
+
+	"github.com/seaweedfs/seaweedfs/weed/cluster"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/util"
+	"github.com/seaweedfs/seaweedfs/weed/util/grace"
 )
 
 var (
@@ -51,7 +52,7 @@ func RunShell(options ShellOptions) {
 	commandEnv.MasterClient.WaitUntilConnected()
 
 	if commandEnv.option.FilerAddress == "" {
-		var filers []pb.ServerAddress
+		var filers []rpc.ServerAddress
 		commandEnv.MasterClient.WithClient(false, func(client master_pb.SeaweedClient) error {
 			resp, err := client.ListClusterNodes(context.Background(), &master_pb.ListClusterNodesRequest{
 				ClientType: cluster.FilerType,
@@ -62,7 +63,7 @@ func RunShell(options ShellOptions) {
 			}
 
 			for _, clusterNode := range resp.ClusterNodes {
-				filers = append(filers, pb.ServerAddress(clusterNode.Address))
+				filers = append(filers, rpc.ServerAddress(clusterNode.Address))
 			}
 			return nil
 		})

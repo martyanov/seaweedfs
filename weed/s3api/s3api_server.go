@@ -3,24 +3,25 @@ package s3api
 import (
 	"context"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/filer"
-	"github.com/seaweedfs/seaweedfs/weed/pb/s3_pb"
 	"net"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
+	"google.golang.org/grpc"
+
+	"github.com/seaweedfs/seaweedfs/weed/filer"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/s3_pb"
 	. "github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 	"github.com/seaweedfs/seaweedfs/weed/s3api/s3err"
 	"github.com/seaweedfs/seaweedfs/weed/security"
 	"github.com/seaweedfs/seaweedfs/weed/util"
-	"google.golang.org/grpc"
 )
 
 type S3ApiServerOption struct {
-	Filer                     pb.ServerAddress
+	Filer                     rpc.ServerAddress
 	Port                      int
 	Config                    string
 	DomainName                string

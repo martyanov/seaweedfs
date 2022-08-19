@@ -4,7 +4,7 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 	"strings"
 
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 )
 
 const (

@@ -1,50 +1,51 @@
 package cluster
 
 import (
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/stretchr/testify/assert"
 	"strconv"
 	"sync"
 	"testing"
+
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestClusterAddRemoveNodes(t *testing.T) {
 	c := NewCluster()
 
-	c.AddClusterNode("", "filer", "", "", pb.ServerAddress("111:1"), "23.45")
-	c.AddClusterNode("", "filer", "", "", pb.ServerAddress("111:2"), "23.45")
-	assert.Equal(t, []pb.ServerAddress{
-		pb.ServerAddress("111:1"),
-		pb.ServerAddress("111:2"),
+	c.AddClusterNode("", "filer", "", "", rpc.ServerAddress("111:1"), "23.45")
+	c.AddClusterNode("", "filer", "", "", rpc.ServerAddress("111:2"), "23.45")
+	assert.Equal(t, []rpc.ServerAddress{
+		rpc.ServerAddress("111:1"),
+		rpc.ServerAddress("111:2"),
 	}, c.getGroupMembers("", "filer", true).leaders.GetLeaders())
 
-	c.AddClusterNode("", "filer", "", "", pb.ServerAddress("111:3"), "23.45")
-	c.AddClusterNode("", "filer", "", "", pb.ServerAddress("111:4"), "23.45")
-	assert.Equal(t, []pb.ServerAddress{
-		pb.ServerAddress("111:1"),
-		pb.ServerAddress("111:2"),
-		pb.ServerAddress("111:3"),
+	c.AddClusterNode("", "filer", "", "", rpc.ServerAddress("111:3"), "23.45")
+	c.AddClusterNode("", "filer", "", "", rpc.ServerAddress("111:4"), "23.45")
+	assert.Equal(t, []rpc.ServerAddress{
+		rpc.ServerAddress("111:1"),
+		rpc.ServerAddress("111:2"),
+		rpc.ServerAddress("111:3"),
 	}, c.getGroupMembers("", "filer", true).leaders.GetLeaders())
 
-	c.AddClusterNode("", "filer", "", "", pb.ServerAddress("111:5"), "23.45")
-	c.AddClusterNode("", "filer", "", "", pb.ServerAddress("111:6"), "23.45")
-	c.RemoveClusterNode("", "filer", pb.ServerAddress("111:4"))
-	assert.Equal(t, []pb.ServerAddress{
-		pb.ServerAddress("111:1"),
-		pb.ServerAddress("111:2"),
-		pb.ServerAddress("111:3"),
-	}, c.getGroupMembers("", "filer", true).leaders.GetLeaders())
-
-	// remove oldest
-	c.RemoveClusterNode("", "filer", pb.ServerAddress("111:1"))
-	assert.Equal(t, []pb.ServerAddress{
-		pb.ServerAddress("111:6"),
-		pb.ServerAddress("111:2"),
-		pb.ServerAddress("111:3"),
+	c.AddClusterNode("", "filer", "", "", rpc.ServerAddress("111:5"), "23.45")
+	c.AddClusterNode("", "filer", "", "", rpc.ServerAddress("111:6"), "23.45")
+	c.RemoveClusterNode("", "filer", rpc.ServerAddress("111:4"))
+	assert.Equal(t, []rpc.ServerAddress{
+		rpc.ServerAddress("111:1"),
+		rpc.ServerAddress("111:2"),
+		rpc.ServerAddress("111:3"),
 	}, c.getGroupMembers("", "filer", true).leaders.GetLeaders())
 
 	// remove oldest
-	c.RemoveClusterNode("", "filer", pb.ServerAddress("111:1"))
+	c.RemoveClusterNode("", "filer", rpc.ServerAddress("111:1"))
+	assert.Equal(t, []rpc.ServerAddress{
+		rpc.ServerAddress("111:6"),
+		rpc.ServerAddress("111:2"),
+		rpc.ServerAddress("111:3"),
+	}, c.getGroupMembers("", "filer", true).leaders.GetLeaders())
+
+	// remove oldest
+	c.RemoveClusterNode("", "filer", rpc.ServerAddress("111:1"))
 
 }
 
@@ -56,7 +57,7 @@ func TestConcurrentAddRemoveNodes(t *testing.T) {
 		go func(i int) {
 			defer wg.Done()
 			address := strconv.Itoa(i)
-			c.AddClusterNode("", "filer", "", "", pb.ServerAddress(address), "23.45")
+			c.AddClusterNode("", "filer", "", "", rpc.ServerAddress(address), "23.45")
 		}(i)
 	}
 	wg.Wait()
@@ -66,7 +67,7 @@ func TestConcurrentAddRemoveNodes(t *testing.T) {
 		go func(i int) {
 			defer wg.Done()
 			address := strconv.Itoa(i)
-			node := c.RemoveClusterNode("", "filer", pb.ServerAddress(address))
+			node := c.RemoveClusterNode("", "filer", rpc.ServerAddress(address))
 
 			if len(node) == 0 {
 				t.Errorf("TestConcurrentAddRemoveNodes: node[%s] not found", address)

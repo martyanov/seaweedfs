@@ -4,13 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"google.golang.org/grpc"
 	"net/http"
 	"strings"
 	"sync"
 
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"google.golang.org/grpc"
+
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 )
 
 type DeleteResult struct {
@@ -75,7 +76,7 @@ func DeleteFilesWithLookupVolumeId(grpcDialOption grpc.DialOption, fileIds []str
 		return ret, err
 	}
 
-	server_to_fileIds := make(map[pb.ServerAddress][]string)
+	server_to_fileIds := make(map[rpc.ServerAddress][]string)
 	for vid, result := range lookupResults {
 		if result.Error != "" {
 			ret = append(ret, &volume_server_pb.DeleteResult{
@@ -99,7 +100,7 @@ func DeleteFilesWithLookupVolumeId(grpcDialOption grpc.DialOption, fileIds []str
 	var wg sync.WaitGroup
 	for server, fidList := range server_to_fileIds {
 		wg.Add(1)
-		go func(server pb.ServerAddress, fidList []string) {
+		go func(server rpc.ServerAddress, fidList []string) {
 			defer wg.Done()
 
 			if deleteResults, deleteErr := DeleteFilesAtOneVolumeServer(server, grpcDialOption, fidList, false); deleteErr != nil {
@@ -121,7 +122,7 @@ func DeleteFilesWithLookupVolumeId(grpcDialOption grpc.DialOption, fileIds []str
 }
 
 // DeleteFilesAtOneVolumeServer deletes a list of files that is on one volume server via gRpc
-func DeleteFilesAtOneVolumeServer(volumeServer pb.ServerAddress, grpcDialOption grpc.DialOption, fileIds []string, includeCookie bool) (ret []*volume_server_pb.DeleteResult, err error) {
+func DeleteFilesAtOneVolumeServer(volumeServer rpc.ServerAddress, grpcDialOption grpc.DialOption, fileIds []string, includeCookie bool) (ret []*volume_server_pb.DeleteResult, err error) {
 
 	err = WithVolumeServerClient(false, volumeServer, grpcDialOption, func(volumeServerClient volume_server_pb.VolumeServerClient) error {
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb/mount_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/mount_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

@@ -10,10 +10,10 @@ import (
 
 	"github.com/seaweedfs/seaweedfs/weed/filer"
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/replication/sink"
 	"github.com/seaweedfs/seaweedfs/weed/replication/source"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 	"github.com/seaweedfs/seaweedfs/weed/wdclient"
 )
@@ -72,7 +72,7 @@ func (fs *FilerSink) DoInitialize(address, grpcAddress string, dir string,
 	replication string, collection string, ttlSec int, diskType string, grpcDialOption grpc.DialOption, writeChunkByFiler bool) (err error) {
 	fs.address = address
 	if fs.address == "" {
-		fs.address = pb.GrpcAddressToServerAddress(grpcAddress)
+		fs.address = rpc.GrpcAddressToServerAddress(grpcAddress)
 	}
 	fs.grpcAddress = grpcAddress
 	fs.dir = dir

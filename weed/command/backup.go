@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/storage"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	"github.com/seaweedfs/seaweedfs/weed/storage/super_block"
@@ -33,7 +33,7 @@ func init() {
 	s.collection = cmdBackup.Flag.String("collection", "", "collection name")
 	s.dir = cmdBackup.Flag.String("dir", ".", "directory to store volume data files")
 	s.volumeId = cmdBackup.Flag.Int("volumeId", -1, "a volume id. The volume .dat and .idx files should already exist in the dir.")
-	s.ttl = cmdBackup.Flag.String("ttl", "", `backup volume's time to live, format: 
+	s.ttl = cmdBackup.Flag.String("ttl", "", `backup volume's time to live, format:
 				3m: 3 minutes
 				4h: 4 hours
 				5d: 5 days
@@ -72,7 +72,7 @@ func runBackup(cmd *Command, args []string) bool {
 	vid := needle.VolumeId(*s.volumeId)
 
 	// find volume location, replication, ttl info
-	lookup, err := operation.LookupVolumeId(func() pb.ServerAddress { return pb.ServerAddress(*s.master) }, grpcDialOption, vid.String())
+	lookup, err := operation.LookupVolumeId(func() rpc.ServerAddress { return rpc.ServerAddress(*s.master) }, grpcDialOption, vid.String())
 	if err != nil {
 		fmt.Printf("Error looking up volume %d: %v\n", vid, err)
 		return true

@@ -9,8 +9,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 	"github.com/seaweedfs/seaweedfs/weed/security"
 	"github.com/seaweedfs/seaweedfs/weed/stats"
 	"github.com/seaweedfs/seaweedfs/weed/storage"
@@ -28,8 +28,8 @@ type VolumeServer struct {
 	inFlightDownloadDataLimitCond *sync.Cond
 	inflightUploadDataTimeout     time.Duration
 
-	SeedMasterNodes []pb.ServerAddress
-	currentMaster   pb.ServerAddress
+	SeedMasterNodes []rpc.ServerAddress
+	currentMaster   rpc.ServerAddress
 	pulseSeconds    int
 	dataCenter      string
 	rack            string
@@ -52,7 +52,7 @@ func NewVolumeServer(adminMux, publicMux *http.ServeMux, ip string,
 	folders []string, maxCounts []int, minFreeSpaces []util.MinFreeSpace, diskTypes []types.DiskType,
 	idxFolder string,
 	needleMapKind storage.NeedleMapKind,
-	masterNodes []pb.ServerAddress, pulseSeconds int,
+	masterNodes []rpc.ServerAddress, pulseSeconds int,
 	dataCenter string, rack string,
 	whiteList []string,
 	readMode string,

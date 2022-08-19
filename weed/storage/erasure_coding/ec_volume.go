@@ -3,16 +3,17 @@ package erasure_coding
 import (
 	"errors"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/storage/volume_info"
-	"golang.org/x/exp/slices"
 	"math"
 	"os"
 	"sync"
 	"time"
 
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/storage/volume_info"
+	"golang.org/x/exp/slices"
+
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/idx"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	"github.com/seaweedfs/seaweedfs/weed/storage/types"
@@ -31,7 +32,7 @@ type EcVolume struct {
 	ecxFileSize               int64
 	ecxCreatedAt              time.Time
 	Shards                    []*EcVolumeShard
-	ShardLocations            map[ShardId][]pb.ServerAddress
+	ShardLocations            map[ShardId][]rpc.ServerAddress
 	ShardLocationsRefreshTime time.Time
 	ShardLocationsLock        sync.RWMutex
 	Version                   needle.Version
@@ -70,7 +71,7 @@ func NewEcVolume(diskType types.DiskType, dir string, dirIdx string, collection 
 		volume_info.SaveVolumeInfo(dataBaseFileName+".vif", &volume_server_pb.VolumeInfo{Version: uint32(ev.Version)})
 	}
 
-	ev.ShardLocations = make(map[ShardId][]pb.ServerAddress)
+	ev.ShardLocations = make(map[ShardId][]rpc.ServerAddress)
 
 	return
 }

@@ -4,19 +4,19 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/storage/types"
 	"io"
 	"time"
 
 	"google.golang.org/grpc"
 
+	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/erasure_coding"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
+	"github.com/seaweedfs/seaweedfs/weed/storage/types"
 )
 
 func init() {
@@ -115,7 +115,7 @@ func doEcDecode(commandEnv *CommandEnv, topoInfo *master_pb.TopologyInfo, collec
 	return nil
 }
 
-func mountVolumeAndDeleteEcShards(grpcDialOption grpc.DialOption, collection string, targetNodeLocation pb.ServerAddress, nodeToEcIndexBits map[pb.ServerAddress]erasure_coding.ShardBits, vid needle.VolumeId) error {
+func mountVolumeAndDeleteEcShards(grpcDialOption grpc.DialOption, collection string, targetNodeLocation rpc.ServerAddress, nodeToEcIndexBits map[rpc.ServerAddress]erasure_coding.ShardBits, vid needle.VolumeId) error {
 
 	// mount volume
 	if err := operation.WithVolumeServerClient(false, targetNodeLocation, grpcDialOption, func(volumeServerClient volume_server_pb.VolumeServerClient) error {
@@ -147,7 +147,7 @@ func mountVolumeAndDeleteEcShards(grpcDialOption grpc.DialOption, collection str
 	return nil
 }
 
-func generateNormalVolume(grpcDialOption grpc.DialOption, vid needle.VolumeId, collection string, sourceVolumeServer pb.ServerAddress) error {
+func generateNormalVolume(grpcDialOption grpc.DialOption, vid needle.VolumeId, collection string, sourceVolumeServer rpc.ServerAddress) error {
 
 	fmt.Printf("generateNormalVolume from ec volume %d on %s\n", vid, sourceVolumeServer)
 
@@ -163,7 +163,7 @@ func generateNormalVolume(grpcDialOption grpc.DialOption, vid needle.VolumeId, c
 
 }
 
-func collectEcShards(commandEnv *CommandEnv, nodeToEcIndexBits map[pb.ServerAddress]erasure_coding.ShardBits, collection string, vid needle.VolumeId) (targetNodeLocation pb.ServerAddress, err error) {
+func collectEcShards(commandEnv *CommandEnv, nodeToEcIndexBits map[rpc.ServerAddress]erasure_coding.ShardBits, collection string, vid needle.VolumeId) (targetNodeLocation rpc.ServerAddress, err error) {
 
 	maxShardCount := 0
 	var exisitngEcIndexBits erasure_coding.ShardBits
@@ -274,14 +274,14 @@ func collectEcShardIds(topoInfo *master_pb.TopologyInfo, selectedCollection stri
 	return
 }
 
-func collectEcNodeShardBits(topoInfo *master_pb.TopologyInfo, vid needle.VolumeId) map[pb.ServerAddress]erasure_coding.ShardBits {
+func collectEcNodeShardBits(topoInfo *master_pb.TopologyInfo, vid needle.VolumeId) map[rpc.ServerAddress]erasure_coding.ShardBits {
 
-	nodeToEcIndexBits := make(map[pb.ServerAddress]erasure_coding.ShardBits)
+	nodeToEcIndexBits := make(map[rpc.ServerAddress]erasure_coding.ShardBits)
 	eachDataNode(topoInfo, func(dc string, rack RackId, dn *master_pb.DataNodeInfo) {
 		if diskInfo, found := dn.DiskInfos[string(types.HardDriveType)]; found {
 			for _, v := range diskInfo.EcShardInfos {
 				if v.Id == uint32(vid) {
-					nodeToEcIndexBits[pb.NewServerAddressFromDataNode(dn)] = erasure_coding.ShardBits(v.EcIndexBits)
+					nodeToEcIndexBits[rpc.NewServerAddressFromDataNode(dn)] = erasure_coding.ShardBits(v.EcIndexBits)
 				}
 			}
 		}

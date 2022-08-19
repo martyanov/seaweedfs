@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
 )
 
 const (
@@ -20,10 +20,10 @@ type DataCenter string
 type Rack string
 
 type Leaders struct {
-	leaders [3]pb.ServerAddress
+	leaders [3]rpc.ServerAddress
 }
 type ClusterNode struct {
-	Address    pb.ServerAddress
+	Address    rpc.ServerAddress
 	Version    string
 	counter    int
 	CreatedTs  time.Time
@@ -31,7 +31,7 @@ type ClusterNode struct {
 	Rack       Rack
 }
 type GroupMembers struct {
-	members map[pb.ServerAddress]*ClusterNode
+	members map[rpc.ServerAddress]*ClusterNode
 	leaders *Leaders
 }
 type ClusterNodeGroups struct {
@@ -51,7 +51,7 @@ func (g *ClusterNodeGroups) getGroupMembers(filerGroup FilerGroupName, createIfN
 	members, found := g.groupMembers[filerGroup]
 	if !found && createIfNotFound {
 		members = &GroupMembers{
-			members: make(map[pb.ServerAddress]*ClusterNode),
+			members: make(map[rpc.ServerAddress]*ClusterNode),
 			leaders: &Leaders{},
 		}
 		g.groupMembers[filerGroup] = members
@@ -59,7 +59,7 @@ func (g *ClusterNodeGroups) getGroupMembers(filerGroup FilerGroupName, createIfN
 	return members
 }
 
-func (m *GroupMembers) addMember(dataCenter DataCenter, rack Rack, address pb.ServerAddress, version string) *ClusterNode {
+func (m *GroupMembers) addMember(dataCenter DataCenter, rack Rack, address rpc.ServerAddress, version string) *ClusterNode {
 	if existingNode, found := m.members[address]; found {
 		existingNode.counter++
 		return nil
@@ -75,7 +75,7 @@ func (m *GroupMembers) addMember(dataCenter DataCenter, rack Rack, address pb.Se
 	m.members[address] = t
 	return t
 }
-func (m *GroupMembers) removeMember(address pb.ServerAddress) bool {
+func (m *GroupMembers) removeMember(address rpc.ServerAddress) bool {
 	if existingNode, found := m.members[address]; !found {
 		return false
 	} else {
@@ -88,7 +88,7 @@ func (m *GroupMembers) removeMember(address pb.ServerAddress) bool {
 	return false
 }
 
-func (g *ClusterNodeGroups) AddClusterNode(filerGroup FilerGroupName, nodeType string, dataCenter DataCenter, rack Rack, address pb.ServerAddress, version string) []*master_pb.KeepConnectedResponse {
+func (g *ClusterNodeGroups) AddClusterNode(filerGroup FilerGroupName, nodeType string, dataCenter DataCenter, rack Rack, address rpc.ServerAddress, version string) []*master_pb.KeepConnectedResponse {
 	g.Lock()
 	defer g.Unlock()
 	m := g.getGroupMembers(filerGroup, true)
@@ -97,7 +97,7 @@ func (g *ClusterNodeGroups) AddClusterNode(filerGroup FilerGroupName, nodeType s
 	}
 	return nil
 }
-func (g *ClusterNodeGroups) RemoveClusterNode(filerGroup FilerGroupName, nodeType string, address pb.ServerAddress) []*master_pb.KeepConnectedResponse {
+func (g *ClusterNodeGroups) RemoveClusterNode(filerGroup FilerGroupName, nodeType string, address rpc.ServerAddress) []*master_pb.KeepConnectedResponse {
 	g.Lock()
 	defer g.Unlock()
 	m := g.getGroupMembers(filerGroup, false)
@@ -121,7 +121,7 @@ func (g *ClusterNodeGroups) ListClusterNode(filerGroup FilerGroupName) (nodes []
 	}
 	return
 }
-func (g *ClusterNodeGroups) IsOneLeader(filerGroup FilerGroupName, address pb.ServerAddress) bool {
+func (g *ClusterNodeGroups) IsOneLeader(filerGroup FilerGroupName, address rpc.ServerAddress) bool {
 	g.Lock()
 	defer g.Unlock()
 	m := g.getGroupMembers(filerGroup, false)
@@ -130,7 +130,7 @@ func (g *ClusterNodeGroups) IsOneLeader(filerGroup FilerGroupName, address pb.Se
 	}
 	return m.leaders.isOneLeader(address)
 }
-func (g *ClusterNodeGroups) ListClusterNodeLeaders(filerGroup FilerGroupName) (nodes []pb.ServerAddress) {
+func (g *ClusterNodeGroups) ListClusterNodeLeaders(filerGroup FilerGroupName) (nodes []rpc.ServerAddress) {
 	g.Lock()
 	defer g.Unlock()
 	m := g.getGroupMembers(filerGroup, false)
@@ -154,7 +154,7 @@ func (cluster *Cluster) getGroupMembers(filerGroup FilerGroupName, nodeType stri
 	return nil
 }
 
-func (cluster *Cluster) AddClusterNode(ns, nodeType string, dataCenter DataCenter, rack Rack, address pb.ServerAddress, version string) []*master_pb.KeepConnectedResponse {
+func (cluster *Cluster) AddClusterNode(ns, nodeType string, dataCenter DataCenter, rack Rack, address rpc.ServerAddress, version string) []*master_pb.KeepConnectedResponse {
 	filerGroup := FilerGroupName(ns)
 	switch nodeType {
 	case FilerType:
@@ -173,7 +173,7 @@ func (cluster *Cluster) AddClusterNode(ns, nodeType string, dataCenter DataCente
 	return nil
 }
 
-func (cluster *Cluster) RemoveClusterNode(ns string, nodeType string, address pb.ServerAddress) []*master_pb.KeepConnectedResponse {
+func (cluster *Cluster) RemoveClusterNode(ns string, nodeType string, address rpc.ServerAddress) []*master_pb.KeepConnectedResponse {
 	filerGroup := FilerGroupName(ns)
 	switch nodeType {
 	case FilerType:
@@ -201,7 +201,7 @@ func (cluster *Cluster) ListClusterNode(filerGroup FilerGroupName, nodeType stri
 	return
 }
 
-func (cluster *Cluster) ListClusterNodeLeaders(filerGroup FilerGroupName, nodeType string) (nodes []pb.ServerAddress) {
+func (cluster *Cluster) ListClusterNodeLeaders(filerGroup FilerGroupName, nodeType string) (nodes []rpc.ServerAddress) {
 	switch nodeType {
 	case FilerType:
 		return cluster.filerGroups.ListClusterNodeLeaders(filerGroup)
@@ -210,7 +210,7 @@ func (cluster *Cluster) ListClusterNodeLeaders(filerGroup FilerGroupName, nodeTy
 	return
 }
 
-func (cluster *Cluster) IsOneLeader(filerGroup FilerGroupName, nodeType string, address pb.ServerAddress) bool {
+func (cluster *Cluster) IsOneLeader(filerGroup FilerGroupName, nodeType string, address rpc.ServerAddress) bool {
 	switch nodeType {
 	case FilerType:
 		return cluster.filerGroups.IsOneLeader(filerGroup, address)
@@ -219,7 +219,7 @@ func (cluster *Cluster) IsOneLeader(filerGroup FilerGroupName, nodeType string, 
 	return false
 }
 
-func ensureGroupLeaders(m *GroupMembers, isAdd bool, filerGroup FilerGroupName, nodeType string, address pb.ServerAddress) (result []*master_pb.KeepConnectedResponse) {
+func ensureGroupLeaders(m *GroupMembers, isAdd bool, filerGroup FilerGroupName, nodeType string, address rpc.ServerAddress) (result []*master_pb.KeepConnectedResponse) {
 	if isAdd {
 		if m.leaders.addLeaderIfVacant(address) {
 			// has added the address as one leader
@@ -259,7 +259,7 @@ func ensureGroupLeaders(m *GroupMembers, isAdd bool, filerGroup FilerGroupName, 
 			// pick the freshest one, since it is less likely to go away
 			var shortestDuration int64 = math.MaxInt64
 			now := time.Now()
-			var candidateAddress pb.ServerAddress
+			var candidateAddress rpc.ServerAddress
 			for _, node := range m.members {
 				if m.leaders.isOneLeader(node.Address) {
 					continue
@@ -297,7 +297,7 @@ func ensureGroupLeaders(m *GroupMembers, isAdd bool, filerGroup FilerGroupName, 
 	return
 }
 
-func (leaders *Leaders) addLeaderIfVacant(address pb.ServerAddress) (hasChanged bool) {
+func (leaders *Leaders) addLeaderIfVacant(address rpc.ServerAddress) (hasChanged bool) {
 	if leaders.isOneLeader(address) {
 		return
 	}
@@ -310,7 +310,7 @@ func (leaders *Leaders) addLeaderIfVacant(address pb.ServerAddress) (hasChanged 
 	}
 	return
 }
-func (leaders *Leaders) removeLeaderIfExists(address pb.ServerAddress) (hasChanged bool) {
+func (leaders *Leaders) removeLeaderIfExists(address rpc.ServerAddress) (hasChanged bool) {
 	if !leaders.isOneLeader(address) {
 		return
 	}
@@ -323,7 +323,7 @@ func (leaders *Leaders) removeLeaderIfExists(address pb.ServerAddress) (hasChang
 	}
 	return
 }
-func (leaders *Leaders) isOneLeader(address pb.ServerAddress) bool {
+func (leaders *Leaders) isOneLeader(address rpc.ServerAddress) bool {
 	for i := 0; i < len(leaders.leaders); i++ {
 		if leaders.leaders[i] == address {
 			return true
@@ -331,7 +331,7 @@ func (leaders *Leaders) isOneLeader(address pb.ServerAddress) bool {
 	}
 	return false
 }
-func (leaders *Leaders) GetLeaders() (addresses []pb.ServerAddress) {
+func (leaders *Leaders) GetLeaders() (addresses []rpc.ServerAddress) {
 	for i := 0; i < len(leaders.leaders); i++ {
 		if leaders.leaders[i] != "" {
 			addresses = append(addresses, leaders.leaders[i])

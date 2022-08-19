@@ -8,9 +8,9 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/replication/source"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
@@ -27,7 +27,7 @@ type RemoteSyncOptions struct {
 var _ = filer_pb.FilerClient(&RemoteSyncOptions{})
 
 func (option *RemoteSyncOptions) WithFilerClient(streamingMode bool, fn func(filer_pb.SeaweedFilerClient) error) error {
-	return pb.WithFilerClient(streamingMode, pb.ServerAddress(*option.filerAddress), option.grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+	return rpc.WithFilerClient(streamingMode, rpc.ServerAddress(*option.filerAddress), option.grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 		return fn(client)
 	})
 }
@@ -75,7 +75,7 @@ func runFilerRemoteSynchronize(cmd *Command, args []string) bool {
 	remoteSyncOptions.grpcDialOption = grpc.WithTransportCredentials(insecure.NewCredentials())
 
 	dir := *remoteSyncOptions.dir
-	filerAddress := pb.ServerAddress(*remoteSyncOptions.filerAddress)
+	filerAddress := rpc.ServerAddress(*remoteSyncOptions.filerAddress)
 
 	filerSource := &source.FilerSource{}
 	filerSource.DoInitialize(

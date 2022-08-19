@@ -11,8 +11,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/seaweedfs/seaweedfs/weed/filer"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
@@ -95,7 +95,7 @@ func runFilerMetaTail(cmd *Command, args []string) bool {
 		untilTsNs = time.Now().Add(-*tailStop).UnixNano()
 	}
 
-	tailErr := pb.FollowMetadata(pb.ServerAddress(*tailFiler), grpcDialOption, "tail", clientId, 0, *tailTarget, nil,
+	tailErr := rpc.FollowMetadata(rpc.ServerAddress(*tailFiler), grpcDialOption, "tail", clientId, 0, *tailTarget, nil,
 		time.Now().Add(-*tailStart).UnixNano(), untilTsNs, 0, func(resp *filer_pb.SubscribeMetadataResponse) error {
 			if !shouldPrint(resp) {
 				return nil
@@ -104,7 +104,7 @@ func runFilerMetaTail(cmd *Command, args []string) bool {
 				return err
 			}
 			return nil
-		}, pb.TrivialOnError)
+		}, rpc.TrivialOnError)
 
 	if tailErr != nil {
 		fmt.Printf("tail %s: %v\n", *tailFiler, tailErr)

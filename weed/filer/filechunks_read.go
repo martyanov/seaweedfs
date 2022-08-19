@@ -1,7 +1,7 @@
 package filer
 
 import (
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"golang.org/x/exp/slices"
 )
 

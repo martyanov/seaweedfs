@@ -13,8 +13,8 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 	weed_server "github.com/seaweedfs/seaweedfs/weed/server"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
@@ -82,12 +82,12 @@ func runMasterFollower(cmd *Command, args []string) bool {
 
 func startMasterFollower(masterOptions MasterOptions) {
 	// collect settings from main masters
-	masters := pb.ServerAddresses(*mf.peers).ToAddressMap()
+	masters := rpc.ServerAddresses(*mf.peers).ToAddressMap()
 
 	var err error
 	grpcDialOption := grpc.WithTransportCredentials(insecure.NewCredentials())
 	for i := 0; i < 10; i++ {
-		err = pb.WithOneOfGrpcMasterClients(false, masters, grpcDialOption, func(client master_pb.SeaweedClient) error {
+		err = rpc.WithOneOfGrpcMasterClients(false, masters, grpcDialOption, func(client master_pb.SeaweedClient) error {
 			resp, err := client.GetMasterConfiguration(context.Background(), &master_pb.GetMasterConfigurationRequest{})
 			if err != nil {
 				return fmt.Errorf("get master grpc address %v configuration: %v", masters, err)
@@ -130,7 +130,7 @@ func startMasterFollower(masterOptions MasterOptions) {
 	if err != nil {
 		glog.Fatalf("master failed to listen on grpc port %d: %v", grpcPort, err)
 	}
-	grpcS := pb.NewGrpcServer()
+	grpcS := rpc.NewGrpcServer()
 	master_pb.RegisterSeaweedServer(grpcS, ms)
 	reflection.Register(grpcS)
 	glog.V(0).Infof("Start Seaweed Master %s grpc server at %s:%d", util.Version(), *masterOptions.ip, grpcPort)

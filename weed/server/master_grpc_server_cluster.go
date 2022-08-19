@@ -2,10 +2,11 @@ package weed_server
 
 import (
 	"context"
-	"github.com/seaweedfs/seaweedfs/weed/cluster"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
 	"math/rand"
+
+	"github.com/seaweedfs/seaweedfs/weed/cluster"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 )
 
 func (ms *MasterServer) ListClusterNodes(ctx context.Context, req *master_pb.ListClusterNodesRequest) (*master_pb.ListClusterNodesResponse, error) {
@@ -37,11 +38,11 @@ func (ms *MasterServer) ListClusterNodes(ctx context.Context, req *master_pb.Lis
 	return resp, nil
 }
 
-func (ms *MasterServer) GetOneFiler(filerGroup cluster.FilerGroupName) pb.ServerAddress {
+func (ms *MasterServer) GetOneFiler(filerGroup cluster.FilerGroupName) rpc.ServerAddress {
 
 	clusterNodes := ms.Cluster.ListClusterNode(filerGroup, cluster.FilerType)
 
-	var filers []pb.ServerAddress
+	var filers []rpc.ServerAddress
 	for _, node := range clusterNodes {
 		if ms.Cluster.IsOneLeader(filerGroup, cluster.FilerType, node.Address) {
 			filers = append(filers, node.Address)
@@ -57,7 +58,7 @@ func limitTo(nodes []*cluster.ClusterNode, limit int32) (selected []*cluster.Clu
 	if limit <= 0 || len(nodes) < int(limit) {
 		return nodes
 	}
-	seletedSet := make(map[pb.ServerAddress]*cluster.ClusterNode)
+	seletedSet := make(map[rpc.ServerAddress]*cluster.ClusterNode)
 	for i := 0; i < int(limit)*3; i++ {
 		x := rand.Intn(len(nodes))
 		if _, found := seletedSet[nodes[x].Address]; found {

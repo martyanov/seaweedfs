@@ -3,12 +3,13 @@ package wdclient
 import (
 	"errors"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"math/rand"
 	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
+
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 )
@@ -30,8 +31,8 @@ type Location struct {
 	GrpcPort   int    `json:"grpcPort,omitempty"`
 }
 
-func (l Location) ServerAddress() pb.ServerAddress {
-	return pb.NewServerAddressWithGrpcPort(l.Url, l.GrpcPort)
+func (l Location) ServerAddress() rpc.ServerAddress {
+	return rpc.NewServerAddressWithGrpcPort(l.Url, l.GrpcPort)
 }
 
 type vidMap struct {

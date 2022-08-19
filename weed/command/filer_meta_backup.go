@@ -12,8 +12,8 @@ import (
 
 	"github.com/seaweedfs/seaweedfs/weed/filer"
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
@@ -188,15 +188,15 @@ func (metaBackup *FilerMetaBackupOptions) streamMetadataBackup() error {
 		return nil
 	}
 
-	processEventFnWithOffset := pb.AddOffsetFunc(eachEntryFunc, 3*time.Second, func(counter int64, lastTsNs int64) error {
+	processEventFnWithOffset := rpc.AddOffsetFunc(eachEntryFunc, 3*time.Second, func(counter int64, lastTsNs int64) error {
 		lastTime := time.Unix(0, lastTsNs)
 		glog.V(0).Infof("meta backup %s progressed to %v %0.2f/sec", *metaBackup.filerAddress, lastTime, float64(counter)/float64(3))
 		return metaBackup.setOffset(lastTime)
 	})
 
 	metaBackup.clientEpoch++
-	return pb.FollowMetadata(pb.ServerAddress(*metaBackup.filerAddress), metaBackup.grpcDialOption, "meta_backup", metaBackup.clientId, metaBackup.clientEpoch,
-		*metaBackup.filerDirectory, nil, startTime.UnixNano(), 0, 0, processEventFnWithOffset, pb.TrivialOnError)
+	return rpc.FollowMetadata(rpc.ServerAddress(*metaBackup.filerAddress), metaBackup.grpcDialOption, "meta_backup", metaBackup.clientId, metaBackup.clientEpoch,
+		*metaBackup.filerDirectory, nil, startTime.UnixNano(), 0, 0, processEventFnWithOffset, rpc.TrivialOnError)
 
 }
 
@@ -224,7 +224,7 @@ var _ = filer_pb.FilerClient(&FilerMetaBackupOptions{})
 
 func (metaBackup *FilerMetaBackupOptions) WithFilerClient(streamingMode bool, fn func(filer_pb.SeaweedFilerClient) error) error {
 
-	return pb.WithFilerClient(streamingMode, pb.ServerAddress(*metaBackup.filerAddress), metaBackup.grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+	return rpc.WithFilerClient(streamingMode, rpc.ServerAddress(*metaBackup.filerAddress), metaBackup.grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 		return fn(client)
 	})
 

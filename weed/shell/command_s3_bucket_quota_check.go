@@ -5,7 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/seaweedfs/seaweedfs/weed/filer"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"io"
 	"math"
 )

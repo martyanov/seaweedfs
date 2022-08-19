@@ -23,7 +23,7 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/s3api/s3err"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	weed_server "github.com/seaweedfs/seaweedfs/weed/server"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )

@@ -6,17 +6,15 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/s3_pb"
-
-	"github.com/gorilla/mux"
-
 	"github.com/seaweedfs/seaweedfs/weed/glog"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/s3_pb"
 	"github.com/seaweedfs/seaweedfs/weed/s3api"
 	stats_collect "github.com/seaweedfs/seaweedfs/weed/stats"
 	"github.com/seaweedfs/seaweedfs/weed/util"
@@ -146,7 +144,7 @@ func runS3(cmd *Command, args []string) bool {
 
 func (s3opt *S3Options) startS3Server() bool {
 
-	filerAddress := pb.ServerAddress(*s3opt.filer)
+	filerAddress := rpc.ServerAddress(*s3opt.filer)
 
 	filerBucketsPath := "/buckets"
 
@@ -157,7 +155,7 @@ func (s3opt *S3Options) startS3Server() bool {
 	var metricsIntervalSec int
 
 	for {
-		err := pb.WithGrpcFilerClient(false, filerAddress, grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
+		err := rpc.WithGrpcFilerClient(false, filerAddress, grpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 			resp, err := client.GetFilerConfiguration(context.Background(), &filer_pb.GetFilerConfigurationRequest{})
 			if err != nil {
 				return fmt.Errorf("get filer %s configuration: %v", filerAddress, err)
@@ -217,7 +215,7 @@ func (s3opt *S3Options) startS3Server() bool {
 	if err != nil {
 		glog.Fatalf("s3 failed to listen on grpc port %d: %v", grpcPort, err)
 	}
-	grpcS := pb.NewGrpcServer()
+	grpcS := rpc.NewGrpcServer()
 	s3_pb.RegisterSeaweedS3Server(grpcS, s3ApiServer)
 	reflection.Register(grpcS)
 	if grpcLocalL != nil {

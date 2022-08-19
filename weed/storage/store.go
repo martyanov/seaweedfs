@@ -7,19 +7,18 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/storage/volume_info"
-	"github.com/seaweedfs/seaweedfs/weed/util"
-
 	"google.golang.org/grpc"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 	"github.com/seaweedfs/seaweedfs/weed/stats"
 	"github.com/seaweedfs/seaweedfs/weed/storage/erasure_coding"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	"github.com/seaweedfs/seaweedfs/weed/storage/super_block"
 	. "github.com/seaweedfs/seaweedfs/weed/storage/types"
+	"github.com/seaweedfs/seaweedfs/weed/storage/volume_info"
+	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
 const (
@@ -41,7 +40,7 @@ type ReadOption struct {
  * A VolumeServer contains one Store
  */
 type Store struct {
-	MasterAddress       pb.ServerAddress
+	MasterAddress       rpc.ServerAddress
 	grpcDialOption      grpc.DialOption
 	volumeSizeLimit     uint64 // read from the master
 	Ip                  string

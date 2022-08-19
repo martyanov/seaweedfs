@@ -11,13 +11,13 @@ import (
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/backend"
 	"github.com/seaweedfs/seaweedfs/weed/storage/erasure_coding"
 )
 
-func (vs *VolumeServer) GetMaster() pb.ServerAddress {
+func (vs *VolumeServer) GetMaster() rpc.ServerAddress {
 	return vs.currentMaster
 }
 
@@ -51,7 +51,7 @@ func (vs *VolumeServer) heartbeat() {
 	grpcDialOption := grpc.WithTransportCredentials(insecure.NewCredentials())
 
 	var err error
-	var newLeader pb.ServerAddress
+	var newLeader rpc.ServerAddress
 	for vs.isHeartbeating {
 		for _, master := range vs.SeedMasterNodes {
 			if newLeader != "" {
@@ -84,12 +84,12 @@ func (vs *VolumeServer) StopHeartbeat() (isAlreadyStopping bool) {
 	return false
 }
 
-func (vs *VolumeServer) doHeartbeat(masterAddress pb.ServerAddress, grpcDialOption grpc.DialOption, sleepInterval time.Duration) (newLeader pb.ServerAddress, err error) {
+func (vs *VolumeServer) doHeartbeat(masterAddress rpc.ServerAddress, grpcDialOption grpc.DialOption, sleepInterval time.Duration) (newLeader rpc.ServerAddress, err error) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	grpcConection, err := pb.GrpcDial(ctx, masterAddress.ToGrpcAddress(), grpcDialOption)
+	grpcConection, err := rpc.GrpcDial(ctx, masterAddress.ToGrpcAddress(), grpcDialOption)
 	if err != nil {
 		return "", fmt.Errorf("fail to dial %s : %v", masterAddress, err)
 	}
@@ -136,7 +136,7 @@ func (vs *VolumeServer) doHeartbeat(masterAddress pb.ServerAddress, grpcDialOpti
 			}
 			if in.GetLeader() != "" && string(vs.currentMaster) != in.GetLeader() {
 				glog.V(0).Infof("Volume Server found a new master newLeader: %v instead of %v", in.GetLeader(), vs.currentMaster)
-				newLeader = pb.ServerAddress(in.GetLeader())
+				newLeader = rpc.ServerAddress(in.GetLeader())
 				doneChan <- nil
 				return
 			}

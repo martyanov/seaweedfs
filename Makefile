@@ -21,13 +21,13 @@ $(GOLANG_BIN)/protoc-gen-go-grpc:
 	GOPATH=$(GOLANG_PATH) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$(GOLANG_GRPC_VERSION)
 
 genproto: deps
-	protoc -Iproto --go_out=./weed/pb/master_pb --go-grpc_out=./weed/pb/master_pb --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative master.proto
-	protoc -Iproto --go_out=./weed/pb/volume_server_pb --go-grpc_out=./weed/pb/volume_server_pb --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative volume_server.proto
-	protoc -Iproto --go_out=./weed/pb/filer_pb --go-grpc_out=./weed/pb/filer_pb --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative filer.proto
-	protoc -Iproto --go_out=./weed/pb/remote_pb --go-grpc_out=./weed/pb/remote_pb --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative remote.proto
-	protoc -Iproto --go_out=./weed/pb/iam_pb --go-grpc_out=./weed/pb/iam_pb --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative iam.proto
-	protoc -Iproto --go_out=./weed/pb/mount_pb --go-grpc_out=./weed/pb/mount_pb --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative mount.proto
-	protoc -Iproto --go_out=./weed/pb/s3_pb --go-grpc_out=./weed/pb/s3_pb --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative s3.proto
+	protoc -Iproto --go_out=./weed/rpc/master_pb --go-grpc_out=./weed/rpc/master_pb --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative master.proto
+	protoc -Iproto --go_out=./weed/rpc/volume_server_pb --go-grpc_out=./weed/rpc/volume_server_pb --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative volume_server.proto
+	protoc -Iproto --go_out=./weed/rpc/filer_pb --go-grpc_out=./weed/rpc/filer_pb --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative filer.proto
+	protoc -Iproto --go_out=./weed/rpc/remote_pb --go-grpc_out=./weed/rpc/remote_pb --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative remote.proto
+	protoc -Iproto --go_out=./weed/rpc/iam_pb --go-grpc_out=./weed/rpc/iam_pb --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative iam.proto
+	protoc -Iproto --go_out=./weed/rpc/mount_pb --go-grpc_out=./weed/rpc/mount_pb --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative mount.proto
+	protoc -Iproto --go_out=./weed/rpc/s3_pb --go-grpc_out=./weed/rpc/s3_pb --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative s3.proto
 
 test:
 	GOPATH=$(GOLANG_PATH) go test -v ./weed/...

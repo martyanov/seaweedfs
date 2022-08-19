@@ -3,9 +3,9 @@ package shell
 import (
 	"flag"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
 	"io"
 
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 )
 
@@ -48,7 +48,7 @@ func (c *commandVolumeMark) Do(args []string, commandEnv *CommandEnv, writer io.
 		return
 	}
 
-	sourceVolumeServer := pb.ServerAddress(*nodeStr)
+	sourceVolumeServer := rpc.ServerAddress(*nodeStr)
 
 	volumeId := needle.VolumeId(*volumeIdInt)
 

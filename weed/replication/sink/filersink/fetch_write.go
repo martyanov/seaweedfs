@@ -3,16 +3,16 @@ package filersink
 import (
 	"context"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/util"
 	"sync"
 
 	"google.golang.org/grpc"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/security"
+	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
 func (fs *FilerSink) replicateChunks(sourceChunks []*filer_pb.FileChunk, path string) (replicatedChunks []*filer_pb.FileChunk, err error) {
@@ -133,7 +133,7 @@ var _ = filer_pb.FilerClient(&FilerSink{})
 
 func (fs *FilerSink) WithFilerClient(streamingMode bool, fn func(filer_pb.SeaweedFilerClient) error) error {
 
-	return pb.WithGrpcClient(streamingMode, func(grpcConnection *grpc.ClientConn) error {
+	return rpc.WithGrpcClient(streamingMode, func(grpcConnection *grpc.ClientConn) error {
 		client := filer_pb.NewSeaweedFilerClient(grpcConnection)
 		return fn(client)
 	}, fs.grpcAddress, fs.grpcDialOption)

@@ -3,7 +3,7 @@ package command
 import (
 	"fmt"
 
-	"github.com/seaweedfs/seaweedfs/weed/pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
@@ -54,7 +54,7 @@ func runShell(command *Command, args []string) bool {
 		}
 	}
 
-	shellOptions.FilerAddress = pb.ServerAddress(*shellInitialFiler)
+	shellOptions.FilerAddress = rpc.ServerAddress(*shellInitialFiler)
 	shellOptions.Directory = "/"
 
 	shell.RunShell(shellOptions)

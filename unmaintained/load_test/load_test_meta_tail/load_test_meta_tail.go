@@ -6,11 +6,12 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	"github.com/seaweedfs/seaweedfs/weed/glog"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 )
 
 var (
@@ -53,7 +54,7 @@ func main() {
 }
 
 func startGenerateMetadata() {
-	pb.WithFilerClient(false, pb.ServerAddress(*tailFiler), grpc.WithTransportCredentials(insecure.NewCredentials()), func(client filer_pb.SeaweedFilerClient) error {
+	rpc.WithFilerClient(false, rpc.ServerAddress(*tailFiler), grpc.WithTransportCredentials(insecure.NewCredentials()), func(client filer_pb.SeaweedFilerClient) error {
 
 		for i := 0; i < *n; i++ {
 			name := fmt.Sprintf("file%d", i)
@@ -79,7 +80,7 @@ func startGenerateMetadata() {
 
 func startSubscribeMetadata(eachEntryFunc func(event *filer_pb.SubscribeMetadataResponse) error) {
 
-	tailErr := pb.FollowMetadata(pb.ServerAddress(*tailFiler), grpc.WithTransportCredentials(insecure.NewCredentials()), "tail", 0, 0, *dir, nil, 0, 0, 0, eachEntryFunc, pb.TrivialOnError)
+	tailErr := rpc.FollowMetadata(rpc.ServerAddress(*tailFiler), grpc.WithTransportCredentials(insecure.NewCredentials()), "tail", 0, 0, *dir, nil, 0, 0, 0, eachEntryFunc, rpc.TrivialOnError)
 
 	if tailErr != nil {
 		fmt.Printf("tail %s: %v\n", *tailFiler, tailErr)

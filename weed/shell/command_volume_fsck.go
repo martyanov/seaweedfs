@@ -5,16 +5,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/filer"
-	"github.com/seaweedfs/seaweedfs/weed/operation"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/volume_server_pb"
-	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
-	"github.com/seaweedfs/seaweedfs/weed/storage/needle_map"
-	"github.com/seaweedfs/seaweedfs/weed/storage/types"
-	"github.com/seaweedfs/seaweedfs/weed/util"
 	"io"
 	"io/ioutil"
 	"math"
@@ -26,6 +16,17 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/seaweedfs/seaweedfs/weed/filer"
+	"github.com/seaweedfs/seaweedfs/weed/operation"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/volume_server_pb"
+	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
+	"github.com/seaweedfs/seaweedfs/weed/storage/needle_map"
+	"github.com/seaweedfs/seaweedfs/weed/storage/types"
+	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
 func init() {
@@ -251,7 +252,7 @@ func (c *commandVolumeFsck) findExtraChunksInVolumeServers(dataNodeVolumeIdToVIn
 	isSeveralReplicas := make(map[uint32]bool)
 	isEcVolumeReplicas := make(map[uint32]bool)
 	isReadOnlyReplicas := make(map[uint32]bool)
-	serverReplicas := make(map[uint32][]pb.ServerAddress)
+	serverReplicas := make(map[uint32][]rpc.ServerAddress)
 	for dataNodeId, volumeIdToVInfo := range dataNodeVolumeIdToVInfo {
 		for volumeId, vinfo := range volumeIdToVInfo {
 			inUseCount, orphanFileIds, orphanDataSize, checkErr := c.oneVolumeFileIdsSubtractFilerFileIds(tempFolder, dataNodeId, volumeId, writer, verbose)
@@ -581,7 +582,7 @@ func (c *commandVolumeFsck) oneVolumeFileIdsSubtractFilerFileIds(tempFolder stri
 }
 
 type VInfo struct {
-	server     pb.ServerAddress
+	server     rpc.ServerAddress
 	collection string
 	isEcVolume bool
 	isReadOnly bool
@@ -606,7 +607,7 @@ func (c *commandVolumeFsck) collectVolumeIds(commandEnv *CommandEnv, verbose boo
 			volumeIdToServer[dataNodeId] = make(map[uint32]VInfo)
 			for _, vi := range diskInfo.VolumeInfos {
 				volumeIdToServer[dataNodeId][vi.Id] = VInfo{
-					server:     pb.NewServerAddressFromDataNode(t),
+					server:     rpc.NewServerAddressFromDataNode(t),
 					collection: vi.Collection,
 					isEcVolume: false,
 					isReadOnly: vi.ReadOnly,
@@ -614,7 +615,7 @@ func (c *commandVolumeFsck) collectVolumeIds(commandEnv *CommandEnv, verbose boo
 			}
 			for _, ecShardInfo := range diskInfo.EcShardInfos {
 				volumeIdToServer[dataNodeId][ecShardInfo.Id] = VInfo{
-					server:     pb.NewServerAddressFromDataNode(t),
+					server:     rpc.NewServerAddressFromDataNode(t),
 					collection: ecShardInfo.Collection,
 					isEcVolume: true,
 					isReadOnly: true,
@@ -640,7 +641,7 @@ func (c *commandVolumeFsck) purgeFileIdsForOneVolume(volumeId uint32, fileIds []
 	var wg sync.WaitGroup
 	for _, location := range locations {
 		wg.Add(1)
-		go func(server pb.ServerAddress, fidList []string) {
+		go func(server rpc.ServerAddress, fidList []string) {
 			defer wg.Done()
 
 			if deleteResults, deleteErr := operation.DeleteFilesAtOneVolumeServer(server, c.env.option.GrpcDialOption, fidList, false); deleteErr != nil {

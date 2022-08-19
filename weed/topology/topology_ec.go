@@ -2,8 +2,8 @@ package topology
 
 import (
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/pb"
-	"github.com/seaweedfs/seaweedfs/weed/pb/master_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 	"github.com/seaweedfs/seaweedfs/weed/storage/erasure_coding"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 )
@@ -136,11 +136,11 @@ func (t *Topology) LookupEcShards(vid needle.VolumeId) (locations *EcShardLocati
 	return
 }
 
-func (t *Topology) ListEcServersByCollection(collection string) (dataNodes []pb.ServerAddress) {
+func (t *Topology) ListEcServersByCollection(collection string) (dataNodes []rpc.ServerAddress) {
 	t.ecShardMapLock.RLock()
 	defer t.ecShardMapLock.RUnlock()
 
-	dateNodeMap := make(map[pb.ServerAddress]bool)
+	dateNodeMap := make(map[rpc.ServerAddress]bool)
 	for _, ecVolumeLocation := range t.ecShardMap {
 		if ecVolumeLocation.Collection == collection {
 			for _, locations := range ecVolumeLocation.Locations {
