@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/seaweedfs/seaweedfs/weed/rpc/iam_pb"
-	jsonpb "google.golang.org/protobuf/encoding/protojson"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )
 
 func ParseS3ConfigurationFromBytes[T proto.Message](content []byte, config T) error {
-	if err := jsonpb.Unmarshal(content, config); err != nil {
+	if err := protojson.Unmarshal(content, config); err != nil {
 		return err
 	}
 	return nil
@@ -18,7 +18,7 @@ func ParseS3ConfigurationFromBytes[T proto.Message](content []byte, config T) er
 
 func ProtoToText(writer io.Writer, config proto.Message) error {
 
-	m := jsonpb.MarshalOptions{
+	m := protojson.MarshalOptions{
 		EmitUnpopulated: true,
 		Indent:          "  ",
 	}
@@ -37,7 +37,7 @@ func ProtoToText(writer io.Writer, config proto.Message) error {
 }
 
 // CheckDuplicateAccessKey returns an error message when s3cfg has duplicate access keys
-func CheckDuplicateAccessKey(s3cfg *iam_pb.S3ApiConfiguration) error {
+func CheckDuplicateAccessKey(s3cfg *rpc.IAMConfiguration) error {
 	accessKeySet := make(map[string]string)
 	for _, ident := range s3cfg.Identities {
 		for _, cred := range ident.Credentials {

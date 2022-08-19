@@ -4,19 +4,17 @@ import (
 	"bytes"
 	"testing"
 
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	. "github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
-
-	"github.com/seaweedfs/seaweedfs/weed/rpc/iam_pb"
-
 	"github.com/stretchr/testify/assert"
 )
 
 func TestS3Conf(t *testing.T) {
-	s3Conf := &iam_pb.S3ApiConfiguration{
-		Identities: []*iam_pb.Identity{
+	s3Conf := &rpc.IAMConfiguration{
+		Identities: []*rpc.IAMIdentity{
 			{
 				Name: "some_name",
-				Credentials: []*iam_pb.Credential{
+				Credentials: []*rpc.IAMCredential{
 					{
 						AccessKey: "some_access_key1",
 						SecretKey: "some_secret_key1",
@@ -30,7 +28,7 @@ func TestS3Conf(t *testing.T) {
 			},
 			{
 				Name: "some_read_only_user",
-				Credentials: []*iam_pb.Credential{
+				Credentials: []*rpc.IAMCredential{
 					{
 						AccessKey: "some_access_key2",
 						SecretKey: "some_secret_key2",
@@ -47,7 +45,7 @@ func TestS3Conf(t *testing.T) {
 	var buf bytes.Buffer
 	err := ProtoToText(&buf, s3Conf)
 	assert.Equal(t, err, nil)
-	s3ConfSaved := &iam_pb.S3ApiConfiguration{}
+	s3ConfSaved := &rpc.IAMConfiguration{}
 	err = ParseS3ConfigurationFromBytes(buf.Bytes(), s3ConfSaved)
 	assert.Equal(t, err, nil)
 
@@ -59,15 +57,15 @@ func TestS3Conf(t *testing.T) {
 
 func TestCheckDuplicateAccessKey(t *testing.T) {
 	var tests = []struct {
-		s3cfg *iam_pb.S3ApiConfiguration
+		s3cfg *rpc.IAMConfiguration
 		err   string
 	}{
 		{
-			&iam_pb.S3ApiConfiguration{
-				Identities: []*iam_pb.Identity{
+			&rpc.IAMConfiguration{
+				Identities: []*rpc.IAMIdentity{
 					{
 						Name: "some_name",
-						Credentials: []*iam_pb.Credential{
+						Credentials: []*rpc.IAMCredential{
 							{
 								AccessKey: "some_access_key1",
 								SecretKey: "some_secret_key1",
@@ -81,7 +79,7 @@ func TestCheckDuplicateAccessKey(t *testing.T) {
 					},
 					{
 						Name: "some_read_only_user",
-						Credentials: []*iam_pb.Credential{
+						Credentials: []*rpc.IAMCredential{
 							{
 								AccessKey: "some_access_key2",
 								SecretKey: "some_secret_key2",
@@ -98,11 +96,11 @@ func TestCheckDuplicateAccessKey(t *testing.T) {
 			"",
 		},
 		{
-			&iam_pb.S3ApiConfiguration{
-				Identities: []*iam_pb.Identity{
+			&rpc.IAMConfiguration{
+				Identities: []*rpc.IAMIdentity{
 					{
 						Name: "some_name",
-						Credentials: []*iam_pb.Credential{
+						Credentials: []*rpc.IAMCredential{
 							{
 								AccessKey: "some_access_key1",
 								SecretKey: "some_secret_key1",
@@ -116,7 +114,7 @@ func TestCheckDuplicateAccessKey(t *testing.T) {
 					},
 					{
 						Name: "some_read_only_user",
-						Credentials: []*iam_pb.Credential{
+						Credentials: []*rpc.IAMCredential{
 							{
 								AccessKey: "some_access_key1",
 								SecretKey: "some_secret_key1",

@@ -14,7 +14,6 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/filer"
 	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/iam_pb"
 	"github.com/seaweedfs/seaweedfs/weed/s3api"
 	. "github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 	"github.com/seaweedfs/seaweedfs/weed/s3api/s3err"
@@ -23,8 +22,8 @@ import (
 )
 
 type IamS3ApiConfig interface {
-	GetS3ApiConfiguration(s3cfg *iam_pb.S3ApiConfiguration) (err error)
-	PutS3ApiConfiguration(s3cfg *iam_pb.S3ApiConfiguration) (err error)
+	GetS3ApiConfiguration(s3cfg *rpc.IAMConfiguration) (err error)
+	PutS3ApiConfiguration(s3cfg *rpc.IAMConfiguration) (err error)
 	GetPolicies(policies *Policies) (err error)
 	PutPolicies(policies *Policies) (err error)
 }
@@ -76,7 +75,7 @@ func (iama *IamApiServer) registerRouter(router *mux.Router) {
 	apiRouter.NotFoundHandler = http.HandlerFunc(s3err.NotFoundHandler)
 }
 
-func (iam IamS3ApiConfigure) GetS3ApiConfiguration(s3cfg *iam_pb.S3ApiConfiguration) (err error) {
+func (iam IamS3ApiConfigure) GetS3ApiConfiguration(s3cfg *rpc.IAMConfiguration) (err error) {
 	var buf bytes.Buffer
 	err = rpc.WithGrpcFilerClient(false, iam.option.Filer, iam.option.GrpcDialOption, func(client filer_pb.SeaweedFilerClient) error {
 		if err = filer.ReadEntry(iam.masterClient, client, filer.IamConfigDirecotry, filer.IamIdentityFile, &buf); err != nil {
@@ -95,7 +94,7 @@ func (iam IamS3ApiConfigure) GetS3ApiConfiguration(s3cfg *iam_pb.S3ApiConfigurat
 	return nil
 }
 
-func (iam IamS3ApiConfigure) PutS3ApiConfiguration(s3cfg *iam_pb.S3ApiConfiguration) (err error) {
+func (iam IamS3ApiConfigure) PutS3ApiConfiguration(s3cfg *rpc.IAMConfiguration) (err error) {
 	buf := bytes.Buffer{}
 	if err := filer.ProtoToText(&buf, s3cfg); err != nil {
 		return fmt.Errorf("ProtoToText: %s", err)

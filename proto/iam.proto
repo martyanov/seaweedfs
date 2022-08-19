@@ -1,45 +1,23 @@
 syntax = "proto3";
 
-package iam_pb;
+package weed.iam;
 
-option go_package = "github.com/seaweedfs/seaweedfs/weed/rpc/iam_pb";
+option go_package = "github.com/seaweedfs/seaweedfs/weed/rpc";
 
-service SeaweedIdentityAccessManagement {
-
+service IAM {
 }
 
-message S3ApiConfiguration {
-    repeated Identity identities = 1;
+message IAMConfiguration {
+    repeated IAMIdentity identities = 1;
 }
 
-message Identity {
+message IAMIdentity {
     string name = 1;
-    repeated Credential credentials = 2;
+    repeated IAMCredential credentials = 2;
     repeated string actions = 3;
 }
 
-message Credential {
+message IAMCredential {
     string access_key = 1;
     string secret_key = 2;
-    // uint64 expiration = 3;
-    // bool is_disabled = 4;
 }
-
-/*
-message Policy {
-    repeated Statement statements = 1;
-}
-
-message Statement {
-    repeated Action action = 1;
-    repeated Resource resource = 2;
-}
-
-message Action {
-    string action = 1;
-}
-message Resource {
-    string bucket = 1;
-    // string path = 2;
-}
-*/

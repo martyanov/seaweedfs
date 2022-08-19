@@ -12,27 +12,27 @@ import (
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/copier"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/iam_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/stretchr/testify/assert"
 )
 
-var GetS3ApiConfiguration func(s3cfg *iam_pb.S3ApiConfiguration) (err error)
-var PutS3ApiConfiguration func(s3cfg *iam_pb.S3ApiConfiguration) (err error)
+var GetS3ApiConfiguration func(s3cfg *rpc.IAMConfiguration) (err error)
+var PutS3ApiConfiguration func(s3cfg *rpc.IAMConfiguration) (err error)
 var GetPolicies func(policies *Policies) (err error)
 var PutPolicies func(policies *Policies) (err error)
 
-var s3config = iam_pb.S3ApiConfiguration{}
+var s3config = rpc.IAMConfiguration{}
 var policiesFile = Policies{Policies: make(map[string]PolicyDocument)}
 var ias = IamApiServer{s3ApiConfig: iamS3ApiConfigureMock{}}
 
 type iamS3ApiConfigureMock struct{}
 
-func (iam iamS3ApiConfigureMock) GetS3ApiConfiguration(s3cfg *iam_pb.S3ApiConfiguration) (err error) {
+func (iam iamS3ApiConfigureMock) GetS3ApiConfiguration(s3cfg *rpc.IAMConfiguration) (err error) {
 	_ = copier.Copy(&s3cfg.Identities, &s3config.Identities)
 	return nil
 }
 
-func (iam iamS3ApiConfigureMock) PutS3ApiConfiguration(s3cfg *iam_pb.S3ApiConfiguration) (err error) {
+func (iam iamS3ApiConfigureMock) PutS3ApiConfiguration(s3cfg *rpc.IAMConfiguration) (err error) {
 	_ = copier.Copy(&s3config.Identities, &s3cfg.Identities)
 	return nil
 }

@@ -1,22 +1,22 @@
 package s3api
 
 import (
-	. "github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
-	"github.com/stretchr/testify/assert"
 	"testing"
 
-	jsonpb "google.golang.org/protobuf/encoding/protojson"
+	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/encoding/protojson"
 
-	"github.com/seaweedfs/seaweedfs/weed/rpc/iam_pb"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	. "github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 )
 
 func TestIdentityListFileFormat(t *testing.T) {
 
-	s3ApiConfiguration := &iam_pb.S3ApiConfiguration{}
+	s3ApiConfiguration := &rpc.IAMConfiguration{}
 
-	identity1 := &iam_pb.Identity{
+	identity1 := &rpc.IAMIdentity{
 		Name: "some_name",
-		Credentials: []*iam_pb.Credential{
+		Credentials: []*rpc.IAMCredential{
 			{
 				AccessKey: "some_access_key1",
 				SecretKey: "some_secret_key2",
@@ -28,9 +28,9 @@ func TestIdentityListFileFormat(t *testing.T) {
 			ACTION_WRITE,
 		},
 	}
-	identity2 := &iam_pb.Identity{
+	identity2 := &rpc.IAMIdentity{
 		Name: "some_read_only_user",
-		Credentials: []*iam_pb.Credential{
+		Credentials: []*rpc.IAMCredential{
 			{
 				AccessKey: "some_access_key1",
 				SecretKey: "some_secret_key1",
@@ -40,9 +40,9 @@ func TestIdentityListFileFormat(t *testing.T) {
 			ACTION_READ,
 		},
 	}
-	identity3 := &iam_pb.Identity{
+	identity3 := &rpc.IAMIdentity{
 		Name: "some_normal_user",
-		Credentials: []*iam_pb.Credential{
+		Credentials: []*rpc.IAMCredential{
 			{
 				AccessKey: "some_access_key2",
 				SecretKey: "some_secret_key2",
@@ -58,7 +58,7 @@ func TestIdentityListFileFormat(t *testing.T) {
 	s3ApiConfiguration.Identities = append(s3ApiConfiguration.Identities, identity2)
 	s3ApiConfiguration.Identities = append(s3ApiConfiguration.Identities, identity3)
 
-	m := jsonpb.MarshalOptions{
+	m := protojson.MarshalOptions{
 		EmitUnpopulated: true,
 		Indent:          "  ",
 	}

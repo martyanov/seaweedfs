@@ -11,7 +11,6 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/iam_pb"
 	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 	"github.com/seaweedfs/seaweedfs/weed/s3api/s3err"
 )
@@ -104,7 +103,7 @@ func (iam *IdentityAccessManagement) loadS3ApiConfigurationFromFile(fileName str
 }
 
 func (iam *IdentityAccessManagement) LoadS3ApiConfigurationFromBytes(content []byte) error {
-	s3ApiConfiguration := &iam_pb.S3ApiConfiguration{}
+	s3ApiConfiguration := &rpc.IAMConfiguration{}
 	if err := filer.ParseS3ConfigurationFromBytes(content, s3ApiConfiguration); err != nil {
 		glog.Warningf("unmarshal error: %v", err)
 		return fmt.Errorf("unmarshal error: %v", err)
@@ -120,7 +119,7 @@ func (iam *IdentityAccessManagement) LoadS3ApiConfigurationFromBytes(content []b
 	return nil
 }
 
-func (iam *IdentityAccessManagement) loadS3ApiConfiguration(config *iam_pb.S3ApiConfiguration) error {
+func (iam *IdentityAccessManagement) loadS3ApiConfiguration(config *rpc.IAMConfiguration) error {
 	var identities []*Identity
 	for _, ident := range config.Identities {
 		t := &Identity{

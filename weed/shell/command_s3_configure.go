@@ -9,9 +9,8 @@ import (
 	"strings"
 
 	"github.com/seaweedfs/seaweedfs/weed/filer"
-
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/iam_pb"
 )
 
 func init() {
@@ -54,7 +53,7 @@ func (c *commandS3Configure) Do(args []string, commandEnv *CommandEnv, writer io
 		return err
 	}
 
-	s3cfg := &iam_pb.S3ApiConfiguration{}
+	s3cfg := &rpc.IAMConfiguration{}
 	if buf.Len() > 0 {
 		if err = filer.ParseS3ConfigurationFromBytes(buf.Bytes(), s3cfg); err != nil {
 			return err
@@ -144,7 +143,7 @@ func (c *commandS3Configure) Do(args []string, commandEnv *CommandEnv, writer io
 					}
 				}
 				if !found {
-					s3cfg.Identities[idx].Credentials = append(s3cfg.Identities[idx].Credentials, &iam_pb.Credential{
+					s3cfg.Identities[idx].Credentials = append(s3cfg.Identities[idx].Credentials, &rpc.IAMCredential{
 						AccessKey: *accessKey,
 						SecretKey: *secretKey,
 					})
@@ -153,14 +152,14 @@ func (c *commandS3Configure) Do(args []string, commandEnv *CommandEnv, writer io
 		}
 	} else if *user != "" && *actions != "" {
 		infoAboutSimulationMode(writer, *apply, "-apply")
-		identity := iam_pb.Identity{
+		identity := rpc.IAMIdentity{
 			Name:        *user,
 			Actions:     cmdActions,
-			Credentials: []*iam_pb.Credential{},
+			Credentials: []*rpc.IAMCredential{},
 		}
 		if *user != "anonymous" {
 			identity.Credentials = append(identity.Credentials,
-				&iam_pb.Credential{AccessKey: *accessKey, SecretKey: *secretKey})
+				&rpc.IAMCredential{AccessKey: *accessKey, SecretKey: *secretKey})
 		}
 		s3cfg.Identities = append(s3cfg.Identities, &identity)
 	}
