@@ -27,7 +27,7 @@ genproto: deps
 	protoc -Iproto --go_out=./weed/rpc/remote_pb --go-grpc_out=./weed/rpc/remote_pb --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative remote.proto
 	protoc -Iproto --go_out=./weed/rpc/iam_pb --go-grpc_out=./weed/rpc/iam_pb --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative iam.proto
 	protoc -Iproto --go_out=./weed/rpc/mount_pb --go-grpc_out=./weed/rpc/mount_pb --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative mount.proto
-	protoc -Iproto --go_out=./weed/rpc/s3_pb --go-grpc_out=./weed/rpc/s3_pb --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative s3.proto
+	protoc -Iproto --go_out=./weed/rpc --go-grpc_out=./weed/rpc --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative s3.proto
 
 test:
 	GOPATH=$(GOLANG_PATH) go test -v ./weed/...

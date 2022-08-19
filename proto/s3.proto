@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package messaging_pb;
+package weed.s3;
 
-option go_package = "github.com/seaweedfs/seaweedfs/weed/rpc/s3_pb";
+option go_package = "github.com/seaweedfs/seaweedfs/weed/rpc";
 
-service SeaweedS3 {
+service S3 {
     rpc Configure (S3ConfigureRequest) returns (S3ConfigureResponse) {
     }
 }

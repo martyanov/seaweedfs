@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"github.com/seaweedfs/seaweedfs/weed/filer"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/s3_pb"
-	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 	"io"
 	"strconv"
 	"strings"
 
+	"github.com/seaweedfs/seaweedfs/weed/filer"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
+	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 )
 
 var LoadConfig = loadConfig
@@ -79,8 +79,8 @@ func (c *commandS3CircuitBreaker) Do(args []string, commandEnv *CommandEnv, writ
 		return err
 	}
 
-	cbCfg := &s3_pb.S3CircuitBreakerConfig{
-		Buckets: make(map[string]*s3_pb.S3CircuitBreakerOptions),
+	cbCfg := &rpc.S3CircuitBreakerConfig{
+		Buckets: make(map[string]*rpc.S3CircuitBreakerOptions),
 	}
 	if buf.Len() > 0 {
 		if err = filer.ParseS3ConfigurationFromBytes(buf.Bytes(), cbCfg); err != nil {
@@ -128,10 +128,10 @@ func (c *commandS3CircuitBreaker) Do(args []string, commandEnv *CommandEnv, writ
 
 		if len(*buckets) > 0 {
 			for _, bucket := range cmdBuckets {
-				var cbOptions *s3_pb.S3CircuitBreakerOptions
+				var cbOptions *rpc.S3CircuitBreakerOptions
 				var exists bool
 				if cbOptions, exists = cbCfg.Buckets[bucket]; !exists {
-					cbOptions = &s3_pb.S3CircuitBreakerOptions{}
+					cbOptions = &rpc.S3CircuitBreakerOptions{}
 					cbCfg.Buckets[bucket] = cbOptions
 				}
 				cbOptions.Enabled = !*disabled
@@ -152,7 +152,7 @@ func (c *commandS3CircuitBreaker) Do(args []string, commandEnv *CommandEnv, writ
 		if *global {
 			globalOptions := cbCfg.Global
 			if globalOptions == nil {
-				globalOptions = &s3_pb.S3CircuitBreakerOptions{Actions: make(map[string]int64, len(cmdActions))}
+				globalOptions = &rpc.S3CircuitBreakerOptions{Actions: make(map[string]int64, len(cmdActions))}
 				cbCfg.Global = globalOptions
 			}
 			globalOptions.Enabled = !*disabled
@@ -199,7 +199,7 @@ func loadConfig(commandEnv *CommandEnv, dir string, file string, buf *bytes.Buff
 	return nil
 }
 
-func insertOrUpdateValues(cbOptions *s3_pb.S3CircuitBreakerOptions, cmdActions []string, cmdValues []int64, limitType *string) error {
+func insertOrUpdateValues(cbOptions *rpc.S3CircuitBreakerOptions, cmdActions []string, cmdValues []int64, limitType *string) error {
 	if len(*limitType) == 0 {
 		return fmt.Errorf("type not valid, only 'count' and 'bytes' are allowed")
 	}
@@ -216,7 +216,7 @@ func insertOrUpdateValues(cbOptions *s3_pb.S3CircuitBreakerOptions, cmdActions [
 	return nil
 }
 
-func deleteBucketsActions(cmdBuckets []string, cbCfg *s3_pb.S3CircuitBreakerConfig, cmdActions []string, limitType *string) {
+func deleteBucketsActions(cmdBuckets []string, cbCfg *rpc.S3CircuitBreakerConfig, cmdActions []string, limitType *string) {
 	if cbCfg.Buckets == nil {
 		return
 	}
@@ -246,7 +246,7 @@ func deleteBucketsActions(cmdBuckets []string, cbCfg *s3_pb.S3CircuitBreakerConf
 	}
 }
 
-func deleteGlobalActions(cbCfg *s3_pb.S3CircuitBreakerConfig, cmdActions []string, limitType *string) {
+func deleteGlobalActions(cbCfg *rpc.S3CircuitBreakerConfig, cmdActions []string, limitType *string) {
 	globalOptions := cbCfg.Global
 	if globalOptions == nil {
 		return

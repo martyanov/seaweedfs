@@ -12,7 +12,6 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/s3_pb"
 	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 	"github.com/seaweedfs/seaweedfs/weed/s3api/s3err"
 )
@@ -46,7 +45,7 @@ func NewCircuitBreaker(option *S3ApiServerOption) *CircuitBreaker {
 }
 
 func (cb *CircuitBreaker) LoadS3ApiConfigurationFromBytes(content []byte) error {
-	cbCfg := &s3_pb.S3CircuitBreakerConfig{}
+	cbCfg := &rpc.S3CircuitBreakerConfig{}
 	if err := filer.ParseS3ConfigurationFromBytes(content, cbCfg); err != nil {
 		glog.Warningf("unmarshal error: %v", err)
 		return fmt.Errorf("unmarshal error: %v", err)
@@ -57,7 +56,7 @@ func (cb *CircuitBreaker) LoadS3ApiConfigurationFromBytes(content []byte) error 
 	return nil
 }
 
-func (cb *CircuitBreaker) loadCircuitBreakerConfig(cfg *s3_pb.S3CircuitBreakerConfig) error {
+func (cb *CircuitBreaker) loadCircuitBreakerConfig(cfg *rpc.S3CircuitBreakerConfig) error {
 
 	//global
 	globalEnabled := false

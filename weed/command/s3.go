@@ -14,7 +14,6 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/glog"
 	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/s3_pb"
 	"github.com/seaweedfs/seaweedfs/weed/s3api"
 	stats_collect "github.com/seaweedfs/seaweedfs/weed/stats"
 	"github.com/seaweedfs/seaweedfs/weed/util"
@@ -216,7 +215,7 @@ func (s3opt *S3Options) startS3Server() bool {
 		glog.Fatalf("s3 failed to listen on grpc port %d: %v", grpcPort, err)
 	}
 	grpcS := rpc.NewGrpcServer()
-	s3_pb.RegisterSeaweedS3Server(grpcS, s3ApiServer)
+	rpc.RegisterS3Server(grpcS, s3ApiServer)
 	reflection.Register(grpcS)
 	if grpcLocalL != nil {
 		go grpcS.Serve(grpcLocalL)

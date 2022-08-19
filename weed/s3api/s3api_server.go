@@ -13,7 +13,6 @@ import (
 
 	"github.com/seaweedfs/seaweedfs/weed/filer"
 	"github.com/seaweedfs/seaweedfs/weed/rpc"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/s3_pb"
 	. "github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 	"github.com/seaweedfs/seaweedfs/weed/s3api/s3err"
 	"github.com/seaweedfs/seaweedfs/weed/security"
@@ -34,7 +33,7 @@ type S3ApiServerOption struct {
 }
 
 type S3ApiServer struct {
-	s3_pb.UnimplementedSeaweedS3Server
+	rpc.UnimplementedS3Server
 	option         *S3ApiServerOption
 	iam            *IdentityAccessManagement
 	cb             *CircuitBreaker

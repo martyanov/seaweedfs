@@ -1,13 +1,14 @@
 package s3api
 
 import (
-	"github.com/seaweedfs/seaweedfs/weed/rpc/s3_pb"
-	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
-	"github.com/seaweedfs/seaweedfs/weed/s3api/s3err"
 	"net/http"
 	"sync"
 	"sync/atomic"
 	"testing"
+
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
+	"github.com/seaweedfs/seaweedfs/weed/s3api/s3err"
 )
 
 type TestLimitCase struct {
@@ -48,15 +49,15 @@ var (
 
 func TestLimit(t *testing.T) {
 	for _, tc := range TestLimitCases {
-		circuitBreakerConfig := &s3_pb.S3CircuitBreakerConfig{
-			Global: &s3_pb.S3CircuitBreakerOptions{
+		circuitBreakerConfig := &rpc.S3CircuitBreakerConfig{
+			Global: &rpc.S3CircuitBreakerOptions{
 				Enabled: true,
 				Actions: map[string]int64{
 					s3_constants.Concat(tc.actionName, tc.limitType): tc.globalLimitValue,
 					s3_constants.Concat(tc.actionName, tc.limitType): tc.globalLimitValue,
 				},
 			},
-			Buckets: map[string]*s3_pb.S3CircuitBreakerOptions{
+			Buckets: map[string]*rpc.S3CircuitBreakerOptions{
 				bucket: {
 					Enabled: true,
 					Actions: map[string]int64{
