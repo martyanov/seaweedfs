@@ -7,9 +7,9 @@ import (
 
 	"github.com/seaweedfs/seaweedfs/weed/filer"
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/replication/sink"
 	"github.com/seaweedfs/seaweedfs/weed/replication/source"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
@@ -133,6 +133,10 @@ func (localsink *LocalSink) CreateEntry(key string, entry *filer_pb.Entry, signa
 	writeFunc := func(data []byte) error {
 		_, writeErr := dstFile.Write(data)
 		return writeErr
+	}
+
+	if len(entry.Content) > 0 {
+		return writeFunc(entry.Content)
 	}
 
 	if err := copyFromChunkViews(chunkViews, localsink.filerSource, writeFunc); err != nil {
