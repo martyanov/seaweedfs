@@ -1,24 +1,24 @@
 package command
 
 import (
+	"sync"
+
 	"github.com/seaweedfs/seaweedfs/weed/glog"
+	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/util"
-	"sync"
 )
-
-type MetadataProcessFunc func(resp *filer_pb.SubscribeMetadataResponse) error
 
 type MetadataProcessor struct {
 	activeJobs           map[int64]*filer_pb.SubscribeMetadataResponse
 	activeJobsLock       sync.Mutex
 	activeJobsCond       *sync.Cond
 	concurrencyLimit     int
-	fn                   MetadataProcessFunc
+	fn                   rpc.ProcessMetadataFunc
 	processedTsWatermark int64
 }
 
-func NewMetadataProcessor(fn MetadataProcessFunc, concurrency int) *MetadataProcessor {
+func NewMetadataProcessor(fn rpc.ProcessMetadataFunc, concurrency int) *MetadataProcessor {
 	t := &MetadataProcessor{
 		fn:               fn,
 		activeJobs:       make(map[int64]*filer_pb.SubscribeMetadataResponse),
