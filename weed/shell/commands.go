@@ -81,6 +81,9 @@ func (ce *CommandEnv) confirmIsLocked(args []string) error {
 }
 
 func (ce *CommandEnv) isLocked() bool {
+	if ce == nil {
+		return true
+	}
 	return ce.locker.IsLocked()
 }
 
