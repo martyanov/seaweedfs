@@ -13,11 +13,14 @@ import (
 func (ms *MasterServer) RaftListClusterServers(ctx context.Context, req *master_pb.RaftListClusterServersRequest) (*master_pb.RaftListClusterServersResponse, error) {
 	resp := &master_pb.RaftListClusterServersResponse{}
 
+	ms.Topo.RaftAccessLock.RLock()
 	if ms.Topo.Raft == nil {
+		ms.Topo.RaftAccessLock.RUnlock()
 		return resp, nil
 	}
 
 	servers := ms.Topo.Raft.GetConfiguration().Configuration().Servers
+	ms.Topo.RaftAccessLock.RUnlock()
 
 	for _, server := range servers {
 		resp.ClusterServers = append(resp.ClusterServers, &master_pb.RaftListClusterServersResponse_ClusterServers{
@@ -32,6 +35,8 @@ func (ms *MasterServer) RaftListClusterServers(ctx context.Context, req *master_
 func (ms *MasterServer) RaftAddServer(ctx context.Context, req *master_pb.RaftAddServerRequest) (*master_pb.RaftAddServerResponse, error) {
 	resp := &master_pb.RaftAddServerResponse{}
 
+	ms.Topo.RaftAccessLock.RLock()
+	defer ms.Topo.RaftAccessLock.RUnlock()
 	if ms.Topo.Raft == nil {
 		return resp, nil
 	}
@@ -56,6 +61,8 @@ func (ms *MasterServer) RaftAddServer(ctx context.Context, req *master_pb.RaftAd
 func (ms *MasterServer) RaftRemoveServer(ctx context.Context, req *master_pb.RaftRemoveServerRequest) (*master_pb.RaftRemoveServerResponse, error) {
 	resp := &master_pb.RaftRemoveServerResponse{}
 
+	ms.Topo.RaftAccessLock.RLock()
+	defer ms.Topo.RaftAccessLock.RUnlock()
 	if ms.Topo.Raft == nil {
 		return resp, nil
 	}

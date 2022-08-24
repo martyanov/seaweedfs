@@ -42,6 +42,7 @@ type Topology struct {
 	Configuration *Configuration
 
 	Raft           *raft.Raft
+	RaftAccessLock sync.RWMutex
 	UuidAccessLock sync.RWMutex
 	UuidMap        map[string][]string
 }
@@ -70,6 +71,9 @@ func NewTopology(id string, seq sequence.Sequencer, volumeSizeLimit uint64, puls
 }
 
 func (t *Topology) IsLeader() bool {
+	t.RaftAccessLock.RLock()
+	defer t.RaftAccessLock.RUnlock()
+
 	if t.Raft != nil {
 		if t.Raft.State() == raft.Leader {
 			return true
@@ -78,21 +82,33 @@ func (t *Topology) IsLeader() bool {
 	return false
 }
 
-func (t *Topology) Leader() (rpc.ServerAddress, error) {
-	var l rpc.ServerAddress
+func (t *Topology) Leader() (l rpc.ServerAddress, err error) {
 	for count := 0; count < 3; count++ {
-		if t.Raft != nil {
-			l = rpc.ServerAddress(t.Raft.Leader())
-		} else {
-			return "", errors.New("Raft Server not ready yet!")
+		l, err = t.MaybeLeader()
+		if err != nil {
+			return
 		}
 		if l != "" {
 			break
-		} else {
-			time.Sleep(time.Duration(5+count) * time.Second)
 		}
+
+		time.Sleep(time.Duration(5+count) * time.Second)
 	}
-	return l, nil
+
+	return
+}
+
+func (t *Topology) MaybeLeader() (l rpc.ServerAddress, err error) {
+	t.RaftAccessLock.RLock()
+	defer t.RaftAccessLock.RUnlock()
+
+	if t.Raft != nil {
+		l = rpc.ServerAddress(t.Raft.Leader())
+	} else {
+		err = errors.New("Raft Server not ready yet!")
+	}
+
+	return
 }
 
 func (t *Topology) Lookup(collection string, vid needle.VolumeId) (dataNodes []*DataNode) {
@@ -122,6 +138,10 @@ func (t *Topology) Lookup(collection string, vid needle.VolumeId) (dataNodes []*
 func (t *Topology) NextVolumeId() (needle.VolumeId, error) {
 	vid := t.GetMaxVolumeId()
 	next := vid.Next()
+
+	t.RaftAccessLock.RLock()
+	defer t.RaftAccessLock.RUnlock()
+
 	if t.Raft != nil {
 		b, err := json.Marshal(NewMaxVolumeIdCommand(next))
 		if err != nil {

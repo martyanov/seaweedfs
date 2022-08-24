@@ -163,6 +163,8 @@ func NewMasterServer(r *mux.Router, option *MasterOption, peers map[string]rpc.S
 
 func (ms *MasterServer) SetRaftServer(raftServer *RaftServer) {
 	var raftServerName string
+
+	ms.Topo.RaftAccessLock.Lock()
 	if raftServer.Raft != nil {
 		ms.Topo.Raft = raftServer.Raft
 		leaderCh := raftServer.Raft.LeaderCh()
@@ -180,12 +182,16 @@ func (ms *MasterServer) SetRaftServer(raftServer *RaftServer) {
 		}()
 		raftServerName = ms.Topo.Raft.String()
 	}
+	ms.Topo.RaftAccessLock.Unlock()
+
 	if ms.Topo.IsLeader() {
 		glog.V(0).Infoln("[", raftServerName, "]", "I am the leader!")
 	} else {
+		ms.Topo.RaftAccessLock.RLock()
 		if ms.Topo.Raft != nil && ms.Topo.Raft.Leader() != "" {
 			glog.V(0).Infoln("[", ms.Topo.Raft.String(), "]", ms.Topo.Raft.Leader(), "is the leader.")
 		}
+		ms.Topo.RaftAccessLock.RUnlock()
 	}
 }
 
@@ -195,14 +201,16 @@ func (ms *MasterServer) proxyToLeader(f http.HandlerFunc) http.HandlerFunc {
 			f(w, r)
 			return
 		}
-		var raftServerLeader string
-		if ms.Topo.Raft != nil && ms.Topo.Raft.Leader() != "" {
-			raftServerLeader = string(ms.Topo.Raft.Leader())
-		}
+
+		// get the current raft leader
+		leaderAddr, _ := ms.Topo.MaybeLeader()
+		raftServerLeader := string(leaderAddr)
+
 		if raftServerLeader == "" {
 			f(w, r)
 			return
 		}
+
 		ms.boundedLeaderChan <- 1
 		defer func() { <-ms.boundedLeaderChan }()
 		targetUrl, err := url.Parse("http://" + raftServerLeader)
@@ -211,6 +219,8 @@ func (ms *MasterServer) proxyToLeader(f http.HandlerFunc) http.HandlerFunc {
 				fmt.Errorf("Leader URL http://%s Parse Error: %v", raftServerLeader, err))
 			return
 		}
+
+		// proxy to leader
 		glog.V(4).Infoln("proxying to leader", raftServerLeader)
 		proxy := httputil.NewSingleHostReverseProxy(targetUrl)
 		director := proxy.Director
@@ -319,6 +329,8 @@ func (ms *MasterServer) createSequencer(option *MasterOption) sequence.Sequencer
 }
 
 func (ms *MasterServer) OnPeerUpdate(update *master_pb.ClusterNodeUpdate, startFrom time.Time) {
+	ms.Topo.RaftAccessLock.RLock()
+	defer ms.Topo.RaftAccessLock.RUnlock()
 	if update.NodeType != cluster.MasterType || ms.Topo.Raft == nil {
 		return
 	}
