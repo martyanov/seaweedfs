@@ -98,7 +98,7 @@ func (c *commandClusterCheck) Do(args []string, commandEnv *CommandEnv, writer i
 	for _, master := range masters {
 		for _, volumeServer := range volumeServers {
 			fmt.Fprintf(writer, "checking master %s to volume server %s ... ", string(master), string(volumeServer))
-			err := rpc.WithMasterClient(false, master, commandEnv.option.GrpcDialOption, func(client master_pb.SeaweedClient) error {
+			err := rpc.WithMasterClient(false, master, commandEnv.option.GrpcDialOption, false, func(client master_pb.SeaweedClient) error {
 				pong, err := client.Ping(context.Background(), &master_pb.PingRequest{
 					Target:     string(volumeServer),
 					TargetType: cluster.VolumeServerType,
@@ -121,7 +121,7 @@ func (c *commandClusterCheck) Do(args []string, commandEnv *CommandEnv, writer i
 				continue
 			}
 			fmt.Fprintf(writer, "checking master %s to %s ... ", string(sourceMaster), string(targetMaster))
-			err := rpc.WithMasterClient(false, sourceMaster, commandEnv.option.GrpcDialOption, func(client master_pb.SeaweedClient) error {
+			err := rpc.WithMasterClient(false, sourceMaster, commandEnv.option.GrpcDialOption, false, func(client master_pb.SeaweedClient) error {
 				pong, err := client.Ping(context.Background(), &master_pb.PingRequest{
 					Target:     string(targetMaster),
 					TargetType: cluster.MasterType,

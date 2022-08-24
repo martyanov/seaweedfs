@@ -89,7 +89,7 @@ func (vs *VolumeServer) doHeartbeat(masterAddress rpc.ServerAddress, grpcDialOpt
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	grpcConection, err := rpc.GrpcDial(ctx, masterAddress.ToGrpcAddress(), grpcDialOption)
+	grpcConection, err := rpc.GrpcDial(ctx, masterAddress.ToGrpcAddress(), false, grpcDialOption)
 	if err != nil {
 		return "", fmt.Errorf("fail to dial %s : %v", masterAddress, err)
 	}

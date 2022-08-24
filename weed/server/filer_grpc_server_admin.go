@@ -67,7 +67,7 @@ func (fs *FilerServer) Ping(ctx context.Context, req *filer_pb.PingRequest) (res
 		})
 	}
 	if req.TargetType == cluster.MasterType {
-		pingErr = rpc.WithMasterClient(false, rpc.ServerAddress(req.Target), fs.grpcDialOption, func(client master_pb.SeaweedClient) error {
+		pingErr = rpc.WithMasterClient(false, rpc.ServerAddress(req.Target), fs.grpcDialOption, false, func(client master_pb.SeaweedClient) error {
 			pingResp, err := client.Ping(ctx, &master_pb.PingRequest{})
 			if pingResp != nil {
 				resp.RemoteTimeNs = pingResp.StartTimeNs

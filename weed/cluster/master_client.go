@@ -6,13 +6,13 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/seaweedfs/seaweedfs/weed/glog"
-	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 	"github.com/seaweedfs/seaweedfs/weed/rpc"
+	"github.com/seaweedfs/seaweedfs/weed/rpc/master_pb"
 )
 
 func ListExistingPeerUpdates(master rpc.ServerAddress, grpcDialOption grpc.DialOption, filerGroup string, clientType string) (existingNodes []*master_pb.ClusterNodeUpdate) {
 
-	if grpcErr := rpc.WithMasterClient(false, master, grpcDialOption, func(client master_pb.SeaweedClient) error {
+	if grpcErr := rpc.WithMasterClient(false, master, grpcDialOption, false, func(client master_pb.SeaweedClient) error {
 		resp, err := client.ListClusterNodes(context.Background(), &master_pb.ListClusterNodesRequest{
 			ClientType: clientType,
 			FilerGroup: filerGroup,

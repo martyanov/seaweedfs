@@ -129,7 +129,7 @@ func runUpload(cmd *Command, args []string) bool {
 }
 
 func readMasterConfiguration(grpcDialOption grpc.DialOption, masterAddress rpc.ServerAddress) (replication string, err error) {
-	err = rpc.WithMasterClient(false, masterAddress, grpcDialOption, func(client master_pb.SeaweedClient) error {
+	err = rpc.WithMasterClient(false, masterAddress, grpcDialOption, false, func(client master_pb.SeaweedClient) error {
 		resp, err := client.GetMasterConfiguration(context.Background(), &master_pb.GetMasterConfigurationRequest{})
 		if err != nil {
 			return fmt.Errorf("get master %s configuration: %v", masterAddress, err)

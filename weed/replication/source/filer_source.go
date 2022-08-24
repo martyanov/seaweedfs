@@ -130,7 +130,7 @@ func (fs *FilerSource) WithFilerClient(streamingMode bool, fn func(filer_pb.Seaw
 	return rpc.WithGrpcClient(streamingMode, func(grpcConnection *grpc.ClientConn) error {
 		client := filer_pb.NewSeaweedFilerClient(grpcConnection)
 		return fn(client)
-	}, fs.grpcAddress, fs.grpcDialOption)
+	}, fs.grpcAddress, false, fs.grpcDialOption)
 
 }
 

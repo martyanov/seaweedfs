@@ -569,7 +569,7 @@ func (worker *FileCopyWorker) WithFilerClient(streamingMode bool, fn func(filer_
 	err = rpc.WithGrpcClient(streamingMode, func(grpcConnection *grpc.ClientConn) error {
 		client := filer_pb.NewSeaweedFilerClient(grpcConnection)
 		return fn(client)
-	}, filerGrpcAddress, worker.options.grpcDialOption)
+	}, filerGrpcAddress, false, worker.options.grpcDialOption)
 
 	return
 }
