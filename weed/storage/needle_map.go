@@ -5,6 +5,8 @@ import (
 	"os"
 	"sync"
 
+	"github.com/syndtr/goleveldb/leveldb/opt"
+
 	"github.com/seaweedfs/seaweedfs/weed/storage/idx"
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle_map"
 	. "github.com/seaweedfs/seaweedfs/weed/storage/types"
@@ -41,6 +43,13 @@ type baseNeedleMapper struct {
 	indexFile           *os.File
 	indexFileAccessLock sync.Mutex
 	indexFileOffset     int64
+}
+
+type TempNeedleMapper interface {
+	NeedleMapper
+	DoOffsetLoading(v *Volume, indexFile *os.File, startFrom uint64) error
+	UpdateNeedleMap(v *Volume, indexFile *os.File, opts *opt.Options) error
+	UpdateNeedleMapMetric(indexFile *os.File) error
 }
 
 func (nm *baseNeedleMapper) IndexFileSize() uint64 {
