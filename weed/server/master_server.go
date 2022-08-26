@@ -113,7 +113,7 @@ func NewMasterServer(r *mux.Router, option *MasterOption, peers map[string]rpc.S
 	}
 	ms.boundedLeaderChan = make(chan int, 16)
 
-	ms.MasterClient.OnPeerUpdate = ms.OnPeerUpdate
+	ms.MasterClient.SetOnPeerUpdateFn(ms.OnPeerUpdate)
 
 	seq := ms.createSequencer(option)
 	if nil == seq {
