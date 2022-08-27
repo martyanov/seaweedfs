@@ -67,11 +67,6 @@ func (ms *MasterServer) SendHeartbeat(stream master_pb.Seaweed_SendHeartbeatServ
 				glog.V(0).Infof("disconnect phantom volume server %s:%d remaining %d", dn.Ip, dn.Port, dn.Counter)
 				return
 			}
-			// if the volume server disconnects and reconnects quickly
-			//  the unregister and register can race with each other
-			ms.Topo.UnRegisterDataNode(dn)
-			glog.V(0).Infof("unregister disconnected volume server %s:%d", dn.Ip, dn.Port)
-			ms.UnRegisterUuids(dn.Ip, dn.Port)
 
 			message := &master_pb.VolumeLocation{
 				Url:       dn.Url(),
@@ -83,6 +78,12 @@ func (ms *MasterServer) SendHeartbeat(stream master_pb.Seaweed_SendHeartbeatServ
 			for _, s := range dn.GetEcShards() {
 				message.DeletedVids = append(message.DeletedVids, uint32(s.VolumeId))
 			}
+
+			// if the volume server disconnects and reconnects quickly
+			//  the unregister and register can race with each other
+			ms.Topo.UnRegisterDataNode(dn)
+			glog.V(0).Infof("unregister disconnected volume server %s:%d", dn.Ip, dn.Port)
+			ms.UnRegisterUuids(dn.Ip, dn.Port)
 
 			if len(message.DeletedVids) > 0 {
 				ms.broadcastToClients(&master_pb.KeepConnectedResponse{VolumeLocation: message})
