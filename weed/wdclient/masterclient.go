@@ -61,7 +61,7 @@ func (mc *MasterClient) LookupFileIdWithFallback(fileId string) (fullUrls []stri
 	if err == nil && len(fullUrls) > 0 {
 		return
 	}
-	err = rpc.WithMasterClient(false, mc.getCurrentMaster(), mc.grpcDialOption, false, func(client master_pb.SeaweedClient) error {
+	err = rpc.WithMasterClient(false, mc.GetMaster(), mc.grpcDialOption, false, func(client master_pb.SeaweedClient) error {
 		resp, err := client.LookupVolume(context.Background(), &master_pb.LookupVolumeRequest{
 			VolumeOrFileIds: []string{fileId},
 		})
@@ -227,8 +227,8 @@ func (mc *MasterClient) tryConnectToMaster(master rpc.ServerAddress) (nextHinted
 
 			if resp.VolumeLocation != nil {
 				// maybe the leader is changed
-				if resp.VolumeLocation.Leader != "" && string(mc.getCurrentMaster()) != resp.VolumeLocation.Leader {
-					glog.V(0).Infof("currentMaster %v redirected to leader %v", mc.getCurrentMaster(), resp.VolumeLocation.Leader)
+				if resp.VolumeLocation.Leader != "" && string(mc.GetMaster()) != resp.VolumeLocation.Leader {
+					glog.V(0).Infof("currentMaster %v redirected to leader %v", mc.GetMaster(), resp.VolumeLocation.Leader)
 					nextHintedLeader = rpc.ServerAddress(resp.VolumeLocation.Leader)
 					stats.MasterClientConnectCounter.WithLabelValues(stats.RedirectedToLeader).Inc()
 					return nil
@@ -290,10 +290,7 @@ func (mc *MasterClient) updateVidMap(resp *master_pb.KeepConnectedResponse) {
 
 func (mc *MasterClient) WithClient(streamingMode bool, fn func(client master_pb.SeaweedClient) error) error {
 	return util.Retry("master grpc", func() error {
-		for mc.getCurrentMaster() == "" {
-			time.Sleep(3 * time.Second)
-		}
-		return rpc.WithMasterClient(streamingMode, mc.getCurrentMaster(), mc.grpcDialOption, false, func(client master_pb.SeaweedClient) error {
+		return rpc.WithMasterClient(streamingMode, mc.GetMaster(), mc.grpcDialOption, false, func(client master_pb.SeaweedClient) error {
 			return fn(client)
 		})
 	})
