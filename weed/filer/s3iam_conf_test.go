@@ -113,6 +113,41 @@ func TestCheckDuplicateAccessKey(t *testing.T) {
 						},
 					},
 					{
+						Name: "some_name",
+						Credentials: []*rpc.IAMCredential{
+							{
+								AccessKey: "some_access_key1",
+								SecretKey: "some_secret_key1",
+							},
+						},
+						Actions: []string{
+							ACTION_READ,
+							ACTION_TAGGING,
+							ACTION_LIST,
+						},
+					},
+				},
+			},
+			"",
+		},
+		{
+			&rpc.IAMConfiguration{
+				Identities: []*rpc.IAMIdentity{
+					{
+						Name: "some_name",
+						Credentials: []*rpc.IAMCredential{
+							{
+								AccessKey: "some_access_key1",
+								SecretKey: "some_secret_key1",
+							},
+						},
+						Actions: []string{
+							ACTION_ADMIN,
+							ACTION_READ,
+							ACTION_WRITE,
+						},
+					},
+					{
 						Name: "some_read_only_user",
 						Credentials: []*rpc.IAMCredential{
 							{
