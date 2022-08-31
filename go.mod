@@ -38,7 +38,7 @@ require (
 	golang.org/x/tools v0.1.8-0.20211029000441-d6a9af8af023
 	google.golang.org/grpc v1.48.0
 	google.golang.org/protobuf v1.28.1
-	modernc.org/strutil v1.1.2
+	modernc.org/strutil v1.1.3
 )
 
 require (
