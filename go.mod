@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/Jille/raft-grpc-transport v1.2.0
-	github.com/Shopify/sarama v1.35.0
+	github.com/Shopify/sarama v1.36.0
 	github.com/aws/aws-sdk-go v1.44.66
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/dustin/go-humanize v1.0.0
@@ -34,7 +34,7 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0
 	github.com/viant/ptrie v0.3.0
 	golang.org/x/exp v0.0.0-20220414153411-bcd21879b8fd
-	golang.org/x/net v0.0.0-20220708220712-1185a9018129
+	golang.org/x/net v0.0.0-20220809184613-07c6da5e1ced
 	golang.org/x/tools v0.1.8-0.20211029000441-d6a9af8af023
 	google.golang.org/grpc v1.48.0
 	google.golang.org/protobuf v1.28.1
@@ -68,16 +68,16 @@ require (
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-msgpack v1.1.5 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
-	github.com/hashicorp/go-uuid v1.0.2 // indirect
+	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
 	github.com/jcmturner/dnsutils/v2 v2.0.0 // indirect
-	github.com/jcmturner/gofork v1.0.0 // indirect
-	github.com/jcmturner/gokrb5/v8 v8.4.2 // indirect
+	github.com/jcmturner/gofork v1.7.6 // indirect
+	github.com/jcmturner/gokrb5/v8 v8.4.3 // indirect
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	github.com/klauspost/compress v1.15.8 // indirect
+	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.14 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
@@ -102,9 +102,8 @@ require (
 	github.com/viant/assertly v0.5.4 // indirect
 	github.com/viant/toolbox v0.33.2 // indirect
 	go.etcd.io/bbolt v1.3.5 // indirect
-	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d // indirect
+	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
 	golang.org/x/oauth2 v0.0.0-20220622183110-fd043fe589d2 // indirect
-	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
 	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20220624142145-8cd45d7dbd1f // indirect
