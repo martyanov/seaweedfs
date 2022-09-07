@@ -10,6 +10,7 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/storage/needle"
 	"github.com/seaweedfs/seaweedfs/weed/storage/types"
 	"github.com/seaweedfs/seaweedfs/weed/util"
+	"sync/atomic"
 )
 
 type DataNode struct {
@@ -142,12 +143,13 @@ func (dn *DataNode) AdjustMaxVolumeCounts(maxVolumeCounts map[string]uint32) {
 		}
 		dt := types.ToDiskType(diskType)
 		currentDiskUsage := dn.diskUsages.getOrCreateDisk(dt)
-		if currentDiskUsage.maxVolumeCount == int64(maxVolumeCount) {
+		currentDiskUsageMaxVolumeCount := atomic.LoadInt64(&currentDiskUsage.maxVolumeCount)
+		if currentDiskUsageMaxVolumeCount == int64(maxVolumeCount) {
 			continue
 		}
 		disk := dn.getOrCreateDisk(dt.String())
 		deltaDiskUsage := deltaDiskUsages.getOrCreateDisk(dt)
-		deltaDiskUsage.maxVolumeCount = int64(maxVolumeCount) - currentDiskUsage.maxVolumeCount
+		deltaDiskUsage.maxVolumeCount = int64(maxVolumeCount) - currentDiskUsageMaxVolumeCount
 		disk.UpAdjustDiskUsageDelta(deltaDiskUsages)
 	}
 }
