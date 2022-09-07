@@ -44,6 +44,7 @@ type VolumeServerClient interface {
 	ReadVolumeFileStatus(ctx context.Context, in *ReadVolumeFileStatusRequest, opts ...grpc.CallOption) (*ReadVolumeFileStatusResponse, error)
 	CopyFile(ctx context.Context, in *CopyFileRequest, opts ...grpc.CallOption) (VolumeServer_CopyFileClient, error)
 	ReadNeedleBlob(ctx context.Context, in *ReadNeedleBlobRequest, opts ...grpc.CallOption) (*ReadNeedleBlobResponse, error)
+	ReadNeedleMeta(ctx context.Context, in *ReadNeedleMetaRequest, opts ...grpc.CallOption) (*ReadNeedleMetaResponse, error)
 	WriteNeedleBlob(ctx context.Context, in *WriteNeedleBlobRequest, opts ...grpc.CallOption) (*WriteNeedleBlobResponse, error)
 	ReadAllNeedles(ctx context.Context, in *ReadAllNeedlesRequest, opts ...grpc.CallOption) (VolumeServer_ReadAllNeedlesClient, error)
 	VolumeTailSender(ctx context.Context, in *VolumeTailSenderRequest, opts ...grpc.CallOption) (VolumeServer_VolumeTailSenderClient, error)
@@ -345,6 +346,15 @@ func (x *volumeServerCopyFileClient) Recv() (*CopyFileResponse, error) {
 func (c *volumeServerClient) ReadNeedleBlob(ctx context.Context, in *ReadNeedleBlobRequest, opts ...grpc.CallOption) (*ReadNeedleBlobResponse, error) {
 	out := new(ReadNeedleBlobResponse)
 	err := c.cc.Invoke(ctx, "/volume_server_pb.VolumeServer/ReadNeedleBlob", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *volumeServerClient) ReadNeedleMeta(ctx context.Context, in *ReadNeedleMetaRequest, opts ...grpc.CallOption) (*ReadNeedleMetaResponse, error) {
+	out := new(ReadNeedleMetaResponse)
+	err := c.cc.Invoke(ctx, "/volume_server_pb.VolumeServer/ReadNeedleMeta", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -704,6 +714,7 @@ type VolumeServerServer interface {
 	ReadVolumeFileStatus(context.Context, *ReadVolumeFileStatusRequest) (*ReadVolumeFileStatusResponse, error)
 	CopyFile(*CopyFileRequest, VolumeServer_CopyFileServer) error
 	ReadNeedleBlob(context.Context, *ReadNeedleBlobRequest) (*ReadNeedleBlobResponse, error)
+	ReadNeedleMeta(context.Context, *ReadNeedleMetaRequest) (*ReadNeedleMetaResponse, error)
 	WriteNeedleBlob(context.Context, *WriteNeedleBlobRequest) (*WriteNeedleBlobResponse, error)
 	ReadAllNeedles(*ReadAllNeedlesRequest, VolumeServer_ReadAllNeedlesServer) error
 	VolumeTailSender(*VolumeTailSenderRequest, VolumeServer_VolumeTailSenderServer) error
@@ -795,6 +806,9 @@ func (UnimplementedVolumeServerServer) CopyFile(*CopyFileRequest, VolumeServer_C
 }
 func (UnimplementedVolumeServerServer) ReadNeedleBlob(context.Context, *ReadNeedleBlobRequest) (*ReadNeedleBlobResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReadNeedleBlob not implemented")
+}
+func (UnimplementedVolumeServerServer) ReadNeedleMeta(context.Context, *ReadNeedleMetaRequest) (*ReadNeedleMetaResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadNeedleMeta not implemented")
 }
 func (UnimplementedVolumeServerServer) WriteNeedleBlob(context.Context, *WriteNeedleBlobRequest) (*WriteNeedleBlobResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method WriteNeedleBlob not implemented")
@@ -1240,6 +1254,24 @@ func _VolumeServer_ReadNeedleBlob_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VolumeServerServer).ReadNeedleBlob(ctx, req.(*ReadNeedleBlobRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VolumeServer_ReadNeedleMeta_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadNeedleMetaRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VolumeServerServer).ReadNeedleMeta(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/volume_server_pb.VolumeServer/ReadNeedleMeta",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VolumeServerServer).ReadNeedleMeta(ctx, req.(*ReadNeedleMetaRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1710,6 +1742,10 @@ var VolumeServer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ReadNeedleBlob",
 			Handler:    _VolumeServer_ReadNeedleBlob_Handler,
+		},
+		{
+			MethodName: "ReadNeedleMeta",
+			Handler:    _VolumeServer_ReadNeedleMeta_Handler,
 		},
 		{
 			MethodName: "WriteNeedleBlob",
