@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"fmt"
+	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 	"os"
 	"strings"
 	"time"
@@ -108,6 +109,9 @@ func makeEventProcessor(remoteStorage *remote_pb.RemoteConf, mountedDir string, 
 			return nil
 		}
 		if filer_pb.IsCreate(resp) {
+			if strings.Contains(message.NewParentPath, "/"+s3_constants.MultipartUploadsFolder+"/") {
+				return nil
+			}
 			if !filer.HasData(message.NewEntry) {
 				return nil
 			}
@@ -157,7 +161,9 @@ func makeEventProcessor(remoteStorage *remote_pb.RemoteConf, mountedDir string, 
 			glog.V(2).Infof("update: %+v", resp)
 			glog.V(0).Infof("delete %s", remote_storage.FormatLocation(oldDest))
 			if err := client.DeleteFile(oldDest); err != nil {
-				return err
+				if !strings.Contains(resp.Directory, "/"+s3_constants.MultipartUploadsFolder+"/") {
+					return err
+				}
 			}
 			remoteEntry, writeErr := retriedWriteFile(client, filerSource, message.NewEntry, dest)
 			if writeErr != nil {
