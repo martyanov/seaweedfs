@@ -17,7 +17,6 @@ import (
 	"github.com/seaweedfs/seaweedfs/weed/rpc"
 	"github.com/seaweedfs/seaweedfs/weed/rpc/filer_pb"
 	"github.com/seaweedfs/seaweedfs/weed/rpc/remote_pb"
-	"github.com/seaweedfs/seaweedfs/weed/s3api/s3_constants"
 	"github.com/seaweedfs/seaweedfs/weed/util"
 )
 
@@ -185,7 +184,7 @@ func (option *RemoteGatewayOptions) makeBucketedEventProcessor(filerSource *sour
 			if message.NewParentPath == option.bucketsDir {
 				return handleCreateBucket(message.NewEntry)
 			}
-			if strings.HasPrefix(message.NewParentPath, option.bucketsDir) && strings.Contains(message.NewParentPath, "/"+s3_constants.MultipartUploadsFolder+"/") {
+			if isMultipartUploadFile(message.NewParentPath, message.NewEntry.Name) {
 				return nil
 			}
 			if !filer.HasData(message.NewEntry) {
