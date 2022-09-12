@@ -155,11 +155,18 @@ func (vs *VolumeServer) doHeartbeat(masterAddress rpc.ServerAddress, grpcDialOpt
 
 	volumeTickChan := time.Tick(sleepInterval)
 	ecShardTickChan := time.Tick(17 * sleepInterval)
-
+	dataCenter := vs.store.GetDataCenter()
+	rack := vs.store.GetRack()
+	ip := vs.store.Ip
+	port := uint32(vs.store.Port)
 	for {
 		select {
 		case volumeMessage := <-vs.store.NewVolumesChan:
 			deltaBeat := &master_pb.Heartbeat{
+				Ip:         ip,
+				Port:       port,
+				DataCenter: dataCenter,
+				Rack:       rack,
 				NewVolumes: []*master_pb.VolumeShortInformationMessage{
 					&volumeMessage,
 				},
@@ -171,6 +178,10 @@ func (vs *VolumeServer) doHeartbeat(masterAddress rpc.ServerAddress, grpcDialOpt
 			}
 		case ecShardMessage := <-vs.store.NewEcShardsChan:
 			deltaBeat := &master_pb.Heartbeat{
+				Ip:         ip,
+				Port:       port,
+				DataCenter: dataCenter,
+				Rack:       rack,
 				NewEcShards: []*master_pb.VolumeEcShardInformationMessage{
 					&ecShardMessage,
 				},
@@ -183,6 +194,10 @@ func (vs *VolumeServer) doHeartbeat(masterAddress rpc.ServerAddress, grpcDialOpt
 			}
 		case volumeMessage := <-vs.store.DeletedVolumesChan:
 			deltaBeat := &master_pb.Heartbeat{
+				Ip:         ip,
+				Port:       port,
+				DataCenter: dataCenter,
+				Rack:       rack,
 				DeletedVolumes: []*master_pb.VolumeShortInformationMessage{
 					&volumeMessage,
 				},
@@ -194,6 +209,10 @@ func (vs *VolumeServer) doHeartbeat(masterAddress rpc.ServerAddress, grpcDialOpt
 			}
 		case ecShardMessage := <-vs.store.DeletedEcShardsChan:
 			deltaBeat := &master_pb.Heartbeat{
+				Ip:         ip,
+				Port:       port,
+				DataCenter: dataCenter,
+				Rack:       rack,
 				DeletedEcShards: []*master_pb.VolumeEcShardInformationMessage{
 					&ecShardMessage,
 				},
@@ -222,12 +241,12 @@ func (vs *VolumeServer) doHeartbeat(masterAddress rpc.ServerAddress, grpcDialOpt
 		case <-vs.stopChan:
 			var volumeMessages []*master_pb.VolumeInformationMessage
 			emptyBeat := &master_pb.Heartbeat{
-				Ip:           vs.store.Ip,
-				Port:         uint32(vs.store.Port),
+				Ip:           ip,
+				Port:         port,
 				PublicUrl:    vs.store.PublicUrl,
 				MaxFileKey:   uint64(0),
-				DataCenter:   vs.store.GetDataCenter(),
-				Rack:         vs.store.GetRack(),
+				DataCenter:   dataCenter,
+				Rack:         rack,
 				Volumes:      volumeMessages,
 				HasNoVolumes: len(volumeMessages) == 0,
 			}
