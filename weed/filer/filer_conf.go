@@ -22,7 +22,7 @@ const (
 	DirectoryEtcSeaweedFS = "/etc/seaweedfs"
 	DirectoryEtcRemote    = "/etc/remote"
 	FilerConfName         = "filer.conf"
-	IamConfigDirecotry    = "/etc/iam"
+	IamConfigDirectory    = "/etc/iam"
 	IamIdentityFile       = "identity.json"
 	IamPoliciesFile       = "policies.json"
 )
