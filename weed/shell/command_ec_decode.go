@@ -171,13 +171,13 @@ func generateNormalVolume(grpcDialOption grpc.DialOption, vid needle.VolumeId, c
 func collectEcShards(commandEnv *CommandEnv, nodeToEcIndexBits map[rpc.ServerAddress]erasure_coding.ShardBits, collection string, vid needle.VolumeId) (targetNodeLocation rpc.ServerAddress, err error) {
 
 	maxShardCount := 0
-	var exisitngEcIndexBits erasure_coding.ShardBits
+	var existingEcIndexBits erasure_coding.ShardBits
 	for loc, ecIndexBits := range nodeToEcIndexBits {
 		toBeCopiedShardCount := ecIndexBits.MinusParityShards().ShardIdCount()
 		if toBeCopiedShardCount > maxShardCount {
 			maxShardCount = toBeCopiedShardCount
 			targetNodeLocation = loc
-			exisitngEcIndexBits = ecIndexBits
+			existingEcIndexBits = ecIndexBits
 		}
 	}
 
@@ -189,7 +189,7 @@ func collectEcShards(commandEnv *CommandEnv, nodeToEcIndexBits map[rpc.ServerAdd
 			continue
 		}
 
-		needToCopyEcIndexBits := ecIndexBits.Minus(exisitngEcIndexBits).MinusParityShards()
+		needToCopyEcIndexBits := ecIndexBits.Minus(existingEcIndexBits).MinusParityShards()
 		if needToCopyEcIndexBits.ShardIdCount() == 0 {
 			continue
 		}
@@ -222,7 +222,7 @@ func collectEcShards(commandEnv *CommandEnv, nodeToEcIndexBits map[rpc.ServerAdd
 
 	}
 
-	nodeToEcIndexBits[targetNodeLocation] = exisitngEcIndexBits.Plus(copiedEcIndexBits)
+	nodeToEcIndexBits[targetNodeLocation] = existingEcIndexBits.Plus(copiedEcIndexBits)
 
 	return targetNodeLocation, err
 
