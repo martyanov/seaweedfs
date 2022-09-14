@@ -131,7 +131,7 @@ func startMaster(masterOption MasterOptions, masterWhiteList []string) {
 	ms := weed_server.NewMasterServer(r, masterOption.toMasterOption(masterWhiteList), masterPeers)
 	listeningAddress := util.JoinHostPort(*masterOption.ipBind, *masterOption.port)
 	glog.V(0).Infof("Start Seaweed Master %s at %s", util.Version(), listeningAddress)
-	masterListener, masterLocalListner, e := util.NewIpAndLocalListeners(*masterOption.ipBind, *masterOption.port, 0)
+	masterListener, masterLocalListener, e := util.NewIpAndLocalListeners(*masterOption.ipBind, *masterOption.port, 0)
 	if e != nil {
 		glog.Fatalf("Master startup error: %v", e)
 	}
@@ -180,8 +180,8 @@ func startMaster(masterOption MasterOptions, masterWhiteList []string) {
 	go ms.MasterClient.KeepConnectedToMaster()
 
 	httpS := &http.Server{Handler: r}
-	if masterLocalListner != nil {
-		go httpS.Serve(masterLocalListner)
+	if masterLocalListener != nil {
+		go httpS.Serve(masterLocalListener)
 	}
 
 	go httpS.Serve(masterListener)

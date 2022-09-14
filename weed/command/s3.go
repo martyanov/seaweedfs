@@ -207,7 +207,7 @@ func (s3opt *S3Options) startS3Server() bool {
 	}
 
 	listenAddress := fmt.Sprintf("%s:%d", *s3opt.bindIp, *s3opt.port)
-	s3ApiListener, s3ApiLocalListner, err := util.NewIpAndLocalListeners(*s3opt.bindIp, *s3opt.port, time.Duration(10)*time.Second)
+	s3ApiListener, s3ApiLocalListener, err := util.NewIpAndLocalListeners(*s3opt.bindIp, *s3opt.port, time.Duration(10)*time.Second)
 	if err != nil {
 		glog.Fatalf("S3 API Server listener on %s error: %v", listenAddress, err)
 	}
@@ -227,9 +227,9 @@ func (s3opt *S3Options) startS3Server() bool {
 	go grpcS.Serve(grpcL)
 
 	glog.V(0).Infof("Start Seaweed S3 API Server %s at http port %d", util.Version(), *s3opt.port)
-	if s3ApiLocalListner != nil {
+	if s3ApiLocalListener != nil {
 		go func() {
-			if err = httpS.Serve(s3ApiLocalListner); err != nil {
+			if err = httpS.Serve(s3ApiLocalListener); err != nil {
 				glog.Fatalf("S3 API Server Fail to serve: %v", err)
 			}
 		}()
