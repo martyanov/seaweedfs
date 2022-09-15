@@ -89,13 +89,13 @@ func (vs *VolumeServer) doHeartbeat(masterAddress rpc.ServerAddress, grpcDialOpt
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	grpcConection, err := rpc.GrpcDial(ctx, masterAddress.ToGrpcAddress(), false, grpcDialOption)
+	grpcConnection, err := rpc.GrpcDial(ctx, masterAddress.ToGrpcAddress(), false, grpcDialOption)
 	if err != nil {
 		return "", fmt.Errorf("fail to dial %s : %v", masterAddress, err)
 	}
-	defer grpcConection.Close()
+	defer grpcConnection.Close()
 
-	client := master_pb.NewSeaweedClient(grpcConection)
+	client := master_pb.NewSeaweedClient(grpcConnection)
 	stream, err := client.SendHeartbeat(ctx)
 	if err != nil {
 		glog.V(0).Infof("SendHeartbeat to %s: %v", masterAddress, err)
