@@ -20,7 +20,7 @@ var cmdScaffold = &Command{
 	The options can also be overwritten by environment variables.
 	Environment variable rules:
 		* Prefix the variable name with "WEED_"
-		* Upppercase the reset of variable name.
+		* Uppercase the reset of variable name.
 		* Replace '.' with '_'
 
   `,
