@@ -104,6 +104,7 @@ func FromPbEntryToExistingEntry(message *filer_pb.Entry, fsEntry *Entry) {
 	fsEntry.Content = message.Content
 	fsEntry.Remote = message.RemoteEntry
 	fsEntry.Quota = message.Quota
+	fsEntry.FileSize = FileSize(message)
 }
 
 func (entry *Entry) ToProtoFullEntry() *filer_pb.FullEntry {
